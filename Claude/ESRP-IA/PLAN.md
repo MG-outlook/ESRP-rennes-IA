@@ -380,10 +380,10 @@ create policy "workshop_state_read" on public.workshop_state
 ### PHASE 6 — Robustesse + Répétition (S6 : 1 → 7 juillet)
 
 #### Jalon 6.1 — Mode dégradé
-- [ ] Détection automatique de l'état des API (ping périodique vers Mistral)
-- [ ] Bannière discrète si mode dégradé activé
+- [x] Détection automatique de l'état des API (ping périodique vers Mistral)
+- [x] Bannière discrète si mode dégradé activé
 - [ ] Tous les défis sensibles servent depuis `ai_cache` en mode dégradé
-- [ ] Indicateur visible côté master du nombre d'équipes en mode dégradé
+- [x] Indicateur visible côté master du nombre d'équipes en mode dégradé
 
 **DoD** : couper le wifi pendant 30 s en plein défi → l'atelier continue sans rupture.
 
