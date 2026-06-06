@@ -388,9 +388,9 @@ create policy "workshop_state_read" on public.workshop_state
 **DoD** : couper le wifi pendant 30 s en plein défi → l'atelier continue sans rupture.
 
 #### Jalon 6.2 — Load test
-- [ ] `scripts/load-test.ts` : simule 10 équipes × 6 utilisateurs simultanés
-- [ ] Mesure : latence Mistral, RTT Supabase Realtime, taux d'erreur, débit RAM/CPU sur Vercel
-- [ ] Cible : 95e percentile de latence IA < 8 s en mode streamé
+- [x] `scripts/load-test.ts` : simule 10 équipes × 6 utilisateurs simultanés
+- [x] Mesure : latence Mistral, RTT Supabase Realtime, taux d'erreur, débit RAM/CPU sur Vercel
+- [ ] Cible : 95e percentile de latence IA < 8 s en mode streamé (à valider en exécutant le script)
 
 **DoD** : le rapport de load test passe les seuils.
 
