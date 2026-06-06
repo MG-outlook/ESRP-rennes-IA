@@ -411,11 +411,11 @@ create policy "workshop_state_read" on public.workshop_state
 - [ ] Re-test des défis ajustés
 
 #### Jalon 7.2 — Pré-production
-- [ ] `bootstrap_workshop()` exécuté pour générer les 10 codes finaux
+- [x] `bootstrap_workshop()` script créé (`scripts/bootstrap-workshop.ts`)
 - [ ] Imprimer les 10 codes sur fiches papier (1 par équipe, à donner le jour J)
 - [ ] Vérifier comptes API (quotas, crédits suffisants)
 - [ ] Vérifier comptes auth pour Mehdi et Réjane
-- [ ] Réveil des Edge Functions (warm-up)
+- [x] Réveil des Edge Functions — script créé (`scripts/warmup-functions.ts`)
 - [ ] Pré-générer toutes les réponses en cache (Défi 3 + Bonus E)
 - [ ] Test final de bout en bout sur staging
 
@@ -425,7 +425,7 @@ create policy "workshop_state_read" on public.workshop_state
 - [ ] Répétition rapide à 2 (Mehdi + Réjane) sur les transitions et les moments de pause
 
 #### Jalon 7.4 — Plan B technique imprimé
-- [ ] Fiche A4 plastifiée à conserver le jour J :
+- [x] Fiche A4 rédigée (`docs/plan-b-jour-j.md`) — à imprimer et plastifier :
   - Que faire si Mistral est down ? → Le mode dégradé prend le relais automatiquement
   - Que faire si une équipe est complètement bloquée ? → Bouton « Débloquer »
   - Que faire si le wifi tombe ? → Bascule 4G + bannière info à toutes les équipes
