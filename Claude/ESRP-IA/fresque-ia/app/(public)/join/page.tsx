@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { Suspense, useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Spinner from "@/components/shared/Spinner";
 
-export default function JoinPage() {
+function JoinContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const code = searchParams.get("code");
@@ -82,6 +82,10 @@ export default function JoinPage() {
     );
   }
 
+  return <JoinFallback retrying={retrying} />;
+}
+
+function JoinFallback({ retrying = false }: { retrying?: boolean }) {
   return (
     <main className="flex flex-col items-center justify-center min-h-screen p-8 bg-white">
       <div className="flex items-center gap-3">
@@ -91,5 +95,13 @@ export default function JoinPage() {
         </p>
       </div>
     </main>
+  );
+}
+
+export default function JoinPage() {
+  return (
+    <Suspense fallback={<JoinFallback />}>
+      <JoinContent />
+    </Suspense>
   );
 }
