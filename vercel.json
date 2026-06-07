@@ -1,0 +1,6 @@
+{
+  "buildCommand": "npm run build --prefix Claude/ESRP-IA/fresque-ia",
+  "installCommand": "npm install --prefix Claude/ESRP-IA/fresque-ia",
+  "outputDirectory": "Claude/ESRP-IA/fresque-ia/.next",
+  "framework": "nextjs"
+}

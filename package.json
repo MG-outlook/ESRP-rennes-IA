@@ -1,0 +1,10 @@
+{
+  "name": "esrp-rennes-ia-deploy",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "npm run build --prefix Claude/ESRP-IA/fresque-ia",
+    "dev": "npm run dev --prefix Claude/ESRP-IA/fresque-ia",
+    "start": "npm run start --prefix Claude/ESRP-IA/fresque-ia"
+  }
+}
