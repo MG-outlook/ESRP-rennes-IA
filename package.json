@@ -1,0 +1,15 @@
+{
+  "name": "esrp-rennes-ia-deploy",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "npm run build --prefix Claude/ESRP-IA/fresque-ia",
+    "dev": "npm run dev --prefix Claude/ESRP-IA/fresque-ia",
+    "start": "npm run start --prefix Claude/ESRP-IA/fresque-ia"
+  },
+  "dependencies": {
+    "next": "^15.5.4",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  }
+}
