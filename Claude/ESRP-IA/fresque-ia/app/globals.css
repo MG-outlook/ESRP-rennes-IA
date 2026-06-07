@@ -66,3 +66,12 @@ h3 { font-size: 1.222rem; font-weight: 700; }
   width: 24px;
   height: 24px;
 }
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid #2D5A3D;
+  outline-offset: 2px;
+}
