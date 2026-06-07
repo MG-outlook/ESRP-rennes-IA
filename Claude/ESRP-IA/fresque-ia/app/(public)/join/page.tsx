@@ -2,7 +2,6 @@
 
 import { Suspense, useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import Spinner from "@/components/shared/Spinner";
 
 function JoinContent() {
@@ -21,25 +20,29 @@ function JoinContent() {
     setError("");
     setRetrying(false);
 
-    const supabase = createClient();
     const maxRetries = 2;
     const backoff = [1000, 2000];
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
-        const { error: authError } = await supabase.auth.signInAnonymously();
-        if (authError) throw new Error("Erreur d'authentification");
-
-        const { error: rpcError } = await supabase.rpc("join_team", {
-          p_code: code,
+        const response = await fetch("/api/team/join", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({ code }),
         });
 
-        if (rpcError) {
-          if (rpcError.message.includes("Code")) {
-            setError("Code equipe inconnu. Verifiez votre code.");
+        const result = (await response.json().catch(() => ({}))) as {
+          error?: string;
+        };
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            setError(result.error ?? "Code equipe inconnu. Verifiez votre code.");
             return;
           }
-          throw new Error("Erreur lors de la connexion");
+
+          throw new Error(result.error ?? "Erreur lors de la connexion");
         }
 
         router.replace("/porte");
