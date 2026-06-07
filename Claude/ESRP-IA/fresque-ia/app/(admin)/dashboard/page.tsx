@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { getAIStatus, onAIStatusChange, startHealthCheck } from "@/lib/ai/health";
+import Skeleton from "@/components/shared/Skeleton";
 
 interface TeamData {
   id: string;
@@ -161,14 +162,6 @@ export default function DashboardPage() {
     [supabase]
   );
 
-  if (loading) {
-    return (
-      <main className="flex items-center justify-center min-h-screen bg-white">
-        <p className="text-[#4A4A4A]">Chargement...</p>
-      </main>
-    );
-  }
-
   return (
     <main className="min-h-screen bg-white p-6">
       <div className="flex items-center justify-between mb-6">
@@ -183,7 +176,19 @@ export default function DashboardPage() {
       </div>
 
       {/* 2×5 Grid */}
-      <div className="grid grid-cols-5 gap-4 mb-8">
+      {loading ? (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 p-6">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div key={i} className="border-2 border-black p-4">
+              <Skeleton className="h-6 w-1/2 mb-3" />
+              <Skeleton className="h-4 w-full mb-2" />
+              <Skeleton className="h-4 w-3/4 mb-2" />
+              <Skeleton className="h-4 w-2/3" />
+            </div>
+          ))}
+        </div>
+      ) : (
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
         {teams.map((team) => (
           <div
             key={team.id}
@@ -236,6 +241,7 @@ export default function DashboardPage() {
           </div>
         ))}
       </div>
+      )}
 
       {/* Detail modal */}
       {selectedTeam && (
