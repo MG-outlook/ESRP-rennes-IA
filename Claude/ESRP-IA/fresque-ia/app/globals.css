@@ -1,0 +1,68 @@
+@import "tailwindcss";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+
+@theme {
+  --color-white: #FFFFFF;
+  --color-black: #1A1A1A;
+  --color-green: #2D5A3D;
+  --color-green-light: #5B8C6B;
+  --color-gray-900: #1A1A1A;
+  --color-gray-700: #4A4A4A;
+  --color-gray-400: #B8B8B8;
+  --color-gray-100: #F5F5F5;
+  --color-red: #8B3A3A;
+
+  --font-sans: Inter, system-ui, sans-serif;
+
+  --text-base: 1.125rem;   /* 18px */
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;   /* ~30px */
+  --text-4xl: 2.25rem;    /* ~36px — H1 */
+
+  --border-radius: 0;
+}
+
+*, *::before, *::after {
+  border-radius: 0 !important;
+}
+
+html {
+  font-size: 18px;
+}
+
+body {
+  background-color: #FFFFFF;
+  color: #1A1A1A;
+  font-family: Inter, system-ui, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 { font-size: 2rem; font-weight: 700; }
+h2 { font-size: 1.556rem; font-weight: 700; }
+h3 { font-size: 1.222rem; font-weight: 700; }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  display: inline-block;
+  border: 2px solid #B8B8B8;
+  border-top-color: #2D5A3D;
+  border-radius: 50% !important;
+  animation: spin 0.6s linear infinite;
+}
+
+.spinner-sm {
+  width: 16px;
+  height: 16px;
+}
+
+.spinner-md {
+  width: 24px;
+  height: 24px;
+}
