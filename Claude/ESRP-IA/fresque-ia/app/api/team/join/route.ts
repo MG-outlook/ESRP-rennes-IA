@@ -4,14 +4,20 @@ import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 const TEAM_CODE_PATTERN = /^\d{4}$/;
 
-function getSupabaseConfig() {
+type SupabaseConfig = {
+  supabaseUrl: string;
+  supabaseAnonKey: string;
+  serviceRoleKey?: string;
+};
+
+function getSupabaseConfig(): SupabaseConfig {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!supabaseUrl || !supabaseAnonKey || !serviceRoleKey) {
+  if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(
-      "Configuration Supabase incomplete: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY et SUPABASE_SERVICE_ROLE_KEY sont requis."
+      "Configuration Supabase incomplete: NEXT_PUBLIC_SUPABASE_URL et NEXT_PUBLIC_SUPABASE_ANON_KEY sont requis."
     );
   }
 
@@ -22,30 +28,66 @@ function errorResponse(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status });
 }
 
-export async function POST(request: NextRequest) {
-  let code: string;
+function createCookieResponseClient(
+  request: NextRequest,
+  response: NextResponse,
+  config: SupabaseConfig
+) {
+  return createServerClient(config.supabaseUrl, config.supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) => {
+          response.cookies.set(name, value, options);
+        });
+      },
+    },
+  });
+}
 
-  try {
-    const body = (await request.json()) as { code?: unknown };
-    code = typeof body.code === "string" ? body.code.trim() : "";
-  } catch {
-    return errorResponse("Requete invalide.");
+async function joinTeamWithSession(
+  supabase: ReturnType<typeof createCookieResponseClient>,
+  code: string
+) {
+  const { error } = await supabase.rpc("join_team", { p_code: code });
+
+  if (!error) return null;
+
+  if (error.message.includes("Code")) {
+    return errorResponse("Code equipe inconnu. Verifiez votre code.", 404);
   }
 
-  if (!TEAM_CODE_PATTERN.test(code)) {
-    return errorResponse("Entrez un code equipe a 4 chiffres.");
+  console.error("join_team RPC failed", error);
+  return errorResponse("Erreur lors de la connexion a l'equipe.", 502);
+}
+
+async function joinWithAnonymousSession(
+  request: NextRequest,
+  config: SupabaseConfig,
+  code: string
+): Promise<{ response: NextResponse | null }> {
+  const response = NextResponse.json({ ok: true });
+  const supabase = createCookieResponseClient(request, response, config);
+  const { error: authError } = await supabase.auth.signInAnonymously();
+
+  if (authError) {
+    console.warn("Anonymous team auth failed", authError.message);
+    return { response: null };
   }
 
-  let config: ReturnType<typeof getSupabaseConfig>;
-  try {
-    config = getSupabaseConfig();
-  } catch (error) {
-    return errorResponse(
-      error instanceof Error ? error.message : "Configuration Supabase incomplete.",
-      500
-    );
-  }
+  const joinErrorResponse = await joinTeamWithSession(supabase, code);
+  if (joinErrorResponse) return { response: joinErrorResponse };
 
+  return { response };
+}
+
+async function joinWithServiceRoleSession(
+  request: NextRequest,
+  config: Required<SupabaseConfig>,
+  code: string
+) {
   const admin = createSupabaseClient(config.supabaseUrl, config.serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
@@ -60,7 +102,8 @@ export async function POST(request: NextRequest) {
     .maybeSingle();
 
   if (teamError) {
-    return errorResponse("Impossible de verifier le code equipe.", 500);
+    console.error("Team code lookup failed", teamError);
+    return errorResponse("Impossible de verifier le code equipe.", 502);
   }
 
   if (!team) {
@@ -82,29 +125,12 @@ export async function POST(request: NextRequest) {
     });
 
   if (createError || !createdUser.user) {
-    return errorResponse(
-      createError?.message ?? "Impossible de creer la session equipe.",
-      500
-    );
+    console.error("Team user creation failed", createError);
+    return errorResponse("Impossible de creer la session equipe.", 502);
   }
 
   const response = NextResponse.json({ ok: true });
-  const supabase = createServerClient(
-    config.supabaseUrl,
-    config.supabaseAnonKey,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
-          });
-        },
-      },
-    }
-  );
+  const supabase = createCookieResponseClient(request, response, config);
 
   const { error: signInError } = await supabase.auth.signInWithPassword({
     email: userEmail,
@@ -113,22 +139,56 @@ export async function POST(request: NextRequest) {
 
   if (signInError) {
     await admin.auth.admin.deleteUser(createdUser.user.id);
-    return errorResponse("Impossible d'ouvrir la session equipe.", 500);
+    console.error("Team user sign-in failed", signInError);
+    return errorResponse("Impossible d'ouvrir la session equipe.", 502);
   }
 
-  const { error: joinError } = await supabase.rpc("join_team", {
-    p_code: code,
-  });
-
-  if (joinError) {
+  const joinErrorResponse = await joinTeamWithSession(supabase, code);
+  if (joinErrorResponse) {
     await admin.auth.admin.deleteUser(createdUser.user.id);
-
-    if (joinError.message.includes("Code")) {
-      return errorResponse("Code equipe inconnu. Verifiez votre code.", 404);
-    }
-
-    return errorResponse("Erreur lors de la connexion a l'equipe.", 500);
+    return joinErrorResponse;
   }
 
   return response;
+}
+
+export async function POST(request: NextRequest) {
+  let code: string;
+
+  try {
+    const body = (await request.json()) as { code?: unknown };
+    code = typeof body.code === "string" ? body.code.trim() : "";
+  } catch {
+    return errorResponse("Requete invalide.");
+  }
+
+  if (!TEAM_CODE_PATTERN.test(code)) {
+    return errorResponse("Entrez un code equipe a 4 chiffres.");
+  }
+
+  let config: SupabaseConfig;
+  try {
+    config = getSupabaseConfig();
+  } catch (error) {
+    console.error(error);
+    return errorResponse("Configuration Supabase incomplete.", 500);
+  }
+
+  const anonymousResult = await joinWithAnonymousSession(request, config, code);
+  if (anonymousResult.response) {
+    return anonymousResult.response;
+  }
+
+  if (!config.serviceRoleKey) {
+    return errorResponse(
+      "Connexion equipe indisponible: activez l'auth anonyme Supabase ou configurez SUPABASE_SERVICE_ROLE_KEY sur Vercel.",
+      503
+    );
+  }
+
+  return joinWithServiceRoleSession(
+    request,
+    { ...config, serviceRoleKey: config.serviceRoleKey },
+    code
+  );
 }

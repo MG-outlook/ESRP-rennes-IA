@@ -37,12 +37,15 @@ function JoinContent() {
         };
 
         if (!response.ok) {
-          if (response.status === 404) {
-            setError(result.error ?? "Code equipe inconnu. Verifiez votre code.");
+          const message = result.error ?? "Erreur lors de la connexion";
+          const shouldRetry = response.status >= 500 && response.status !== 503;
+
+          if (!shouldRetry) {
+            setError(message);
             return;
           }
 
-          throw new Error(result.error ?? "Erreur lors de la connexion");
+          throw new Error(message);
         }
 
         router.replace("/porte");
