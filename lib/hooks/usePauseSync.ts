@@ -15,7 +15,7 @@ export function usePauseSync() {
       const { data } = await supabase
         .from("workshop_state")
         .select("is_paused, pause_reason")
-        .eq("id", "main")
+        .eq("id", 1)
         .maybeSingle();
 
       if (!mounted || !data) return;
