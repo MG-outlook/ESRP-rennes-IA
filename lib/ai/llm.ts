@@ -1,0 +1,147 @@
+/**
+ * Server-side LLM streaming helper.
+ *
+ * Calls the primary provider (Mistral) and falls back to the secondary
+ * (Deepseek) on error. Both expose an OpenAI-compatible streaming chat
+ * completions API, so we can parse their SSE the same way.
+ *
+ * Keys are read from the Vercel environment (MISTRAL_API_KEY, DEEPSEEK_API_KEY).
+ */
+
+export interface ChatMessage {
+  role: "system" | "user" | "assistant";
+  content: string;
+}
+
+interface ProviderConfig {
+  name: string;
+  url: string;
+  apiKey: string | undefined;
+  model: string;
+}
+
+function getProviders(): ProviderConfig[] {
+  return [
+    {
+      name: "mistral",
+      url: "https://api.mistral.ai/v1/chat/completions",
+      apiKey: process.env.MISTRAL_API_KEY,
+      model: process.env.MISTRAL_MODEL ?? "mistral-large-latest",
+    },
+    {
+      name: "deepseek",
+      url: "https://api.deepseek.com/v1/chat/completions",
+      apiKey: process.env.DEEPSEEK_API_KEY,
+      model: process.env.DEEPSEEK_MODEL ?? "deepseek-chat",
+    },
+  ];
+}
+
+export interface StreamOptions {
+  messages: ChatMessage[];
+  maxTokens?: number;
+  temperature?: number;
+  signal?: AbortSignal;
+}
+
+/**
+ * Opens a streaming chat completion, trying providers in order until one
+ * responds. Returns the upstream fetch Response (OpenAI-compatible SSE body).
+ * Throws with a combined diagnostic if every provider fails.
+ */
+export async function openChatStream({
+  messages,
+  maxTokens = 1024,
+  temperature = 0.7,
+  signal,
+}: StreamOptions): Promise<Response> {
+  const errors: string[] = [];
+
+  for (const provider of getProviders()) {
+    if (!provider.apiKey) {
+      errors.push(`${provider.name}: clé absente`);
+      continue;
+    }
+
+    try {
+      const res = await fetch(provider.url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "text/event-stream",
+          Authorization: `Bearer ${provider.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: provider.model,
+          messages,
+          stream: true,
+          max_tokens: maxTokens,
+          temperature,
+        }),
+        signal,
+      });
+
+      if (res.ok && res.body) return res;
+
+      const detail = await res.text().catch(() => "");
+      errors.push(`${provider.name}: HTTP ${res.status} ${detail.slice(0, 200)}`);
+    } catch (e) {
+      errors.push(`${provider.name}: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+
+  throw new Error(`Aucun fournisseur LLM disponible — ${errors.join(" | ")}`);
+}
+
+/**
+ * Transforms an upstream OpenAI-style SSE response into a client byte stream.
+ * `format` maps each content delta to the text emitted to the client, and the
+ * optional `doneMarker` is emitted once the upstream completes.
+ */
+export function transformDeltaStream(
+  upstream: Response,
+  format: (delta: string) => string,
+  doneMarker?: string
+): ReadableStream<Uint8Array> {
+  const reader = upstream.body!.getReader();
+  const decoder = new TextDecoder();
+  const encoder = new TextEncoder();
+  let buffer = "";
+
+  return new ReadableStream<Uint8Array>({
+    async pull(controller) {
+      try {
+        const { done, value } = await reader.read();
+        if (done) {
+          if (doneMarker) controller.enqueue(encoder.encode(doneMarker));
+          controller.close();
+          return;
+        }
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith("data:")) continue;
+          const data = trimmed.slice(5).trim();
+          if (!data || data === "[DONE]") continue;
+
+          try {
+            const json = JSON.parse(data);
+            const delta: string | undefined = json.choices?.[0]?.delta?.content;
+            if (delta) controller.enqueue(encoder.encode(format(delta)));
+          } catch {
+            // Ignore keep-alive comments and non-JSON lines.
+          }
+        }
+      } catch (e) {
+        controller.error(e);
+      }
+    },
+    cancel() {
+      reader.cancel().catch(() => {});
+    },
+  });
+}

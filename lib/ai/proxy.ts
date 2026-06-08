@@ -24,22 +24,13 @@ export async function streamFromProxy({
   onDone,
   onError,
 }: StreamFromProxyOptions): Promise<string> {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !anonKey) {
-    const error = new Error("Configuration Supabase manquante");
-    onError?.(error);
-    throw error;
-  }
-
   try {
-  const response = await fetch(`${supabaseUrl}/functions/v1/ai-proxy`, {
+  const response = await fetch("/api/ai-proxy", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${anonKey}`,
     },
+    credentials: "same-origin",
     body: JSON.stringify({
       system_prompt: systemPrompt,
       messages,

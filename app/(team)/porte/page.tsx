@@ -120,17 +120,12 @@ export default function PortePage() {
     await persistMessage("user", text);
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/porte-chat`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({ messages: newMessages }),
-        }
-      );
+      const res = await fetch("/api/porte-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ messages: newMessages }),
+      });
 
       if (!res.ok) throw new Error("Erreur serveur");
 
