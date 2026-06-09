@@ -223,3 +223,177 @@ export const BONUS_H_SCENARIOS: CrisisScenario[] = [
       "Au cours de la 2e semaine de stage, le tuteur en entreprise signale des incompréhensions et Camille se dit « mal à l'aise, pas à sa place ».",
   },
 ];
+
+/* ------------------------------------------------------------------ */
+/* Bonus A — Le détective des doublons (pari)                         */
+/* ------------------------------------------------------------------ */
+
+export const BONUS_A_DOUBLONS_PROMPT = `Tu es un assistant qui aide une équipe pluri-professionnelle de l'ESRP à fiabiliser le dossier de Camille. On te donne 4 rapports courts (administratif, médico-psy, formateur, insertion pro) concernant la même personne. Ta tâche :
+1. Repère les informations REDONDANTES entre ces rapports (les mêmes faits répétés d'un rapport à l'autre).
+2. Pour chaque redondance, indique dans quels rapports elle apparaît.
+3. Propose une fusion utile : une seule formulation partagée, claire, non répétitive.
+Sois concret et factuel. Tu ne diagnostiques pas, tu rapproches des informations.`;
+
+export interface TeamReport {
+  role: string;
+  content: string;
+}
+
+export const BONUS_A_REPORTS: TeamReport[] = [
+  {
+    role: "Rapport administratif",
+    content:
+      "Camille Renaud, RQTH valide jusqu'au 31/03/2031. Restrictions notifiées : pas de port de charges supérieures à 5 kg, station debout prolongée à proscrire. Bureautique de base maîtrisée (mails, traitement de texte). Dossier complet.",
+  },
+  {
+    role: "Rapport médico-psy",
+    content:
+      "Lombalgie chronique stabilisée. Restrictions : port de charges > 5 kg contre-indiqué, station debout prolongée à éviter. Bon relationnel, à l'aise au contact des autres. Fatigabilité en fin de journée.",
+  },
+  {
+    role: "Rapport formateur",
+    content:
+      "Sait utiliser un ordinateur pour les tâches simples (mails, saisie de texte). Aptitudes relationnelles marquées : écoute, patience. Appétence pour l'organisation administrative.",
+  },
+  {
+    role: "Rapport insertion pro",
+    content:
+      "Projet : métier de bureau avec maintien d'un lien humain. Bon relationnel, atout pour l'accueil. À l'aise avec la bureautique courante. Souhaite éviter l'isolement.",
+  },
+];
+
+// Redondances volontaires : (1) restrictions port de charges/station debout
+// (admin + médico-psy), (2) bureautique de base (admin + formateur + insertion),
+// (3) bon relationnel (médico-psy + formateur + insertion).
+export const BONUS_A_DOUBLON_COUNT = 3;
+
+/* ------------------------------------------------------------------ */
+/* Bonus E — Vrai ou Faux IA (pari)                                   */
+/* ------------------------------------------------------------------ */
+
+export type IaVerdict = "vrai" | "faux" | "nuance";
+
+export interface IaStatement {
+  id: number;
+  text: string;
+  verdict: IaVerdict;
+  explanation: string;
+}
+
+// Verdicts/explications rédigés en brouillon — à valider Mehdi/Réjane.
+export const BONUS_E_STATEMENTS: IaStatement[] = [
+  {
+    id: 1,
+    text: "L'IA peut remplacer une synthèse de réunion.",
+    verdict: "faux",
+    explanation:
+      "Elle peut assembler et structurer des notes, mais elle n'a pas assisté à la réunion : elle n'invente pas le sens, elle l'orchestre. Le regard professionnel reste indispensable.",
+  },
+  {
+    id: 2,
+    text: "Mistral est hébergé entièrement en France.",
+    verdict: "nuance",
+    explanation:
+      "Mistral est une société française et propose des options souveraines, mais l'hébergement effectif dépend de l'offre et de l'infrastructure cloud choisie. Ce n'est pas automatiquement « entièrement en France ».",
+  },
+  {
+    id: 3,
+    text: "L'IA est neutre, c'est l'humain qui biaise.",
+    verdict: "faux",
+    explanation:
+      "L'IA reproduit et peut amplifier les biais présents dans ses données d'entraînement et dans la façon dont on la sollicite. Elle n'est pas neutre.",
+  },
+  {
+    id: 4,
+    text: "Plus un prompt est long, meilleure est la réponse.",
+    verdict: "faux",
+    explanation:
+      "C'est la clarté et la précision qui comptent, pas la longueur. Un prompt trop long peut diluer la consigne.",
+  },
+  {
+    id: 5,
+    text: "L'IA ne peut pas mentir sciemment.",
+    verdict: "nuance",
+    explanation:
+      "Elle n'a pas d'intention, donc pas de mensonge « volontaire ». Mais elle peut produire des affirmations fausses très plausibles (« hallucinations ») : l'effet pour l'utilisateur est le même qu'une erreur.",
+  },
+  {
+    id: 6,
+    text: "Le RGPD interdit d'utiliser ChatGPT au travail.",
+    verdict: "faux",
+    explanation:
+      "Le RGPD n'interdit pas l'outil. Il encadre l'usage : pas de données personnelles sensibles sans précaution, vigilance sur la confidentialité et l'hébergement.",
+  },
+  {
+    id: 7,
+    text: "L'IA générative a une mémoire d'une conversation à l'autre.",
+    verdict: "nuance",
+    explanation:
+      "Par défaut, non : chaque conversation repart de zéro. Certaines offres ajoutent une fonction « mémoire » optionnelle, qu'il faut activer et paramétrer.",
+  },
+  {
+    id: 8,
+    text: "Une IA peut générer des images de personnes identifiables sans autorisation.",
+    verdict: "nuance",
+    explanation:
+      "Techniquement, c'est possible. Juridiquement et éthiquement, c'est encadré (droit à l'image, données personnelles) : ce n'est pas parce que c'est faisable que c'est permis.",
+  },
+  {
+    id: 9,
+    text: "Le mot « IA » désigne toujours la même chose.",
+    verdict: "faux",
+    explanation:
+      "« IA » est un terme parapluie : systèmes experts, apprentissage automatique, IA générative… des réalités techniques très différentes.",
+  },
+  {
+    id: 10,
+    text: "Demander « Sois bienveillant » à une IA garantit qu'elle le sera.",
+    verdict: "faux",
+    explanation:
+      "Cela influence le ton, sans garantie. Le comportement dépend du modèle et du contexte : aucune consigne ne « garantit » un résultat.",
+  },
+];
+
+/* ------------------------------------------------------------------ */
+/* Bonus F — Le journal de Camille                                    */
+/* ------------------------------------------------------------------ */
+
+export const BONUS_F_JOURNAL_PROMPT = `Tu écris, à la PREMIÈRE PERSONNE, un fragment du journal intime de Camille Renaud (38 ans, en reconversion à l'ESRP après un accident du travail). Tu prends son point de vue, à un moment précis de son parcours indiqué par l'équipe.
+
+Règles :
+- ~200 mots, ton intime et sincère
+- Doutes et fierté entremêlés, sans pathos
+- Pas de jargon professionnel : c'est Camille qui écrit, pas un dossier
+- Tu ne caricatures pas le handicap, tu donnes une voix digne et nuancée.`;
+
+export const BONUS_F_MOMENTS: string[] = [
+  "Le soir du premier jour à l'ESRP",
+  "Le soir du 3e jour de stage en entreprise",
+  "Le jour où Camille reçoit la convention de stage",
+  "Un soir de doute, après une difficulté en formation",
+  "Le jour d'un petit succès inattendu",
+];
+
+/* ------------------------------------------------------------------ */
+/* Bonus G — Le pitch en 30 secondes                                  */
+/* ------------------------------------------------------------------ */
+
+export const BONUS_G_PITCH_PROMPT = `Tu rédiges, à la PREMIÈRE PERSONNE (Camille parle), un elevator pitch de présentation d'environ 30 secondes à l'oral (70 à 85 mots). Camille se présente en entretien pour un poste d'accueil-secrétariat.
+
+À partir des 3 éléments forts fournis par l'équipe (une compétence, une motivation, un projet), tu produis un pitch :
+- naturel, ni scolaire ni récité
+- positif et concret, centré sur ce que Camille apporte
+- qui se termine par une phrase d'ouverture
+Tu rends UNIQUEMENT le texte du pitch, sans préambule.`;
+
+/* ------------------------------------------------------------------ */
+/* Bonus I — Le glossaire qui sauve                                   */
+/* ------------------------------------------------------------------ */
+
+export const BONUS_I_GLOSSAIRE_PROMPT = `Tu reçois un courrier administratif réel reçu par une personne accompagnée. Ta tâche :
+1. Repère tous les acronymes et termes techniques (ex : RQTH, CDAPH, ESRP, RAPO, MDPH…).
+2. Pour chacun, donne une définition FALC : une phrase courte (<15 mots), vocabulaire simple, sans autre jargon.
+
+Réponds en Markdown, une ligne par terme : **TERME** : définition simple.
+N'invente pas de terme absent du courrier.`;
+
