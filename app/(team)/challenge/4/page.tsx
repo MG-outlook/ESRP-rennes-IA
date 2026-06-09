@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
+import ChallengeIntro from "@/components/shared/ChallengeIntro";
+import { CHALLENGE_INTROS } from "@/lib/challenges/intros";
 import Timer from "@/components/shared/Timer";
 import PredictionWidget from "@/components/shared/PredictionWidget";
 import SubmitButton from "@/components/shared/SubmitButton";
@@ -252,6 +254,15 @@ export default function Defi4Page() {
     showToast("Reponse enregistree", "success");
     clearSavedInstructions();
   }, [teamId, submitState, predictionValue, approvedCount, columns, showToast, clearSavedInstructions]);
+
+  const [introDone, setIntroDone] = useState(false);
+  if (!introDone)
+    return (
+      <ChallengeIntro
+        {...CHALLENGE_INTROS[CHALLENGE_ID]}
+        onStart={() => setIntroDone(true)}
+      />
+    );
 
   return (
     <div className="min-h-screen bg-white">

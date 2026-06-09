@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import ChallengeIntro from "@/components/shared/ChallengeIntro";
+import { CHALLENGE_INTROS } from "@/lib/challenges/intros";
 import Timer from "@/components/shared/Timer";
 import StreamedOutput from "@/components/shared/StreamedOutput";
 import SubmitButton from "@/components/shared/SubmitButton";
@@ -96,6 +98,15 @@ export default function BonusHPage() {
 
     setSubmitState("done");
   }, [teamId, submitState, selectedScenario, protocolOutput]);
+
+  const [introDone, setIntroDone] = useState(false);
+  if (!introDone)
+    return (
+      <ChallengeIntro
+        {...CHALLENGE_INTROS[CHALLENGE_ID]}
+        onStart={() => setIntroDone(true)}
+      />
+    );
 
   return (
     <div className="min-h-screen bg-white">

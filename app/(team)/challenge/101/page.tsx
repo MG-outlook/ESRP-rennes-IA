@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import ChallengeIntro from "@/components/shared/ChallengeIntro";
+import { CHALLENGE_INTROS } from "@/lib/challenges/intros";
 import Timer from "@/components/shared/Timer";
 import PredictionWidget from "@/components/shared/PredictionWidget";
 import StreamedOutput from "@/components/shared/StreamedOutput";
@@ -118,6 +120,15 @@ export default function BonusAPage() {
 
   const ecart =
     prediction !== null ? Math.abs(prediction - BONUS_A_DOUBLON_COUNT) : null;
+
+  const [introDone, setIntroDone] = useState(false);
+  if (!introDone)
+    return (
+      <ChallengeIntro
+        {...CHALLENGE_INTROS[CHALLENGE_ID]}
+        onStart={() => setIntroDone(true)}
+      />
+    );
 
   return (
     <div className="min-h-screen bg-white">

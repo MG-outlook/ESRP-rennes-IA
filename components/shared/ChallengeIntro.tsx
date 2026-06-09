@@ -1,0 +1,72 @@
+"use client";
+
+import { ReactNode } from "react";
+
+interface ChallengeIntroProps {
+  title: string;
+  subtitle?: string;
+  /** Numbered "how it works" steps. Plain strings or rich nodes. */
+  steps: ReactNode[];
+  /** Optional closing note (the pedagogical point of the challenge). */
+  note?: ReactNode;
+  /** Estimated duration, e.g. "20 min". */
+  duration?: string;
+  startLabel?: string;
+  onStart: () => void;
+}
+
+/**
+ * Reusable "Comment ça marche" intro screen shown before a challenge begins.
+ * Gives participants the rules and the point of the game before they dive in,
+ * so the AI steps don't feel arbitrary. Rendered as an early return by each
+ * challenge page.
+ */
+export default function ChallengeIntro({
+  title,
+  subtitle,
+  steps,
+  note,
+  duration,
+  startLabel = "C'est parti",
+  onStart,
+}: ChallengeIntroProps) {
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="max-w-3xl mx-auto px-6 py-12">
+        <h1 className="text-4xl font-bold text-black">{title}</h1>
+        {subtitle && (
+          <p className="text-[#4A4A4A] mt-3 text-lg italic">{subtitle}</p>
+        )}
+
+        <section className="border-2 border-black p-8 mt-8 bg-[#F5F5F5]">
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <h2 className="text-2xl font-bold text-black">Comment ça marche</h2>
+            {duration && (
+              <span className="text-sm font-semibold text-[#2D5A3D] border-2 border-[#2D5A3D] px-3 py-1">
+                ⏱ {duration}
+              </span>
+            )}
+          </div>
+          <ol className="list-decimal pl-6 space-y-3 text-black text-lg">
+            {steps.map((step, i) => (
+              <li key={i}>{step}</li>
+            ))}
+          </ol>
+          {note && (
+            <p className="text-[#4A4A4A] mt-5 italic border-t-2 border-[#E0E0E0] pt-4">
+              {note}
+            </p>
+          )}
+          <div className="flex justify-center mt-6">
+            <button
+              onClick={onStart}
+              className="px-8 py-4 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl hover:bg-[#234a31] transition-colors"
+            >
+              {startLabel}
+            </button>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
