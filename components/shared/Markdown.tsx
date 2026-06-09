@@ -1,0 +1,72 @@
+"use client";
+
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+/**
+ * Renders AI output as properly formatted markdown (headings, lists, bold,
+ * tables, rules…) with the workshop's typographic style. Used everywhere an
+ * LLM response is displayed so participants read clean prose, not raw `###`
+ * and `**` markup.
+ */
+export default function Markdown({ content }: { content: string }) {
+  return (
+    <div className="text-black leading-relaxed space-y-3">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          h1: ({ children }) => (
+            <h1 className="text-2xl font-bold text-black mt-4 mb-2">{children}</h1>
+          ),
+          h2: ({ children }) => (
+            <h2 className="text-xl font-bold text-black mt-4 mb-2">{children}</h2>
+          ),
+          h3: ({ children }) => (
+            <h3 className="text-lg font-bold text-[#2D5A3D] mt-4 mb-1">{children}</h3>
+          ),
+          h4: ({ children }) => (
+            <h4 className="text-base font-bold text-[#2D5A3D] mt-3 mb-1">{children}</h4>
+          ),
+          p: ({ children }) => <p className="text-black">{children}</p>,
+          strong: ({ children }) => (
+            <strong className="font-bold text-black">{children}</strong>
+          ),
+          em: ({ children }) => <em className="italic">{children}</em>,
+          ul: ({ children }) => (
+            <ul className="list-disc pl-6 space-y-1">{children}</ul>
+          ),
+          ol: ({ children }) => (
+            <ol className="list-decimal pl-6 space-y-1">{children}</ol>
+          ),
+          li: ({ children }) => <li className="text-black">{children}</li>,
+          hr: () => <hr className="border-t-2 border-[#E0E0E0] my-4" />,
+          blockquote: ({ children }) => (
+            <blockquote className="border-l-4 border-[#2D5A3D] pl-4 italic text-[#4A4A4A]">
+              {children}
+            </blockquote>
+          ),
+          code: ({ children }) => (
+            <code className="px-1 bg-[#EDEDED] text-[#2D5A3D] text-[0.95em] rounded">
+              {children}
+            </code>
+          ),
+          table: ({ children }) => (
+            <table className="w-full border-collapse border-2 border-black my-3">
+              {children}
+            </table>
+          ),
+          th: ({ children }) => (
+            <th className="border border-black px-3 py-1 bg-[#F5F5F5] text-left font-bold">
+              {children}
+            </th>
+          ),
+          td: ({ children }) => (
+            <td className="border border-black px-3 py-1">{children}</td>
+          ),
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
+  );
+}
