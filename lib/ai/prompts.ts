@@ -305,6 +305,8 @@ export interface Defi3Case {
   title: string;
   bad_prompt: string;
   expected_biases: string[];
+  /** Pourquoi ces biais apparaissent dans ce cas précis (révélé après le pari). */
+  explanation: string;
 }
 
 export const DEFI3_CASES: Defi3Case[] = [
@@ -313,26 +315,61 @@ export const DEFI3_CASES: Defi3Case[] = [
     title: "Cas 1 — Genre et handicap projetés",
     bad_prompt: "Donne-moi 10 métiers pour une femme handicapée de 38 ans.",
     expected_biases: ["stereotype_genre", "stereotype_handicap"],
+    explanation:
+      "Le prompt réduit Camille à deux étiquettes — « femme » et « handicapée » — et demande des métiers sur cette seule base. La réponse risque de proposer des métiers « féminins » et « pour personnes handicapées », au lieu de partir de ses compétences et de son projet réels.",
   },
   {
     cache_key: "defi3_cas2",
     title: "Cas 2 — Formulation par le manque",
     bad_prompt: "Quels métiers sont accessibles MALGRÉ son handicap ?",
     expected_biases: ["formulation_manque"],
+    explanation:
+      "Le mot « malgré » place le handicap au centre, comme un obstacle à contourner. On parle de ce qui manque plutôt que des ressources et compétences réelles de Camille.",
   },
   {
     cache_key: "defi3_cas3",
     title: "Cas 3 — Jugement de valeur factuellement faux",
     bad_prompt: "Camille n'a aucun diplôme valorisable, que faire ?",
     expected_biases: ["information_fausse"],
+    explanation:
+      "Le prompt pose un présupposé faux : Camille a un CAP magasinier et 16 ans d'expérience. Si l'IA ne corrige pas cette affirmation, elle construit toute sa réponse sur une base erronée.",
   },
   {
     cache_key: "defi3_cas4",
     title: "Cas 4 — Réducteur, stigmatisant",
     bad_prompt: "Liste de métiers calmes et faciles pour personne fatigable.",
     expected_biases: ["reductionnisme"],
+    explanation:
+      "« Calmes et faciles » caricature Camille en personne diminuée. On gomme la diversité de ses ressources (organisation, relationnel, bureautique) au profit d'une image réductrice.",
   },
 ];
+
+/**
+ * Question bonus de fin de défi : à partir des réponses (qui citent des détails
+ * précis sur Camille), l'équipe doit deviner de quoi l'IA disposait en mémoire.
+ */
+export interface Defi3BonusOption {
+  id: string;
+  label: string;
+}
+
+export const DEFI3_BONUS = {
+  question:
+    "Vu les réponses que l'IA a données, de quel document disposait-elle déjà dans sa mémoire au préalable ?",
+  options: [
+    {
+      id: "dossier",
+      label:
+        "Le dossier de pré-admission de Camille (courrier MDPH, lettre de motivation, fiche médicale)",
+    },
+    { id: "rien", label: "Rien : l'IA a tout inventé à partir des prompts" },
+    { id: "convention", label: "Uniquement la convention de stage" },
+    { id: "cv", label: "Un CV détaillé rédigé par Camille" },
+  ] as Defi3BonusOption[],
+  correctId: "dossier",
+  explanation:
+    "Les réponses citent des éléments précis — 38 ans, ancien·ne magasinier·ère, RQTH, restrictions médicales, projet de reconversion. Ces détails ne viennent pas des prompts (très courts) : l'IA les tient du dossier de Camille, présent dans son contexte. Leçon : une réponse IA dépend autant de ce qu'il y a dans sa mémoire que de la question posée.",
+};
 
 /* ------------------------------------------------------------------ */
 /* Défi 4 — Une info, cinq destinataires                              */

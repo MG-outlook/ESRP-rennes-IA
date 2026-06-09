@@ -15,6 +15,7 @@ import {
   DEFI3_BIAS_CATEGORIES,
   DEFI3_CASES,
   DEFI3_REWRITE_PROMPT,
+  DEFI3_BONUS,
 } from "@/lib/ai/prompts";
 import { useAutoSave, useAutoSaveRestore } from "@/lib/hooks/useAutoSave";
 import { useToast } from "@/lib/hooks/useToast";
@@ -27,7 +28,11 @@ interface CaseResult {
   rewriteOutput: string;
 }
 
-type Phase = "case" | "rewrite" | "results";
+type Phase = "case" | "reveal" | "rewrite" | "results";
+
+const BIAS_LABELS: Record<string, string> = Object.fromEntries(
+  DEFI3_BIAS_CATEGORIES.map((b) => [b.id, b.label])
+);
 
 export default function Defi3Page() {
   const [teamId, setTeamId] = useState<string | null>(null);
@@ -44,6 +49,8 @@ export default function Defi3Page() {
   const [rewriting, setRewriting] = useState(false);
 
   const [caseResults, setCaseResults] = useState<CaseResult[]>([]);
+  const [bonusAnswer, setBonusAnswer] = useState<string | null>(null);
+  const [bonusRevealed, setBonusRevealed] = useState(false);
   const [submitState, setSubmitState] = useState<"idle" | "loading" | "done">("idle");
 
   const { show: showToast } = useToast();
@@ -127,7 +134,7 @@ export default function Defi3Page() {
   const handleLockPrediction = useCallback((value: unknown) => {
     setSelectedBiases(value as string[]);
     setPredictionLocked(true);
-    setPhase("rewrite");
+    setPhase("reveal");
   }, []);
 
   const handleRewrite = useCallback(async () => {
@@ -140,7 +147,7 @@ export default function Defi3Page() {
       messages: [{ role: "user", content: rewrittenPrompt }],
       challengeId: CHALLENGE_ID,
       teamId,
-      maxTokens: 1000,
+      maxTokens: 2200,
       onChunk: (t) => setRewriteOutput((p) => p + t),
       onDone: () => setRewriting(false),
       onError: () => setRewriting(false),
@@ -207,7 +214,12 @@ export default function Defi3Page() {
     await supabase.from("submissions").insert({
       team_id: teamId,
       challenge_id: CHALLENGE_ID,
-      payload: { case_results: caseResults, score },
+      payload: {
+        case_results: caseResults,
+        score,
+        bonus_answer: bonusAnswer,
+        bonus_correct: bonusAnswer === DEFI3_BONUS.correctId,
+      },
       ai_provider: "proxy",
       model: "ai-proxy",
     });
@@ -221,7 +233,7 @@ export default function Defi3Page() {
     setSubmitState("done");
     showToast("Reponse enregistree", "success");
     clearSavedProgress();
-  }, [teamId, submitState, caseResults, computeScore, showToast, clearSavedProgress]);
+  }, [teamId, submitState, caseResults, bonusAnswer, computeScore, showToast, clearSavedProgress]);
 
   const biasOptions = DEFI3_BIAS_CATEGORIES.map((b) => b.id);
 
@@ -325,6 +337,66 @@ export default function Defi3Page() {
               </section>
             )}
 
+            {/* Reveal — the answer + explanation on the bias */}
+            {phase === "reveal" && (
+              <section className="mb-6">
+                <h2 className="text-2xl font-bold text-black mb-4">
+                  La réponse : les biais de ce prompt
+                </h2>
+                <div className="border-2 border-[#2D5A3D] p-5 mb-4 bg-[#F5F5F5]">
+                  <p className="text-sm text-[#4A4A4A] mb-2 font-semibold uppercase tracking-wide">
+                    Biais réellement présents
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {currentCaseData.expected_biases.map((b) => (
+                      <span
+                        key={b}
+                        className="text-sm px-3 py-1 border-2 border-[#2D5A3D] text-[#2D5A3D] font-semibold"
+                      >
+                        {BIAS_LABELS[b] ?? b.replace(/_/g, " ")}
+                        {selectedBiases.includes(b) ? " ✓" : ""}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="text-black leading-relaxed">
+                    {currentCaseData.explanation}
+                  </p>
+                </div>
+
+                {/* Feedback on the team's guess */}
+                <div className="mb-4">
+                  <p className="text-sm text-[#4A4A4A]">
+                    Votre pari :{" "}
+                    {selectedBiases.length === 0 ? (
+                      <em>aucun biais sélectionné</em>
+                    ) : (
+                      selectedBiases.map((b) => (
+                        <span
+                          key={b}
+                          className={`text-sm px-2 py-0.5 border mr-1 ${
+                            currentCaseData.expected_biases.includes(b)
+                              ? "border-[#2D5A3D] text-[#2D5A3D]"
+                              : "border-[#8B3A3A] text-[#8B3A3A]"
+                          }`}
+                        >
+                          {BIAS_LABELS[b] ?? b.replace(/_/g, " ")}
+                        </span>
+                      ))
+                    )}
+                  </p>
+                </div>
+
+                <div className="flex justify-center">
+                  <button
+                    onClick={() => setPhase("rewrite")}
+                    className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D]"
+                  >
+                    Réécrire le prompt
+                  </button>
+                </div>
+              </section>
+            )}
+
             {/* Rewrite phase */}
             {phase === "rewrite" && (
               <section className="mb-6">
@@ -416,6 +488,61 @@ export default function Defi3Page() {
                 </div>
               </div>
             ))}
+
+            {/* Bonus question */}
+            <div className="border-2 border-[#2D5A3D] p-6 mt-8 mb-6">
+              <p className="text-xs font-bold text-[#2D5A3D] uppercase tracking-widest mb-2">
+                Question bonus
+              </p>
+              <h3 className="text-xl font-bold text-black mb-4">
+                {DEFI3_BONUS.question}
+              </h3>
+              <div className="flex flex-col gap-2">
+                {DEFI3_BONUS.options.map((opt) => {
+                  const selected = bonusAnswer === opt.id;
+                  const isCorrect = opt.id === DEFI3_BONUS.correctId;
+                  return (
+                    <button
+                      key={opt.id}
+                      onClick={() => !bonusRevealed && setBonusAnswer(opt.id)}
+                      disabled={bonusRevealed}
+                      className={`text-left px-4 py-3 border-2 font-medium ${
+                        bonusRevealed && isCorrect
+                          ? "border-[#2D5A3D] bg-[#F0F5F1] text-[#2D5A3D]"
+                          : bonusRevealed && selected && !isCorrect
+                          ? "border-[#8B3A3A] bg-[#F8F0F0] text-[#8B3A3A]"
+                          : selected
+                          ? "border-[#2D5A3D] bg-[#2D5A3D] text-white"
+                          : "border-black bg-white text-black"
+                      } disabled:cursor-default`}
+                    >
+                      {bonusRevealed && isCorrect ? "✓ " : ""}
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+              {!bonusRevealed ? (
+                <button
+                  onClick={() => setBonusRevealed(true)}
+                  disabled={!bonusAnswer}
+                  className="mt-4 px-5 py-2 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] disabled:opacity-50"
+                >
+                  Valider ma réponse
+                </button>
+              ) : (
+                <div className="mt-4 border-t-2 border-[#E0E0E0] pt-4">
+                  <p className="font-bold text-black mb-1">
+                    {bonusAnswer === DEFI3_BONUS.correctId
+                      ? "✓ Bien vu !"
+                      : "La bonne réponse était la première."}
+                  </p>
+                  <p className="text-[#4A4A4A] leading-relaxed">
+                    {DEFI3_BONUS.explanation}
+                  </p>
+                </div>
+              )}
+            </div>
 
             <div className="flex justify-center mt-6">
               <SubmitButton
