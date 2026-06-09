@@ -177,7 +177,10 @@ export default function Defi2Page() {
         onChunk: (t) => { evalText += t; },
         onDone: () => {
           try {
-            setFalcEval(JSON.parse(evalText.trim()) as FalcEval);
+            // The model may wrap the JSON in prose or code fences — extract the
+            // first {...} block before parsing.
+            const match = evalText.match(/\{[\s\S]*\}/);
+            if (match) setFalcEval(JSON.parse(match[0]) as FalcEval);
           } catch {
             /* eval parse failed — non bloquant */
           }
