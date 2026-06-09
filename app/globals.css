@@ -64,6 +64,12 @@ h3 { font-size: 1.222rem; font-weight: 700; }
   height: 24px;
 }
 
+.spinner-lg {
+  width: 40px;
+  height: 40px;
+  border-width: 3px;
+}
+
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,

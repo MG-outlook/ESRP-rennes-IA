@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
+import ChallengeIntro from "@/components/shared/ChallengeIntro";
+import { CHALLENGE_INTROS } from "@/lib/challenges/intros";
 import Timer from "@/components/shared/Timer";
 import StreamedOutput from "@/components/shared/StreamedOutput";
 import SubmitButton from "@/components/shared/SubmitButton";
@@ -124,6 +126,15 @@ export default function BonusJPage() {
 
     setSubmitState("done");
   }, [teamId, submitState, theme, markdownOutput]);
+
+  const [introDone, setIntroDone] = useState(false);
+  if (!introDone)
+    return (
+      <ChallengeIntro
+        {...CHALLENGE_INTROS[CHALLENGE_ID]}
+        onStart={() => setIntroDone(true)}
+      />
+    );
 
   return (
     <div className="min-h-screen bg-white">

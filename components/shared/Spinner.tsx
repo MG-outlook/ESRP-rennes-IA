@@ -1,5 +1,5 @@
 interface SpinnerProps {
-  size?: "sm" | "md";
+  size?: "sm" | "md" | "lg";
 }
 
 export default function Spinner({ size = "md" }: SpinnerProps) {

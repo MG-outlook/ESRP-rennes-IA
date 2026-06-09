@@ -20,6 +20,74 @@ Règles :
 - Tu termines chaque section par une question ouverte pour l'équipe
 - Pour un métier absent de l'équipe, ajoute une note « 🌱 Section à découvrir ensemble »`;
 
+/**
+ * « Vérité » du Défi 1 : les informations réellement présentes dans le dossier
+ * de Camille (courrier MDPH + lettre de motivation + fiche médicale), classées
+ * par métier. C'est la réponse au pari : l'équipe estime combien d'infos utiles
+ * à son métier le dossier contient, puis on révèle la liste exacte et l'écart.
+ * Les faits sont tirés mot pour mot des documents (DocumentCamille.tsx).
+ */
+export interface Defi1RoleTruth {
+  role: "admin" | "medico_psy" | "formateur" | "insertion_pro";
+  label: string;
+  facts: string[];
+}
+
+export const DEFI1_GROUND_TRUTH: Defi1RoleTruth[] = [
+  {
+    role: "admin",
+    label: "Administratif",
+    facts: [
+      "Référence dossier : MDPH35-RQTH-2025-04217",
+      "RQTH attribuée 5 ans : du 01/04/2026 au 31/03/2031",
+      "Demande déposée le 08/11/2025, décision CDAPH du 11/03/2026",
+      "Recours possible (RAPO) dans un délai de 2 mois après notification",
+      "Orientation ESRP officielle + préconisations d'aménagement à tracer",
+    ],
+  },
+  {
+    role: "medico_psy",
+    label: "Médico-psy-social",
+    facts: [
+      "Lombalgie chronique post-accident (14/06/2023), stabilisée sous antalgiques",
+      "Fatigabilité résiduelle, surtout en fin de journée",
+      "Épisode dépressif réactionnel, suivi jusqu'en 09/2025, en rémission",
+      "Restrictions : port >5 kg, station debout >30 min, postures, travail de nuit",
+      "Aptitudes conservées : travail assis avec pauses, pas de contre-indication cognitive",
+      "Relationnel conservé, atout signalé par les collègues",
+    ],
+  },
+  {
+    role: "formateur",
+    label: "Formation",
+    facts: [
+      "Bureautique de base maîtrisée (mails, traitement de texte, internet)",
+      "CAP magasinier + 16 ans d'expérience terrain",
+      "Pas de diplôme tertiaire → besoin d'une formation progressive",
+      "Appétence pour l'organisation (gère les papiers, la scolarité à la maison)",
+      "Activités cognitives soutenues compatibles",
+    ],
+  },
+  {
+    role: "insertion_pro",
+    label: "Insertion pro",
+    facts: [
+      "Projet : reconversion vers un métier de bureau / tertiaire sédentaire",
+      "Inaptitude définitive au métier antérieur (magasinier)",
+      "Souhait de garder un lien avec le terrain et du contact humain",
+      "Contraintes d'environnement : poste assis, pauses, pas de port de charges",
+      "Frein psychologique : peur de l'échec, « peur que ce soit trop tard », mais forte motivation",
+    ],
+  },
+];
+
+/** Nombre d'infos utiles par métier — la « bonne réponse » du pari. */
+export const DEFI1_TRUTH_COUNTS: Record<Defi1RoleTruth["role"], number> =
+  DEFI1_GROUND_TRUTH.reduce(
+    (acc, r) => ({ ...acc, [r.role]: r.facts.length }),
+    {} as Record<Defi1RoleTruth["role"], number>
+  );
+
 /* ------------------------------------------------------------------ */
 /* Défi 2 — La Synthèse à 4 voix                                      */
 /* ------------------------------------------------------------------ */

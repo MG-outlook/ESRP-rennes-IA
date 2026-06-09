@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import ChallengeIntro from "@/components/shared/ChallengeIntro";
+import { CHALLENGE_INTROS } from "@/lib/challenges/intros";
 import Timer from "@/components/shared/Timer";
 import SubmitButton from "@/components/shared/SubmitButton";
 import { BONUS_E_STATEMENTS, type IaVerdict } from "@/lib/ai/prompts";
@@ -95,6 +97,15 @@ export default function BonusEPage() {
   }, [teamId, submitState, votes, score]);
 
   const allVoted = BONUS_E_STATEMENTS.every((s) => votes[s.id]);
+
+  const [introDone, setIntroDone] = useState(false);
+  if (!introDone)
+    return (
+      <ChallengeIntro
+        {...CHALLENGE_INTROS[CHALLENGE_ID]}
+        onStart={() => setIntroDone(true)}
+      />
+    );
 
   return (
     <div className="min-h-screen bg-white">
