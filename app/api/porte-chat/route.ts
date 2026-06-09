@@ -45,11 +45,17 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    // Le Gardien is a short conversational gatekeeper: a fast small model
+    // keeps each turn snappy. The large default model added minutes of latency.
     const upstream = await openChatStream({
       messages: convo,
-      maxTokens: 1024,
+      maxTokens: 512,
       temperature: 0.7,
       signal: req.signal,
+      modelOverride: {
+        mistral: process.env.PORTE_MISTRAL_MODEL ?? "mistral-small-latest",
+        deepseek: process.env.PORTE_DEEPSEEK_MODEL ?? "deepseek-chat",
+      },
     });
 
     // The porte page expects OpenAI-style SSE: data: {choices:[{delta:{content}}]}
