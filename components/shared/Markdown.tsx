@@ -4,12 +4,30 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 /**
+ * Promotes inline "section titles" to real headings.
+ *
+ * Models routinely write a section header as bold text at the start of a
+ * paragraph, glued to the body: `**Situation sociale** Un dossier...`. That
+ * renders as bold text inline with the paragraph, with no separation. We detect
+ * a paragraph that BEGINS with **bold** followed by more text on the same line
+ * and promote the bold run to its own heading, so titles sit detached from the
+ * body — consistently across every AI output.
+ */
+function normalizeHeadings(md: string): string {
+  return md.replace(
+    /^[ \t]*\*\*(.+?)\*\*[ \t]*:?[ \t]+(?=\S)/gm,
+    (_m, title: string) => `#### ${title.trim()}\n\n`
+  );
+}
+
+/**
  * Renders AI output as properly formatted markdown (headings, lists, bold,
  * tables, rules…) with the workshop's typographic style. Used everywhere an
  * LLM response is displayed so participants read clean prose, not raw `###`
  * and `**` markup.
  */
 export default function Markdown({ content }: { content: string }) {
+  const normalized = normalizeHeadings(content);
   return (
     <div className="text-black leading-relaxed space-y-3">
       <ReactMarkdown
@@ -65,7 +83,7 @@ export default function Markdown({ content }: { content: string }) {
           ),
         }}
       >
-        {content}
+        {normalized}
       </ReactMarkdown>
     </div>
   );

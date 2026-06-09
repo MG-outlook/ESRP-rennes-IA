@@ -108,10 +108,16 @@ Règles FALC strictes :
 - ~150 mots maximum
 - Tu n'inventes rien : tu reformules seulement ce que l'équipe a fourni.`;
 
-export const DEFI2_FALC_EVAL_PROMPT = `Tu es un évaluateur FALC (Facile À Lire et à Comprendre). Tu reçois un texte destiné à une personne accompagnée et tu l'évalues sur 10 selon : longueur des phrases (<15 mots), simplicité du vocabulaire, structure (une idée par phrase), absence de jargon, aération.
+export const DEFI2_FALC_EVAL_PROMPT = `Tu es un évaluateur FALC (Facile À Lire et à Comprendre). Tu reçois un texte destiné à une personne accompagnée (Camille). Évalue-le selon 5 critères, chacun noté de 0 à 2 :
+1. Phrases courtes (moins de 15 mots)
+2. Vocabulaire simple (aucun jargon ni acronyme)
+3. Structure claire (une seule idée par phrase, texte aéré)
+4. Adressage direct (s'adresse à Camille avec « vous », ton bienveillant)
+5. Information actionnable (Camille comprend ce qui la concerne et les suites)
 
-Réponds en JSON strict :
-{"note": <0-10>, "points_forts": ["..."], "ameliorations": ["..."]}`;
+Réponds UNIQUEMENT par un JSON valide sur une seule ligne, sans aucun texte autour, sans bloc de code :
+{"scores":[n,n,n,n,n],"total":n,"commentaire":"une phrase courte de synthèse"}
+"scores" contient les 5 notes dans l'ordre exact ci-dessus (chacune 0, 1 ou 2). "total" est leur somme, sur 10.`;
 
 /**
  * « Le tri des observations » — matière du Défi 2.
@@ -147,63 +153,63 @@ export const DEFI2_OBSERVATIONS: Defi2Observation[] = [
   // — 8 notes utiles, réparties sur les 4 dimensions —
   {
     id: 1,
-    text: "Camille est présente et ponctuelle à toutes les sessions depuis la rentrée. Aucun retard signalé.",
+    text: "Camille est présente et ponctuelle à toutes les sessions depuis la rentrée. Aucun retard n'a été signalé par les formateurs. Elle prévient toujours à l'avance lorsqu'elle a un rendez-vous médical.",
     kind: "useful",
     dimension: "social",
   },
   {
     id: 2,
-    text: "Un dossier de transport adapté a été déposé ; en attente de réponse de la caisse.",
+    text: "Un dossier de transport adapté a été déposé auprès de la caisse il y a trois semaines. La réponse est encore en attente. En attendant, ses trajets du matin restent parfois compliqués.",
     kind: "useful",
     dimension: "social",
   },
   {
     id: 3,
-    text: "Camille dit se sentir « plus à sa place » qu'au début, même si les fins de journée restent fatigantes.",
+    text: "Camille confie se sentir « plus à sa place » qu'au début du parcours. Elle reste cependant fatiguée en fin de journée, surtout après les après-midis chargés. Cette fatigue n'entame pas sa volonté de continuer.",
     kind: "useful",
     dimension: "moral",
   },
   {
     id: 4,
-    text: "Quelques moments de découragement après les mises en situation, vite surmontés avec le soutien du groupe.",
+    text: "Après les exercices de mise en situation, elle traverse parfois des moments de découragement et doute d'elle-même. Un temps d'échange et le soutien du groupe suffisent en général à relancer sa motivation.",
     kind: "useful",
     dimension: "moral",
   },
   {
     id: 5,
-    text: "Bonne progression en traitement de texte : la mise en forme et les tableaux sont acquis.",
+    text: "En traitement de texte, Camille maîtrise désormais la mise en forme et la création de tableaux. Elle commence même à aider spontanément d'autres stagiaires sur ces points.",
     kind: "useful",
     dimension: "formation",
   },
   {
     id: 6,
-    text: "Les exercices de saisie longue restent difficiles : une pause est nécessaire toutes les 30 minutes.",
+    text: "Les exercices de saisie longue restent exigeants pour elle : une pause est nécessaire toutes les 30 minutes environ. Au-delà, la fatigue et les douleurs lombaires réapparaissent et ralentissent le travail.",
     kind: "useful",
     dimension: "formation",
   },
   {
     id: 7,
-    text: "Camille évoque de plus en plus précisément un poste d'accueil-secrétariat.",
+    text: "Son projet professionnel se précise nettement autour des métiers de l'accueil et du secrétariat. Elle dit s'y projeter avec beaucoup plus de clarté qu'au démarrage de la formation.",
     kind: "useful",
     dimension: "projection",
   },
   {
     id: 8,
-    text: "Un premier contact a été pris avec une PME locale en vue d'une éventuelle immersion.",
+    text: "Un premier contact a été établi avec une PME locale en vue d'une immersion. La date n'est pas encore fixée, mais l'entreprise s'est montrée ouverte et plutôt enthousiaste.",
     kind: "useful",
     dimension: "projection",
   },
   // — 2 notes redondantes (doublons d'une note utile) —
   {
     id: 9,
-    text: "RAS sur l'assiduité : Camille vient à tous les cours, toujours à l'heure.",
+    text: "Côté assiduité, rien à signaler : Camille assiste à tous les cours et arrive toujours à l'heure. Plusieurs formateurs ont souligné ce sérieux comme un vrai point d'appui.",
     kind: "redundant",
     dimension: "social",
-    debrief: "Doublon de la note 1 (assiduité). Apporte la même information.",
+    debrief: "Doublon de la note 1 (assiduité). Apporte la même information, sous une autre forme.",
   },
   {
     id: 10,
-    text: "Le projet se dessine vers le secrétariat et l'accueil, c'est de plus en plus clair pour elle.",
+    text: "Le projet professionnel s'oriente de plus en plus vers le secrétariat et l'accueil. C'est désormais clair dans son esprit, et elle en parle volontiers.",
     kind: "redundant",
     dimension: "projection",
     debrief: "Doublon de la note 7 (projet accueil-secrétariat).",
@@ -211,40 +217,40 @@ export const DEFI2_OBSERVATIONS: Defi2Observation[] = [
   // — 2 notes contradictoires —
   {
     id: 11,
-    text: "Une formatrice mentionne deux absences non justifiées la semaine dernière.",
+    text: "Une formatrice a relevé deux absences non justifiées la semaine dernière, sans nouvelle de Camille ces jours-là. L'information n'a pas encore été recoupée avec le reste de l'équipe.",
     kind: "contradictory",
-    debrief: "Contredit les notes 1 et 9 (« présente à toutes les sessions »). À clarifier avant d'écrire.",
+    debrief: "Contredit les notes 1 et 9 (« présente à toutes les sessions »). À clarifier avant d'écrire le compte-rendu.",
   },
   {
     id: 12,
-    text: "Aucune difficulté particulière relevée sur les activités bureautiques.",
+    text: "D'après un autre intervenant, aucune difficulté particulière n'a été observée sur les activités bureautiques, y compris la saisie. Camille suivrait le rythme sans problème.",
     kind: "contradictory",
-    debrief: "Contredit la note 6 (saisie longue difficile). Deux observations à concilier.",
+    debrief: "Contredit la note 6 (saisie longue difficile). Deux observations à concilier, pas à empiler.",
   },
   // — 4 notes hors-sujet / jugements de valeur (à jeter) —
   {
     id: 13,
-    text: "Camille a un caractère bien trempé, elle n'a pas sa langue dans sa poche.",
+    text: "Camille a un caractère bien trempé et n'a pas sa langue dans sa poche. Elle n'hésite pas à donner son avis pendant les pauses, parfois avec franchise.",
     kind: "offtopic",
     debrief: "Jugement sur la personnalité, sans valeur pour la synthèse. À écarter.",
   },
   {
     id: 14,
-    text: "On a beaucoup parlé de la tempête qui a perturbé les transports cette semaine.",
+    text: "La semaine a surtout été marquée par la tempête qui a perturbé les transports de toute la métropole. Plusieurs sessions ont démarré avec un retard collectif.",
     kind: "offtopic",
-    debrief: "Hors-sujet : ne concerne pas le parcours de Camille.",
+    debrief: "Hors-sujet : ne concerne pas le parcours de Camille en particulier.",
   },
   {
     id: 15,
-    text: "À mon avis elle ne tiendra pas dans un bureau, ce n'est pas fait pour elle.",
+    text: "À mon avis, elle ne tiendra pas dans un travail de bureau, ce n'est pas fait pour quelqu'un comme elle. C'est une impression personnelle, mais je préfère le dire.",
     kind: "offtopic",
-    debrief: "Jugement de valeur infondé, à proscrire d'un compte-rendu.",
+    debrief: "Jugement de valeur infondé et stigmatisant, à proscrire d'un compte-rendu.",
   },
   {
     id: 16,
-    text: "Très sympa : elle a apporté des gâteaux pour l'anniversaire d'un stagiaire.",
+    text: "Très sympathique : elle a apporté des gâteaux faits maison pour l'anniversaire d'un stagiaire. L'ambiance du groupe est d'ailleurs excellente en ce moment.",
     kind: "offtopic",
-    debrief: "Anecdote sans portée professionnelle. À écarter.",
+    debrief: "Anecdote sans portée professionnelle. À écarter d'une synthèse.",
   },
 ];
 
