@@ -1,9 +1,24 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { adminFetch } from "@/lib/admin/client";
 import { getAIStatus, onAIStatusChange, startHealthCheck } from "@/lib/ai/health";
 import Skeleton from "@/components/shared/Skeleton";
+
+interface ProgressRow {
+  team_id: string;
+  challenge_id: number;
+  started_at: string | null;
+  finished_at: string | null;
+}
+
+interface TeamRow {
+  id: string;
+  code: string;
+  password: string | null;
+  animator: string | null;
+  composition: Record<string, number> | null;
+}
 
 interface TeamData {
   id: string;
@@ -52,27 +67,23 @@ export default function DashboardPage() {
   const [submissions, setSubmissions] = useState<SubmissionDetail[]>([]);
   const [aiStatus, setAiStatus] = useState(getAIStatus);
 
-  const supabase = createClient();
-
   const fetchAll = useCallback(async () => {
-    // Fetch teams
-    const { data: teamsData } = await supabase
-      .from("teams")
-      .select("id, code, password, animator, composition")
-      .order("code");
-
-    if (!teamsData) return;
-
-    // Fetch progress for all teams
-    const { data: progressData } = await supabase
-      .from("team_progress")
-      .select("team_id, challenge_id, started_at, finished_at")
-      .order("challenge_id", { ascending: false });
-
-    // Fetch scores
-    const { data: scoresData } = await supabase
-      .from("team_scores")
-      .select("team_id, score");
+    let teamsData: TeamRow[];
+    let progressData: ProgressRow[];
+    let scoresData: { team_id: string; score: number }[];
+    try {
+      const data = await adminFetch<{
+        teams: TeamRow[];
+        progress: ProgressRow[];
+        scores: { team_id: string; score: number }[];
+      }>("get_dashboard");
+      teamsData = data.teams;
+      progressData = data.progress;
+      scoresData = data.scores;
+    } catch {
+      setLoading(false);
+      return;
+    }
 
     const scoreMap: Record<string, number> = {};
     if (scoresData) {
@@ -126,7 +137,7 @@ export default function DashboardPage() {
 
     setTeams(result);
     setLoading(false);
-  }, [supabase]);
+  }, []);
 
   useEffect(() => {
     startHealthCheck();
@@ -135,32 +146,21 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetchAll();
+    const interval = setInterval(fetchAll, 4000);
+    return () => clearInterval(interval);
+  }, [fetchAll]);
 
-    const channel = supabase
-      .channel("dashboard-realtime")
-      .on("postgres_changes", { event: "*", schema: "public", table: "team_progress" }, () => fetchAll())
-      .on("postgres_changes", { event: "*", schema: "public", table: "team_scores" }, () => fetchAll())
-      .on("postgres_changes", { event: "*", schema: "public", table: "teams" }, () => fetchAll())
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [fetchAll, supabase]);
-
-  const openDetails = useCallback(
-    async (teamId: string) => {
-      setSelectedTeam(teamId);
-      const { data } = await supabase
-        .from("submissions")
-        .select("id, challenge_id, ai_provider, created_at, payload")
-        .eq("team_id", teamId)
-        .order("created_at", { ascending: false })
-        .limit(20);
-      setSubmissions((data as SubmissionDetail[]) ?? []);
-    },
-    [supabase]
-  );
+  const openDetails = useCallback(async (teamId: string) => {
+    setSelectedTeam(teamId);
+    try {
+      const { submissions } = await adminFetch<{
+        submissions: SubmissionDetail[];
+      }>("get_submissions", { team_id: teamId });
+      setSubmissions(submissions);
+    } catch {
+      setSubmissions([]);
+    }
+  }, []);
 
   return (
     <main className="min-h-screen bg-white p-6">

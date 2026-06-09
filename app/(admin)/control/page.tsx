@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { adminFetch } from "@/lib/admin/client";
 import Spinner from "@/components/shared/Spinner";
 import { useToast } from "@/lib/hooks/useToast";
 
@@ -42,18 +42,7 @@ const BONUS_CHALLENGES = [
   { id: 110, title: "Carte mentale" },
 ];
 
-async function adminAction(action: string, data: Record<string, unknown> = {}) {
-  const res = await fetch("/api/admin", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action, ...data }),
-  });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error ?? "Admin action failed");
-  }
-  return res.json();
-}
+const adminAction = adminFetch;
 
 export default function ControlPage() {
   const [teams, setTeams] = useState<Team[]>([]);
@@ -68,37 +57,28 @@ export default function ControlPage() {
   const [bonusChallenge, setBonusChallenge] = useState(101);
   const [bonusTargets, setBonusTargets] = useState<Set<string>>(new Set());
 
-  const supabase = createClient();
   const { show: showToast } = useToast();
 
   const fetchData = useCallback(async () => {
-    const [teamsRes, stateRes] = await Promise.all([
-      supabase
-        .from("teams")
-        .select("id, code, password, animator, composition, porte_passed_at")
-        .order("code"),
-      supabase
-        .from("workshop_state")
-        .select("is_paused, pause_reason, active_challenge_id")
-        .eq("id", 1)
-        .single(),
-    ]);
-    if (teamsRes.data) setTeams(teamsRes.data);
-    if (stateRes.data) setWorkshopState(stateRes.data);
-    setLoading(false);
-  }, [supabase]);
+    try {
+      const { teams, workshop_state } = await adminFetch<{
+        teams: Team[];
+        workshop_state: WorkshopState;
+      }>("get_state");
+      setTeams(teams);
+      setWorkshopState(workshop_state);
+    } catch (e) {
+      showToast((e as Error).message, "error");
+    } finally {
+      setLoading(false);
+    }
+  }, [showToast]);
 
   useEffect(() => {
     fetchData();
-
-    const channel = supabase
-      .channel("control-realtime")
-      .on("postgres_changes", { event: "*", schema: "public", table: "teams" }, () => fetchData())
-      .on("postgres_changes", { event: "*", schema: "public", table: "workshop_state" }, () => fetchData())
-      .subscribe();
-
-    return () => { supabase.removeChannel(channel); };
-  }, [fetchData, supabase]);
+    const interval = setInterval(fetchData, 4000);
+    return () => clearInterval(interval);
+  }, [fetchData]);
 
   async function handlePauseToggle() {
     if (workshopState.is_paused) {

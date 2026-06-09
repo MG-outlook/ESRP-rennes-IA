@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import PauseOverlay from "@/components/PauseOverlay";
 import DegradedBanner from "@/components/shared/DegradedBanner";
+import ChallengeNavigator from "@/components/ChallengeNavigator";
 
 export default async function TeamLayout({
   children,
@@ -31,6 +32,7 @@ export default async function TeamLayout({
 
   return (
     <>
+      <ChallengeNavigator />
       <DegradedBanner />
       <PauseOverlay />
       {children}

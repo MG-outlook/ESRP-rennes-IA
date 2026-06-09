@@ -8,6 +8,7 @@ interface StreamFromProxyOptions {
   messages: ProxyMessage[];
   challengeId?: number;
   teamId?: string | null;
+  maxTokens?: number;
   onToken?: (token: string) => void;
   onChunk?: (token: string) => void;
   onDone?: (fullText: string) => void;
@@ -19,6 +20,7 @@ export async function streamFromProxy({
   messages,
   challengeId,
   teamId,
+  maxTokens,
   onToken,
   onChunk,
   onDone,
@@ -36,6 +38,7 @@ export async function streamFromProxy({
       messages,
       challenge_id: challengeId,
       team_id: teamId,
+      max_tokens: maxTokens,
     }),
   });
 
