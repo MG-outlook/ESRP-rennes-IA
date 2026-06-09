@@ -134,12 +134,30 @@ export function transformDeltaStream(
           const trimmed = line.trim();
           if (!trimmed.startsWith("data:")) continue;
           const data = trimmed.slice(5).trim();
-          if (!data || data === "[DONE]") continue;
+          if (!data) continue;
+          // Upstream signals completion: emit our done marker and close now,
+          // rather than waiting for the socket to close (some providers keep
+          // the connection open after [DONE], which would hang the client).
+          if (data === "[DONE]") {
+            if (doneMarker) controller.enqueue(encoder.encode(doneMarker));
+            controller.close();
+            reader.cancel().catch(() => {});
+            return;
+          }
 
           try {
             const json = JSON.parse(data);
             const delta: string | undefined = json.choices?.[0]?.delta?.content;
             if (delta) controller.enqueue(encoder.encode(format(delta)));
+            // Some providers omit [DONE] and instead set a finish_reason.
+            const finish: string | null | undefined =
+              json.choices?.[0]?.finish_reason;
+            if (finish) {
+              if (doneMarker) controller.enqueue(encoder.encode(doneMarker));
+              controller.close();
+              reader.cancel().catch(() => {});
+              return;
+            }
           } catch {
             // Ignore keep-alive comments and non-JSON lines.
           }
