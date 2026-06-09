@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Spinner from "@/components/shared/Spinner";
+import RichText from "@/components/shared/RichText";
 import { useAutoSave, useAutoSaveRestore } from "@/lib/hooks/useAutoSave";
 import { useToast } from "@/lib/hooks/useToast";
 
@@ -99,11 +100,9 @@ export default function PortePage() {
     clearSavedChat();
     showToast("Mot de passe accepte — bienvenue !", "success");
 
-    // Reveal animation
+    // Reveal animation. The team then advances at their own pace via the button
+    // (no auto-redirect, so they have time to read and note their password).
     setTimeout(() => setRevealed(true), 500);
-
-    // Redirect after 4 seconds
-    setTimeout(() => router.push("/lobby"), 4500);
   }
 
   async function sendMessage(e: React.FormEvent) {
@@ -202,15 +201,31 @@ export default function PortePage() {
     }
   }
 
-  // Password reveal screen
+  // Password reveal screen — the team stays here until they choose to continue.
   if (readyPayload && revealed) {
     return (
-      <main className="flex flex-col items-center justify-center min-h-screen p-8 bg-white">
-        <p className="text-[#4A4A4A] mb-4">{readyPayload.team_essence}</p>
-        <p className="text-4xl font-bold text-[#2D5A3D] mb-8 tracking-wider">
+      <main className="flex flex-col items-center justify-center min-h-screen p-8 bg-white text-center">
+        <p className="text-[#4A4A4A] mb-2 text-sm uppercase tracking-widest">
+          Votre équipe
+        </p>
+        <p className="text-[#4A4A4A] mb-6 italic max-w-md">
+          {readyPayload.team_essence}
+        </p>
+        <p className="text-[#4A4A4A] mb-2 text-sm uppercase tracking-widest">
+          Mot de passe d&apos;équipe
+        </p>
+        <p className="text-4xl md:text-5xl font-bold text-[#2D5A3D] mb-10 tracking-wider">
           {readyPayload.password}
         </p>
-        <p className="text-[#4A4A4A] opacity-60">Entrée dans l'atelier...</p>
+        <button
+          onClick={() => router.push("/lobby")}
+          className="px-8 py-4 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl hover:bg-[#234a31] transition-colors"
+        >
+          Commencer la découverte de l&apos;IA
+        </button>
+        <p className="text-[#B8B8B8] text-sm mt-6">
+          Notez bien votre mot de passe avant de continuer.
+        </p>
       </main>
     );
   }
@@ -235,7 +250,7 @@ export default function PortePage() {
                 <p className="text-black">{msg.content}</p>
               </div>
             ) : (
-              <p className="text-[#4A4A4A] pl-5">{msg.content}</p>
+              <RichText text={msg.content} className="block text-[#4A4A4A] pl-5" />
             )}
           </div>
         ))}
