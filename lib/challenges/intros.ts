@@ -12,17 +12,17 @@ export interface ChallengeIntroContent {
 
 export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
   2: {
-    title: "Défi 2 — La Synthèse à 4 voix",
+    title: "Défi 2 — Le tri des observations",
     subtitle:
-      "« Trois mois plus tard, on fait le point sur Camille. Personne ne peut le faire seul. »",
+      "« Trois mois plus tard, on fait le point sur Camille. Mais toutes les notes ne se valent pas. »",
     duration: "15 min",
     steps: [
-      "Tour de table : chaque métier saisit 2-3 phrases sur ce qu'il observe chez Camille à 3 mois.",
-      "Pariez : quelle note FALC (de 0 à 10) l'IA donnera-t-elle au compte-rendu destiné à Camille ?",
-      "L'IA assemble vos contributions en un seul compte-rendu pluri-pro, sans rien inventer.",
-      "Elle en produit aussi une version FALC, lisible par Camille elle-même.",
+      "On vous donne 16 notes prises sur Camille après 3 mois de formation.",
+      "Triez chaque note : à jeter, ou à ranger dans la bonne dimension (sociale, moral, formation, projection). Attention aux doublons, contradictions et hors-sujet !",
+      "L'IA assemble une synthèse pluri-pro à partir des seules notes que vous gardez.",
+      "Elle en produit aussi une version FALC, lisible par Camille elle-même, puis on débriefe le tri.",
     ],
-    note: "L'IA n'invente rien — elle assemble ce que vous lui donnez. La richesse du résultat dépend de celle de vos regards.",
+    note: "L'IA n'invente rien — elle assemble ce que vous lui donnez. Si vous gardez du bruit, le compte-rendu en gardera la trace.",
   },
   3: {
     title: "Défi 3 — La Chasse aux mauvais prompts",

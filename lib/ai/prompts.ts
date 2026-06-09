@@ -113,6 +113,142 @@ export const DEFI2_FALC_EVAL_PROMPT = `Tu es un évaluateur FALC (Facile À Lire
 Réponds en JSON strict :
 {"note": <0-10>, "points_forts": ["..."], "ameliorations": ["..."]}`;
 
+/**
+ * « Le tri des observations » — matière du Défi 2.
+ *
+ * 16 notes pré-écrites sur Camille après 3 mois de formation, volontairement
+ * mélangées : utiles (à ranger dans une dimension), redondantes, contradictoires
+ * et hors-sujet / jugements de valeur (à jeter). L'équipe trie, puis l'IA
+ * assemble la synthèse + FALC à partir des notes gardées. Le débrief utilise
+ * `kind` et `debrief` pour révéler la nature de chaque note.
+ * Contenu à valider par Réjane avant le jour J.
+ */
+export type Defi2Dimension = "social" | "moral" | "formation" | "projection";
+export type Defi2NoteKind = "useful" | "redundant" | "contradictory" | "offtopic";
+
+export interface Defi2Observation {
+  id: number;
+  text: string;
+  kind: Defi2NoteKind;
+  /** Dimension attendue pour une note utile ou redondante. */
+  dimension?: Defi2Dimension;
+  /** Explication affichée au débrief. */
+  debrief?: string;
+}
+
+export const DEFI2_DIMENSION_LABELS: Record<Defi2Dimension, string> = {
+  social: "Situation sociale",
+  moral: "État moral",
+  formation: "Parcours formation",
+  projection: "Projection professionnelle",
+};
+
+export const DEFI2_OBSERVATIONS: Defi2Observation[] = [
+  // — 8 notes utiles, réparties sur les 4 dimensions —
+  {
+    id: 1,
+    text: "Camille est présente et ponctuelle à toutes les sessions depuis la rentrée. Aucun retard signalé.",
+    kind: "useful",
+    dimension: "social",
+  },
+  {
+    id: 2,
+    text: "Un dossier de transport adapté a été déposé ; en attente de réponse de la caisse.",
+    kind: "useful",
+    dimension: "social",
+  },
+  {
+    id: 3,
+    text: "Camille dit se sentir « plus à sa place » qu'au début, même si les fins de journée restent fatigantes.",
+    kind: "useful",
+    dimension: "moral",
+  },
+  {
+    id: 4,
+    text: "Quelques moments de découragement après les mises en situation, vite surmontés avec le soutien du groupe.",
+    kind: "useful",
+    dimension: "moral",
+  },
+  {
+    id: 5,
+    text: "Bonne progression en traitement de texte : la mise en forme et les tableaux sont acquis.",
+    kind: "useful",
+    dimension: "formation",
+  },
+  {
+    id: 6,
+    text: "Les exercices de saisie longue restent difficiles : une pause est nécessaire toutes les 30 minutes.",
+    kind: "useful",
+    dimension: "formation",
+  },
+  {
+    id: 7,
+    text: "Camille évoque de plus en plus précisément un poste d'accueil-secrétariat.",
+    kind: "useful",
+    dimension: "projection",
+  },
+  {
+    id: 8,
+    text: "Un premier contact a été pris avec une PME locale en vue d'une éventuelle immersion.",
+    kind: "useful",
+    dimension: "projection",
+  },
+  // — 2 notes redondantes (doublons d'une note utile) —
+  {
+    id: 9,
+    text: "RAS sur l'assiduité : Camille vient à tous les cours, toujours à l'heure.",
+    kind: "redundant",
+    dimension: "social",
+    debrief: "Doublon de la note 1 (assiduité). Apporte la même information.",
+  },
+  {
+    id: 10,
+    text: "Le projet se dessine vers le secrétariat et l'accueil, c'est de plus en plus clair pour elle.",
+    kind: "redundant",
+    dimension: "projection",
+    debrief: "Doublon de la note 7 (projet accueil-secrétariat).",
+  },
+  // — 2 notes contradictoires —
+  {
+    id: 11,
+    text: "Une formatrice mentionne deux absences non justifiées la semaine dernière.",
+    kind: "contradictory",
+    debrief: "Contredit les notes 1 et 9 (« présente à toutes les sessions »). À clarifier avant d'écrire.",
+  },
+  {
+    id: 12,
+    text: "Aucune difficulté particulière relevée sur les activités bureautiques.",
+    kind: "contradictory",
+    debrief: "Contredit la note 6 (saisie longue difficile). Deux observations à concilier.",
+  },
+  // — 4 notes hors-sujet / jugements de valeur (à jeter) —
+  {
+    id: 13,
+    text: "Camille a un caractère bien trempé, elle n'a pas sa langue dans sa poche.",
+    kind: "offtopic",
+    debrief: "Jugement sur la personnalité, sans valeur pour la synthèse. À écarter.",
+  },
+  {
+    id: 14,
+    text: "On a beaucoup parlé de la tempête qui a perturbé les transports cette semaine.",
+    kind: "offtopic",
+    debrief: "Hors-sujet : ne concerne pas le parcours de Camille.",
+  },
+  {
+    id: 15,
+    text: "À mon avis elle ne tiendra pas dans un bureau, ce n'est pas fait pour elle.",
+    kind: "offtopic",
+    debrief: "Jugement de valeur infondé, à proscrire d'un compte-rendu.",
+  },
+  {
+    id: 16,
+    text: "Très sympa : elle a apporté des gâteaux pour l'anniversaire d'un stagiaire.",
+    kind: "offtopic",
+    debrief: "Anecdote sans portée professionnelle. À écarter.",
+  },
+];
+
+
 /* ------------------------------------------------------------------ */
 /* Défi 3 — La Chasse aux mauvais prompts                             */
 /* ------------------------------------------------------------------ */
