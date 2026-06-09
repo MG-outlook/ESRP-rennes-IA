@@ -132,10 +132,11 @@ export default function PortePage() {
       const reader = res.body!.getReader();
       const decoder = new TextDecoder();
       let assistantContent = "";
+      let streamDone = false;
 
       setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
-      while (true) {
+      while (!streamDone) {
         const { done, value } = await reader.read();
         if (done) break;
 
@@ -144,8 +145,11 @@ export default function PortePage() {
 
         for (const line of lines) {
           if (!line.startsWith("data: ")) continue;
-          const data = line.slice(6);
-          if (data === "[DONE]") continue;
+          const data = line.slice(6).trim();
+          if (data === "[DONE]") {
+            streamDone = true;
+            break;
+          }
 
           try {
             const parsed = JSON.parse(data);
@@ -167,6 +171,8 @@ export default function PortePage() {
           }
         }
       }
+
+      reader.cancel().catch(() => {});
 
       await persistMessage("assistant", assistantContent);
 
@@ -234,7 +240,7 @@ export default function PortePage() {
           </div>
         ))}
 
-        {streaming && (
+        {streaming && messages[messages.length - 1]?.content === "" && (
           <span className="text-[#4A4A4A] pl-5 inline-flex items-center gap-2">
             <Spinner size="sm" />
             <span>Le Gardien reflechit...</span>
@@ -246,25 +252,35 @@ export default function PortePage() {
 
       {/* Input */}
       {!readyPayload && (
-        <form
-          onSubmit={sendMessage}
-          className="border-t-2 border-black p-4 max-w-3xl mx-auto w-full"
-        >
-          <div className="flex gap-2 items-center">
-            <span className="text-[#2D5A3D] font-bold text-xl">{">"}</span>
-            <input
-              ref={inputRef}
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder=""
-              disabled={streaming}
-              aria-label="Votre message au Gardien"
-              className="flex-1 text-black bg-white outline-none border-none text-lg"
-              autoFocus
-            />
-          </div>
-        </form>
+        <div className="sticky bottom-0 bg-white border-t-2 border-black">
+          <form
+            onSubmit={sendMessage}
+            className="max-w-3xl mx-auto w-full p-4"
+          >
+            <div className="flex gap-3 items-center border-2 border-black px-4 py-3 focus-within:border-[#2D5A3D] transition-colors">
+              <span className="text-[#2D5A3D] font-bold text-xl select-none">{">"}</span>
+              <input
+                ref={inputRef}
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={streaming ? "Le Gardien répond…" : "Votre réponse…"}
+                disabled={streaming}
+                aria-label="Votre message au Gardien"
+                className="flex-1 text-black bg-white outline-none border-none text-lg placeholder:text-[#B8B8B8]"
+                autoFocus
+              />
+              <button
+                type="submit"
+                disabled={streaming || !input.trim()}
+                className="px-4 py-1 bg-[#2D5A3D] text-white font-semibold text-sm disabled:opacity-40"
+              >
+                Envoyer
+              </button>
+            </div>
+            <p className="text-xs text-[#B8B8B8] mt-2 pl-1">Appuyez sur Entrée ou cliquez Envoyer</p>
+          </form>
+        </div>
       )}
     </main>
   );
