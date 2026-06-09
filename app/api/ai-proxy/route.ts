@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import {
-  openChatStream,
-  transformDeltaStream,
-  type ChatMessage,
-} from "@/lib/ai/llm";
+import { streamChatResponse, type ChatMessage } from "@/lib/ai/llm";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 interface ProxyBody {
   system_prompt?: string;
@@ -51,29 +48,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Aucun message" }, { status: 400 });
   }
 
-  try {
-    const upstream = await openChatStream({
+  // Stream is returned immediately; the provider connection happens inside it
+  // so Vercel's gateway never 504s while the model warms up. The client
+  // (lib/ai/proxy.ts) reads the body as a raw text stream, so the heartbeat is
+  // a leading space (harmless whitespace) rather than an SSE comment.
+  const stream = streamChatResponse(
+    {
       messages,
       maxTokens: body.health_check ? 5 : body.max_tokens ?? 2048,
       temperature: 0.5,
       signal: req.signal,
-    });
+    },
+    (delta) => delta,
+    undefined,
+    " "
+  );
 
-    // The client (lib/ai/proxy.ts) reads the body as a raw text stream.
-    const stream = transformDeltaStream(upstream, (delta) => delta);
-
-    return new Response(stream, {
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8",
-        "Cache-Control": "no-cache, no-transform",
-        "X-Accel-Buffering": "no",
-      },
-    });
-  } catch (e) {
-    console.error("ai-proxy failed:", e);
-    return NextResponse.json(
-      { error: "Service IA indisponible" },
-      { status: 502 }
-    );
-  }
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "no-cache, no-transform",
+      "X-Accel-Buffering": "no",
+    },
+  });
 }

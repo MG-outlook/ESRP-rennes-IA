@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import {
-  openChatStream,
-  transformDeltaStream,
-  type ChatMessage,
-} from "@/lib/ai/llm";
+import { streamChatResponse, type ChatMessage } from "@/lib/ai/llm";
 import { GARDIEN_SYSTEM_PROMPT } from "@/lib/ai/porte-prompt";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 interface PorteBody {
   messages?: { role?: string; content?: string }[];
@@ -44,10 +41,12 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  try {
-    // Le Gardien is a short conversational gatekeeper: a fast small model
-    // keeps each turn snappy. The large default model added minutes of latency.
-    const upstream = await openChatStream({
+  // Le Gardien is a short conversational gatekeeper: a fast small model keeps
+  // each turn snappy. The stream is returned immediately (connection happens
+  // inside it) so Vercel's gateway never 504s while the model warms up.
+  // The porte page expects OpenAI-style SSE: data: {choices:[{delta:{content}}]}
+  const stream = streamChatResponse(
+    {
       messages: convo,
       maxTokens: 512,
       temperature: 0.7,
@@ -56,29 +55,20 @@ export async function POST(req: NextRequest) {
         mistral: process.env.PORTE_MISTRAL_MODEL ?? "mistral-small-latest",
         deepseek: process.env.PORTE_DEEPSEEK_MODEL ?? "deepseek-chat",
       },
-    });
+    },
+    (delta) =>
+      `data: ${JSON.stringify({ choices: [{ delta: { content: delta } }] })}\n\n`,
+    "data: [DONE]\n\n",
+    // Immediate SSE comment heartbeat to open the response on the wire.
+    ": connecting\n\n"
+  );
 
-    // The porte page expects OpenAI-style SSE: data: {choices:[{delta:{content}}]}
-    const stream = transformDeltaStream(
-      upstream,
-      (delta) =>
-        `data: ${JSON.stringify({ choices: [{ delta: { content: delta } }] })}\n\n`,
-      "data: [DONE]\n\n"
-    );
-
-    return new Response(stream, {
-      headers: {
-        "Content-Type": "text/event-stream; charset=utf-8",
-        "Cache-Control": "no-cache, no-transform",
-        Connection: "keep-alive",
-        "X-Accel-Buffering": "no",
-      },
-    });
-  } catch (e) {
-    console.error("porte-chat failed:", e);
-    return NextResponse.json(
-      { error: "Service IA indisponible" },
-      { status: 502 }
-    );
-  }
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/event-stream; charset=utf-8",
+      "Cache-Control": "no-cache, no-transform",
+      Connection: "keep-alive",
+      "X-Accel-Buffering": "no",
+    },
+  });
 }

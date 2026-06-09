@@ -134,72 +134,94 @@ export async function openChatStream({
 }
 
 /**
- * Transforms an upstream OpenAI-style SSE response into a client byte stream.
- * `format` maps each content delta to the text emitted to the client, and the
- * optional `doneMarker` is emitted once the upstream completes.
+ * Returns a client byte stream IMMEDIATELY, then connects to the LLM provider
+ * and pumps deltas from inside the stream.
+ *
+ * This is important on serverless platforms (Vercel): if we awaited the
+ * provider's response headers before returning the HTTP Response, a slow model
+ * start would send no bytes and the gateway would kill the request with a 504.
+ * By returning the stream first and emitting an immediate `heartbeat`, the
+ * gateway sees an active response and keeps the connection open while the model
+ * warms up.
+ *
+ * `format` maps each content delta to the bytes emitted to the client.
+ * `doneMarker` is emitted once when the upstream completes (or errors), so the
+ * client's read loop always terminates. `heartbeat` is emitted right away.
  */
-export function transformDeltaStream(
-  upstream: Response,
+export function streamChatResponse(
+  options: StreamOptions,
   format: (delta: string) => string,
-  doneMarker?: string
+  doneMarker?: string,
+  heartbeat?: string
 ): ReadableStream<Uint8Array> {
-  const reader = upstream.body!.getReader();
-  const decoder = new TextDecoder();
   const encoder = new TextEncoder();
-  let buffer = "";
+  const decoder = new TextDecoder();
 
   return new ReadableStream<Uint8Array>({
-    async pull(controller) {
+    async start(controller) {
+      // Establish the response on the wire before the (possibly slow) connect.
+      if (heartbeat) controller.enqueue(encoder.encode(heartbeat));
+
+      let upstream: Response;
       try {
-        const { done, value } = await reader.read();
-        if (done) {
-          if (doneMarker) controller.enqueue(encoder.encode(doneMarker));
-          controller.close();
-          return;
-        }
+        upstream = await openChatStream(options);
+      } catch (e) {
+        console.error("openChatStream failed:", e);
+        // Always close cleanly so the client's read loop unblocks.
+        if (doneMarker) controller.enqueue(encoder.encode(doneMarker));
+        controller.close();
+        return;
+      }
 
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() ?? "";
+      const reader = upstream.body!.getReader();
+      let buffer = "";
 
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (!trimmed.startsWith("data:")) continue;
-          const data = trimmed.slice(5).trim();
-          if (!data) continue;
-          // Upstream signals completion: emit our done marker and close now,
-          // rather than waiting for the socket to close (some providers keep
-          // the connection open after [DONE], which would hang the client).
-          if (data === "[DONE]") {
-            if (doneMarker) controller.enqueue(encoder.encode(doneMarker));
-            controller.close();
-            reader.cancel().catch(() => {});
+      const finish = () => {
+        if (doneMarker) controller.enqueue(encoder.encode(doneMarker));
+        controller.close();
+        reader.cancel().catch(() => {});
+      };
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) {
+            finish();
             return;
           }
 
-          try {
-            const json = JSON.parse(data);
-            const delta: string | undefined = json.choices?.[0]?.delta?.content;
-            if (delta) controller.enqueue(encoder.encode(format(delta)));
-            // Some providers omit [DONE] and instead set a finish_reason.
-            const finish: string | null | undefined =
-              json.choices?.[0]?.finish_reason;
-            if (finish) {
-              if (doneMarker) controller.enqueue(encoder.encode(doneMarker));
-              controller.close();
-              reader.cancel().catch(() => {});
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() ?? "";
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed.startsWith("data:")) continue;
+            const data = trimmed.slice(5).trim();
+            if (!data) continue;
+            if (data === "[DONE]") {
+              finish();
               return;
             }
-          } catch {
-            // Ignore keep-alive comments and non-JSON lines.
+
+            try {
+              const json = JSON.parse(data);
+              const delta: string | undefined = json.choices?.[0]?.delta?.content;
+              if (delta) controller.enqueue(encoder.encode(format(delta)));
+              const stop: string | null | undefined =
+                json.choices?.[0]?.finish_reason;
+              if (stop) {
+                finish();
+                return;
+              }
+            } catch {
+              // Ignore keep-alive comments and non-JSON lines.
+            }
           }
         }
       } catch (e) {
         controller.error(e);
       }
-    },
-    cancel() {
-      reader.cancel().catch(() => {});
     },
   });
 }

@@ -55,11 +55,20 @@ export async function streamFromProxy({
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let fullText = "";
+  let started = false;
 
   while (true) {
     const { value, done } = await reader.read();
     if (done) break;
-    const chunk = decoder.decode(value, { stream: true });
+    let chunk = decoder.decode(value, { stream: true });
+    // The server emits a leading-whitespace heartbeat to open the response
+    // immediately (avoids gateway 504s). Drop leading whitespace until the
+    // model's real output begins so it isn't prepended to the result.
+    if (!started) {
+      chunk = chunk.replace(/^\s+/, "");
+      if (chunk === "") continue;
+      started = true;
+    }
     fullText += chunk;
     onToken?.(chunk);
     onChunk?.(chunk);
