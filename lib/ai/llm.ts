@@ -47,6 +47,24 @@ export interface StreamOptions {
    * Lets latency-sensitive routes pick a faster model than the default large one.
    */
   modelOverride?: Partial<Record<string, string>>;
+  /**
+   * Max time (ms) to wait for a provider's response headers before aborting it
+   * and failing over to the next provider. Defaults to 12s.
+   */
+  connectTimeoutMs?: number;
+}
+
+/** Aborts when any of the given signals abort. */
+function anySignal(signals: AbortSignal[]): AbortSignal {
+  const controller = new AbortController();
+  for (const s of signals) {
+    if (s.aborted) {
+      controller.abort();
+      break;
+    }
+    s.addEventListener("abort", () => controller.abort(), { once: true });
+  }
+  return controller.signal;
 }
 
 /**
@@ -60,6 +78,7 @@ export async function openChatStream({
   temperature = 0.7,
   signal,
   modelOverride,
+  connectTimeoutMs = 12000,
 }: StreamOptions): Promise<Response> {
   const errors: string[] = [];
 
@@ -70,6 +89,14 @@ export async function openChatStream({
     }
 
     const model = modelOverride?.[provider.name] ?? provider.model;
+
+    // Abort a provider that hasn't started responding within the budget, so we
+    // fail over to the next one instead of stalling on a hung connection.
+    const timeout = new AbortController();
+    const timer = setTimeout(() => timeout.abort(), connectTimeoutMs);
+    const composedSignal = signal
+      ? anySignal([signal, timeout.signal])
+      : timeout.signal;
 
     try {
       const res = await fetch(provider.url, {
@@ -86,14 +113,19 @@ export async function openChatStream({
           max_tokens: maxTokens,
           temperature,
         }),
-        signal,
+        signal: composedSignal,
       });
+
+      // Headers received — clear the connect timeout and let the body stream
+      // at its own pace.
+      clearTimeout(timer);
 
       if (res.ok && res.body) return res;
 
       const detail = await res.text().catch(() => "");
       errors.push(`${provider.name} (${model}): HTTP ${res.status} ${detail.slice(0, 200)}`);
     } catch (e) {
+      clearTimeout(timer);
       errors.push(`${provider.name}: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
