@@ -42,6 +42,11 @@ export interface StreamOptions {
   maxTokens?: number;
   temperature?: number;
   signal?: AbortSignal;
+  /**
+   * Per-provider model override, keyed by provider name ("mistral", "deepseek").
+   * Lets latency-sensitive routes pick a faster model than the default large one.
+   */
+  modelOverride?: Partial<Record<string, string>>;
 }
 
 /**
@@ -54,6 +59,7 @@ export async function openChatStream({
   maxTokens = 1024,
   temperature = 0.7,
   signal,
+  modelOverride,
 }: StreamOptions): Promise<Response> {
   const errors: string[] = [];
 
@@ -62,6 +68,8 @@ export async function openChatStream({
       errors.push(`${provider.name}: clé absente`);
       continue;
     }
+
+    const model = modelOverride?.[provider.name] ?? provider.model;
 
     try {
       const res = await fetch(provider.url, {
@@ -72,7 +80,7 @@ export async function openChatStream({
           Authorization: `Bearer ${provider.apiKey}`,
         },
         body: JSON.stringify({
-          model: provider.model,
+          model,
           messages,
           stream: true,
           max_tokens: maxTokens,
@@ -84,7 +92,7 @@ export async function openChatStream({
       if (res.ok && res.body) return res;
 
       const detail = await res.text().catch(() => "");
-      errors.push(`${provider.name}: HTTP ${res.status} ${detail.slice(0, 200)}`);
+      errors.push(`${provider.name} (${model}): HTTP ${res.status} ${detail.slice(0, 200)}`);
     } catch (e) {
       errors.push(`${provider.name}: ${e instanceof Error ? e.message : String(e)}`);
     }
