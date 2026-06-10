@@ -98,7 +98,7 @@ export default function BonusJPage() {
       }],
       challengeId: CHALLENGE_ID,
       teamId,
-      maxTokens: 800,
+      maxTokens: 4000,
       onChunk: (t) => setMarkdownOutput((p) => p + t),
       onDone: () => setGenerating(false),
       onError: () => setGenerating(false),

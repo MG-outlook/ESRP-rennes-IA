@@ -77,7 +77,7 @@ export default function BonusGPage() {
       }],
       challengeId: CHALLENGE_ID,
       teamId,
-      maxTokens: 300,
+      maxTokens: 4000,
       onChunk: (t) => setPitch((p) => p + t),
       onDone: () => setGenerating(false),
       onError: () => setGenerating(false),

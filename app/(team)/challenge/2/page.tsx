@@ -143,7 +143,7 @@ export default function Defi2Page() {
       messages: [{ role: "user", content: userMsg }],
       challengeId: CHALLENGE_ID,
       teamId,
-      maxTokens: 1500,
+      maxTokens: 4000,
       onChunk: (t) => setProOutput((p) => p + t),
       onDone: () => setProGenerating(false),
       onError: () => setProGenerating(false),
@@ -155,7 +155,7 @@ export default function Defi2Page() {
       messages: [{ role: "user", content: userMsg }],
       challengeId: CHALLENGE_ID,
       teamId,
-      maxTokens: 1000,
+      maxTokens: 4000,
       onChunk: (t) => {
         fullFalc += t;
         setFalcOutput((p) => p + t);

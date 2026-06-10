@@ -71,7 +71,7 @@ export default function BonusDPage() {
       }],
       challengeId: CHALLENGE_ID,
       teamId,
-      maxTokens: 1000,
+      maxTokens: 4000,
       onChunk: (t) => setDraftOutput((p) => p + t),
       onDone: () => setGenerating(false),
       onError: () => setGenerating(false),

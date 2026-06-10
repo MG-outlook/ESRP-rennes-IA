@@ -126,7 +126,7 @@ export default function Defi4Page() {
         ],
         challengeId: CHALLENGE_ID,
         teamId,
-        maxTokens: 800,
+        maxTokens: 4000,
         onChunk: (t) =>
           setColumns((prev) => ({
             ...prev,
@@ -183,7 +183,7 @@ export default function Defi4Page() {
         messages: [{ role: "user", content: userContent }],
         challengeId: CHALLENGE_ID,
         teamId,
-        maxTokens: 800,
+        maxTokens: 4000,
         onChunk: (t) =>
           setColumns((prev) => ({
             ...prev,

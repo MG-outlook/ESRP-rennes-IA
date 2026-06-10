@@ -143,7 +143,7 @@ export default function Defi1Page() {
         messages: [{ role: "user", content: userMessage }],
         challengeId: CHALLENGE_ID,
         teamId,
-        maxTokens: 2000,
+        maxTokens: 4000,
         onChunk: (text) => setAiOutput((prev) => prev + text),
         onDone: () => {
           setGenerating(false);

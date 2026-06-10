@@ -89,7 +89,7 @@ export default function BonusAPage() {
       messages: [{ role: "user", content: `Voici les 4 rapports :\n\n${reports}` }],
       challengeId: CHALLENGE_ID,
       teamId,
-      maxTokens: 900,
+      maxTokens: 4000,
       onChunk: (t) => setAnalysis((p) => p + t),
       onDone: () => {
         setGenerating(false);

@@ -133,7 +133,7 @@ export default function Defi5Page() {
       messages: [{ role: "user", content: userMsg }],
       challengeId: CHALLENGE_ID,
       teamId,
-      maxTokens: 1500,
+      maxTokens: 4000,
       onChunk: (t) => setPactOutput((p) => p + t),
       onDone: () => {
         setGenerating(false);
