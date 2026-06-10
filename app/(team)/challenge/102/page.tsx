@@ -6,6 +6,7 @@ import InstructionsButton from "@/components/shared/InstructionsButton";
 import { CHALLENGE_INTROS } from "@/lib/challenges/intros";
 import Timer from "@/components/shared/Timer";
 import SubmitButton from "@/components/shared/SubmitButton";
+import Markdown from "@/components/shared/Markdown";
 import { streamFromProxy } from "@/lib/ai/proxy";
 import { BONUS_B_COACH_PROMPT } from "@/lib/ai/prompts";
 
@@ -162,7 +163,11 @@ export default function BonusBPage() {
               <span className="text-sm text-[#B8B8B8]">
                 {msg.role === "assistant" ? "Coach" : "Vous"}
               </span>
-              <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+              {msg.role === "assistant" ? (
+                <Markdown content={msg.content} />
+              ) : (
+                <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+              )}
             </div>
           ))}
           {streaming && messages.length > 0 && !messages[messages.length - 1].content && (
