@@ -49,7 +49,7 @@ const DOC_LABELS: Record<string, string> = {
   ai_output: "Fiche de synthèse",
   pro_output: "Synthèse professionnelle",
   falc_output: "Version FALC",
-  output: "Document produit",
+  output: "Les courriers produits",
   pact: "Pacte IA",
   analysis: "Analyse",
   journal: "Journal de Camille",
@@ -62,7 +62,17 @@ const DOC_LABELS: Record<string, string> = {
   subvention: "Demande de subvention",
   markdownOutput: "Carte mentale",
   mindmap: "Carte mentale",
+  rewriteOutput: "Réponse au prompt réécrit",
+  rewrittenPrompt: "Prompt réécrit par l'équipe",
+  // Anciens destinataires du Défi 4 (format imbriqué)
+  camille: "Courrier à Camille",
+  parents: "Courrier aux parents",
+  entreprise: "Courrier à l'entreprise",
+  medecin: "Courrier au médecin",
+  mdph: "Courrier à la MDPH",
 };
+
+const GENERIC_KEYS = new Set(["content", "text", "value", "markdown"]);
 
 function prettifyKey(key: string): string {
   return (
@@ -73,20 +83,41 @@ function prettifyKey(key: string): string {
 
 /**
  * Extracts the human-readable document(s) a team produced in a submission, for
- * admin viewing and .md export. Generic: any reasonably long string field is
- * treated as a produced document.
+ * admin viewing and .md export. Recurses (depth-limited) into nested objects
+ * and arrays so challenges that store documents inside sub-objects (e.g. Défi 3
+ * rewrites, the old Défi 4 per-recipient format) are surfaced too. Any
+ * reasonably long string is treated as a produced document.
  */
 export function extractDocuments(
   payload: unknown
 ): { label: string; markdown: string }[] {
-  if (!payload || typeof payload !== "object") return [];
-  const p = payload as Record<string, unknown>;
   const docs: { label: string; markdown: string }[] = [];
-  for (const [key, value] of Object.entries(p)) {
-    if (typeof value === "string" && value.trim().length > 40) {
-      docs.push({ label: prettifyKey(key), markdown: value });
+  const seen = new Set<string>();
+
+  function walk(value: unknown, parentKey: string, key: string, depth: number) {
+    if (depth > 4) return;
+    if (typeof value === "string") {
+      const text = value.trim();
+      if (text.length > 40 && !seen.has(text)) {
+        seen.add(text);
+        // When the field name is generic ("content"), label by its parent.
+        const labelKey = GENERIC_KEYS.has(key) && parentKey ? parentKey : key;
+        docs.push({ label: prettifyKey(labelKey), markdown: value });
+      }
+      return;
+    }
+    if (Array.isArray(value)) {
+      value.forEach((v) => walk(v, parentKey, key, depth + 1));
+      return;
+    }
+    if (value && typeof value === "object") {
+      for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+        walk(v, key, k, depth + 1);
+      }
     }
   }
+
+  walk(payload, "", "", 0);
   return docs;
 }
 

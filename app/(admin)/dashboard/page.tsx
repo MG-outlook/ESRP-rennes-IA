@@ -162,7 +162,15 @@ export default function DashboardPage() {
       const { submissions } = await adminFetch<{
         submissions: SubmissionDetail[];
       }>("get_submissions", { team_id: teamId });
-      setSubmissions(submissions);
+      // Keep only the latest submission per challenge (already sorted desc).
+      const seen = new Set<number>();
+      const latest = submissions.filter((s) => {
+        if (seen.has(s.challenge_id)) return false;
+        seen.add(s.challenge_id);
+        return true;
+      });
+      latest.sort((a, b) => a.challenge_id - b.challenge_id);
+      setSubmissions(latest);
     } catch {
       setSubmissions([]);
     }
