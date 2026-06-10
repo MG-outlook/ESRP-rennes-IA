@@ -136,9 +136,7 @@ export default function BonusIPage() {
         {(glossaire || generating) && (
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-black mb-4">Glossaire FALC</h2>
-            <div className="border-2 border-black p-6 bg-[#F5F5F5] whitespace-pre-line">
-              <StreamedOutput content={glossaire} loading={generating} />
-            </div>
+            <StreamedOutput content={glossaire} loading={generating} />
           </section>
         )}
 
