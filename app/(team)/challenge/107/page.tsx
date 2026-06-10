@@ -139,7 +139,7 @@ export default function BonusGPage() {
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <InstructionsButton content={CHALLENGE_INTROS[CHALLENGE_ID]} />
-            <Timer durationSec={900} startedAt={startedAt} />
+            <Timer durationSec={900} startedAt={startedAt} challengeId={CHALLENGE_ID} />
           </div>
         </div>
 

@@ -148,7 +148,7 @@ export default function GenDPage() {
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <InstructionsButton content={intro} />
-            <Timer durationSec={840} startedAt={startedAt} />
+            <Timer durationSec={840} startedAt={startedAt} challengeId={CHALLENGE_ID} />
           </div>
         </div>
 

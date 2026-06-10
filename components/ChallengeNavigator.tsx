@@ -74,7 +74,17 @@ export default function ChallengeNavigator() {
       if (bonus && bonus.length > 0) {
         target = `/challenge/${bonus[0].challenge_id}`;
       } else if (activeId !== null && activeId > 0) {
-        target = `/challenge/${activeId}`;
+        // Go to the active challenge UNLESS the team already finished it — in
+        // that case it waits in the lobby for the animator to open the next one.
+        const { data: ap } = await supabase
+          .from("team_progress")
+          .select("finished_at")
+          .eq("team_id", teamId)
+          .eq("challenge_id", activeId)
+          .maybeSingle();
+        if (!ap || ap.finished_at === null) {
+          target = `/challenge/${activeId}`;
+        }
       }
 
       const current = pathRef.current;

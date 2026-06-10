@@ -206,7 +206,7 @@ export default function Defi1Page() {
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <InstructionsButton content={CHALLENGE_INTROS[CHALLENGE_ID]} />
-            <Timer durationSec={1200} startedAt={startedAt} />
+            <Timer durationSec={1200} startedAt={startedAt} challengeId={CHALLENGE_ID} />
           </div>
         </div>
 

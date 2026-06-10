@@ -45,7 +45,16 @@ interface TeamData {
   currentChallenge: number | null;
   currentChallengeTitle: string | null;
   totalScore: number;
+  totalTimeMs: number;
   progressPhase: string;
+}
+
+function formatMs(ms: number): string {
+  if (!ms || ms <= 0) return "—";
+  const totalSec = Math.round(ms / 1000);
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return `${m}min ${s.toString().padStart(2, "0")}s`;
 }
 
 interface SubmissionDetail {
@@ -99,8 +108,9 @@ export default function DashboardPage() {
       }
     }
 
-    // Determine current challenge per team
+    // Determine current challenge + total time per team
     const progressMap: Record<string, { challengeId: number; finished: boolean }[]> = {};
+    const timeMap: Record<string, number> = {};
     if (progressData) {
       for (const p of progressData) {
         if (!progressMap[p.team_id]) progressMap[p.team_id] = [];
@@ -108,6 +118,11 @@ export default function DashboardPage() {
           challengeId: p.challenge_id,
           finished: !!p.finished_at,
         });
+        if (p.started_at && p.finished_at) {
+          const ms =
+            new Date(p.finished_at).getTime() - new Date(p.started_at).getTime();
+          if (ms > 0) timeMap[p.team_id] = (timeMap[p.team_id] ?? 0) + ms;
+        }
       }
     }
 
@@ -137,8 +152,15 @@ export default function DashboardPage() {
         currentChallengeTitle:
           currentChallenge !== null ? challengeTitle(currentChallenge) : null,
         totalScore: scoreMap[t.id] ?? 0,
+        totalTimeMs: timeMap[t.id] ?? 0,
         progressPhase,
       };
+    });
+
+    // Ranking: most points first; on a tie, the fastest team (least total time).
+    result.sort((a, b) => {
+      if (b.totalScore !== a.totalScore) return b.totalScore - a.totalScore;
+      return a.totalTimeMs - b.totalTimeMs;
     });
 
     setTeams(result);
@@ -203,15 +225,27 @@ export default function DashboardPage() {
         </div>
       ) : (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-        {teams.map((team) => (
+        {teams.map((team, idx) => (
           <div
             key={team.id}
             className="border-2 border-black p-4 flex flex-col gap-2 cursor-pointer hover:border-[#2D5A3D]"
             onClick={() => openDetails(team.id)}
           >
-            {/* Code + animator */}
+            {/* Rank + code + animator */}
             <div className="flex justify-between items-center">
-              <span className="text-2xl font-bold text-black">{team.code}</span>
+              <span className="flex items-center gap-2">
+                <span
+                  className={`inline-flex items-center justify-center w-7 h-7 text-sm font-bold border-2 ${
+                    idx === 0
+                      ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
+                      : "border-black text-black"
+                  }`}
+                  title="Classement"
+                >
+                  {idx + 1}
+                </span>
+                <span className="text-2xl font-bold text-black">{team.code}</span>
+              </span>
               <span className="text-sm text-[#4A4A4A] capitalize">{team.animator ?? ""}</span>
             </div>
 
@@ -247,10 +281,13 @@ export default function DashboardPage() {
               )}
             </div>
 
-            {/* Score */}
-            <div className="text-right">
-              <span className="text-xl font-bold text-black">{team.totalScore}</span>
-              <span className="text-sm text-[#4A4A4A]"> pts</span>
+            {/* Score + total time */}
+            <div className="flex justify-between items-baseline">
+              <span className="text-sm text-[#4A4A4A]">⏱ {formatMs(team.totalTimeMs)}</span>
+              <span>
+                <span className="text-xl font-bold text-black">{team.totalScore}</span>
+                <span className="text-sm text-[#4A4A4A]"> pts</span>
+              </span>
             </div>
           </div>
         ))}
