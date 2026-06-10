@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import InstructionsButton from "@/components/shared/InstructionsButton";
+import { CHALLENGE_INTROS } from "@/lib/challenges/intros";
 import Timer from "@/components/shared/Timer";
 import SubmitButton from "@/components/shared/SubmitButton";
 import { streamFromProxy } from "@/lib/ai/proxy";
@@ -142,7 +144,10 @@ export default function BonusBPage() {
               3 questions, 3 réponses. Préparez Camille à son entretien.
             </p>
           </div>
-          <Timer durationSec={900} startedAt={startedAt} />
+          <div className="flex items-center gap-3 shrink-0">
+            <InstructionsButton content={CHALLENGE_INTROS[CHALLENGE_ID]} />
+            <Timer durationSec={900} startedAt={startedAt} />
+          </div>
         </div>
 
         {/* Chat */}

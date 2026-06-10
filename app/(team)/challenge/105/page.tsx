@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import InstructionsButton from "@/components/shared/InstructionsButton";
 import ChallengeIntro from "@/components/shared/ChallengeIntro";
 import { CHALLENGE_INTROS } from "@/lib/challenges/intros";
 import Timer from "@/components/shared/Timer";
@@ -117,7 +118,10 @@ export default function BonusEPage() {
               10 affirmations sur l&apos;IA. Vrai, Faux, ou Nuancé ?
             </p>
           </div>
-          <Timer durationSec={600} startedAt={startedAt} />
+          <div className="flex items-center gap-3 shrink-0">
+            <InstructionsButton content={CHALLENGE_INTROS[CHALLENGE_ID]} />
+            <Timer durationSec={600} startedAt={startedAt} />
+          </div>
         </div>
 
         <div className="flex flex-col gap-4 mb-8">

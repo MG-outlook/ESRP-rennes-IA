@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import InstructionsButton from "@/components/shared/InstructionsButton";
 import ChallengeIntro from "@/components/shared/ChallengeIntro";
 import { CHALLENGE_INTROS } from "@/lib/challenges/intros";
 import Timer from "@/components/shared/Timer";
@@ -258,7 +259,10 @@ export default function Defi3Page() {
               Identifiez les biais dans les réponses IA, puis réécrivez le prompt
             </p>
           </div>
-          <Timer durationSec={1200} startedAt={startedAt} />
+          <div className="flex items-center gap-3 shrink-0">
+            <InstructionsButton content={CHALLENGE_INTROS[CHALLENGE_ID]} />
+            <Timer durationSec={1200} startedAt={startedAt} />
+          </div>
         </div>
 
         <FadeTransition phaseKey={phase === "results" ? "results" : `case-${currentCase}`}>

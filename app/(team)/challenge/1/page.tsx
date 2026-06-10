@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import InstructionsButton from "@/components/shared/InstructionsButton";
+import { CHALLENGE_INTROS } from "@/lib/challenges/intros";
 import Timer from "@/components/shared/Timer";
 import StreamedOutput from "@/components/shared/StreamedOutput";
 import SubmitButton from "@/components/shared/SubmitButton";
@@ -197,7 +199,10 @@ export default function Defi1Page() {
               Le dossier de Camille vient d&apos;arriver. Que voit chaque métier dans le même dossier ?
             </p>
           </div>
-          <Timer durationSec={1200} startedAt={startedAt} />
+          <div className="flex items-center gap-3 shrink-0">
+            <InstructionsButton content={CHALLENGE_INTROS[CHALLENGE_ID]} />
+            <Timer durationSec={1200} startedAt={startedAt} />
+          </div>
         </div>
 
         <FadeTransition phaseKey={phase}>

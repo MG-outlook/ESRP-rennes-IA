@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import InstructionsButton from "@/components/shared/InstructionsButton";
 import ChallengeIntro from "@/components/shared/ChallengeIntro";
 import { CHALLENGE_INTROS } from "@/lib/challenges/intros";
 import Timer from "@/components/shared/Timer";
@@ -136,7 +137,10 @@ export default function BonusGPage() {
               3 éléments forts de Camille. L&apos;IA rédige le pitch. Écoutez-le.
             </p>
           </div>
-          <Timer durationSec={900} startedAt={startedAt} />
+          <div className="flex items-center gap-3 shrink-0">
+            <InstructionsButton content={CHALLENGE_INTROS[CHALLENGE_ID]} />
+            <Timer durationSec={900} startedAt={startedAt} />
+          </div>
         </div>
 
         <section className="mb-8 flex flex-col gap-4">

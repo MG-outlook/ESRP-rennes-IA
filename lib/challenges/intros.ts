@@ -11,6 +11,19 @@ export interface ChallengeIntroContent {
 }
 
 export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
+  1: {
+    title: "Défi 1 — La Pré-admission",
+    subtitle:
+      "« Le dossier de Camille vient d'arriver. Que voit chaque métier dans le même dossier ? »",
+    duration: "20 min",
+    steps: [
+      "Lisez le dossier de Camille : trois documents (courrier MDPH, lettre de motivation, fiche médicale).",
+      "Pariez avant l'IA : pour chaque métier de votre équipe, estimez combien d'informations utiles à votre métier se cachent dans le dossier (de 0 à 10).",
+      "L'IA produit la fiche de synthèse pluri-pro en 4 sections, une par métier.",
+      "La Vérité : on révèle les informations réellement présentes pour chaque métier, et on compare à votre pari.",
+    ],
+    note: "Chaque métier voit des choses différentes dans le même dossier — et l'on découvre ce qu'on rate seul·e.",
+  },
   2: {
     title: "Défi 2 — Le tri des observations",
     subtitle:
@@ -74,6 +87,17 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
       "Comparez avec votre pari.",
     ],
     note: "Quand l'info circule mal, chacun re-saisit ce que d'autres ont déjà noté. L'IA aide à repérer ces redondances.",
+  },
+  102: {
+    title: "Bonus B — Le coach d'entretien",
+    subtitle: "« Camille passe un entretien dans une PME. Préparez-la avec l'IA. »",
+    duration: "15 min",
+    steps: [
+      "L'IA joue le rôle d'un coach d'entretien et vous pose des questions.",
+      "Répondez tour à tour pour préparer Camille (3 échanges).",
+      "Le coach propose des questions probables, co-rédige des réponses et donne des conseils concrets.",
+    ],
+    note: "S'entraîner avant un entretien change tout. L'IA est un partenaire d'entraînement patient et disponible.",
   },
   103: {
     title: "Bonus C — La pièce manquante",
