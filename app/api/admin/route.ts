@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { computeChallengeScore } from "@/lib/scoring";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -76,7 +77,7 @@ export async function POST(req: NextRequest) {
       }
 
       case "get_dashboard": {
-        const [teams, progress, scores] = await Promise.all([
+        const [teams, progress, subs] = await Promise.all([
           supabase
             .from("teams")
             .select("id, code, password, animator, composition")
@@ -85,13 +86,34 @@ export async function POST(req: NextRequest) {
             .from("team_progress")
             .select("team_id, challenge_id, started_at, finished_at")
             .order("challenge_id", { ascending: false }),
-          supabase.from("team_scores").select("team_id, score"),
+          supabase
+            .from("submissions")
+            .select("team_id, challenge_id, payload, created_at")
+            .order("created_at", { ascending: false }),
         ]);
         if (teams.error) throw teams.error;
+
+        // Compute each team's total from the latest submission per challenge.
+        const latest = new Map<string, unknown>(); // `${team}:${challenge}` -> payload
+        for (const s of subs.data ?? []) {
+          const key = `${s.team_id}:${s.challenge_id}`;
+          if (!latest.has(key)) latest.set(key, s.payload); // first seen = newest
+        }
+        const scoreMap: Record<string, number> = {};
+        for (const [key, payload] of latest) {
+          const [teamId, challengeStr] = key.split(":");
+          const pts = computeChallengeScore(Number(challengeStr), payload);
+          if (pts != null) scoreMap[teamId] = (scoreMap[teamId] ?? 0) + pts;
+        }
+        const scores = Object.entries(scoreMap).map(([team_id, score]) => ({
+          team_id,
+          score,
+        }));
+
         return NextResponse.json({
           teams: teams.data ?? [],
           progress: progress.data ?? [],
-          scores: scores.data ?? [],
+          scores,
         });
       }
 

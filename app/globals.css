@@ -70,6 +70,25 @@ h3 { font-size: 1.222rem; font-weight: 700; }
   border-width: 3px;
 }
 
+/* PDF export: print only the finalized Pacte document. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-pact,
+  #printable-pact * {
+    visibility: visible;
+  }
+  #printable-pact {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    border: none !important;
+    padding: 0 !important;
+  }
+}
+
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,

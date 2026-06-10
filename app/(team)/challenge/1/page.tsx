@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import InstructionsButton from "@/components/shared/InstructionsButton";
+import { CHALLENGE_INTROS } from "@/lib/challenges/intros";
 import Timer from "@/components/shared/Timer";
 import StreamedOutput from "@/components/shared/StreamedOutput";
 import SubmitButton from "@/components/shared/SubmitButton";
@@ -159,11 +161,16 @@ export default function Defi1Page() {
   const handleSubmitScore = useCallback(async () => {
     if (!teamId || submitState !== "idle") return;
     setSubmitState("loading");
+    const gap = betRoles.reduce(
+      (sum, r) => sum + Math.abs((predictions[r] ?? 0) - DEFI1_TRUTH_COUNTS[r]),
+      0
+    );
+    const points = Math.max(0, Math.min(20, 20 - gap));
     const supabase = createClient();
     await supabase.from("submissions").insert({
       team_id: teamId,
       challenge_id: CHALLENGE_ID,
-      payload: { ai_output: aiOutput, predictions, truth: DEFI1_TRUTH_COUNTS },
+      payload: { ai_output: aiOutput, predictions, truth: DEFI1_TRUTH_COUNTS, points },
       ai_provider: "proxy",
       model: "ai-proxy",
     });
@@ -174,7 +181,7 @@ export default function Defi1Page() {
       .eq("challenge_id", CHALLENGE_ID);
     setSubmitState("done");
     showToast("Réponse enregistrée", "success");
-  }, [teamId, submitState, aiOutput, predictions, showToast]);
+  }, [teamId, submitState, aiOutput, predictions, betRoles, showToast]);
 
   useEffect(() => {
     if (phase === "generation" && !generating && !aiOutput) handleGenerate();
@@ -197,7 +204,10 @@ export default function Defi1Page() {
               Le dossier de Camille vient d&apos;arriver. Que voit chaque métier dans le même dossier ?
             </p>
           </div>
-          <Timer durationSec={1200} startedAt={startedAt} />
+          <div className="flex items-center gap-3 shrink-0">
+            <InstructionsButton content={CHALLENGE_INTROS[CHALLENGE_ID]} />
+            <Timer durationSec={1200} startedAt={startedAt} />
+          </div>
         </div>
 
         <FadeTransition phaseKey={phase}>

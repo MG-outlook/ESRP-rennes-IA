@@ -2,16 +2,29 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import InstructionsButton from "@/components/shared/InstructionsButton";
 import ChallengeIntro from "@/components/shared/ChallengeIntro";
 import { CHALLENGE_INTROS } from "@/lib/challenges/intros";
 import Timer from "@/components/shared/Timer";
 import StreamedOutput from "@/components/shared/StreamedOutput";
 import SubmitButton from "@/components/shared/SubmitButton";
 import FadeTransition from "@/components/shared/FadeTransition";
+import Markdown from "@/components/shared/Markdown";
 import { streamFromProxy } from "@/lib/ai/proxy";
 import { DEFI5_CADRAGE_PROMPT, DEFI5_QUESTIONS } from "@/lib/ai/prompts";
+import { challengeTitle, computeChallengeScore, formatDuration } from "@/lib/scoring";
 import { useAutoSave, useAutoSaveRestore } from "@/lib/hooks/useAutoSave";
 import { useToast } from "@/lib/hooks/useToast";
+
+function downloadMarkdown(filename: string, content: string) {
+  const blob = new Blob([content], { type: "text/markdown;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 const CHALLENGE_ID = 5;
 const VOTE_CATEGORIES = ["inspirant", "realiste", "universel"] as const;
@@ -34,8 +47,15 @@ export default function Defi5Page() {
   const [otherProjects, setOtherProjects] = useState<OtherProject[]>([]);
   const [votes, setVotes] = useState<Record<string, Record<string, number>>>({});
   const [submitState, setSubmitState] = useState<"idle" | "loading" | "done">("idle");
+  const [teamCode, setTeamCode] = useState<string>("");
   const [previousDefis, setPreviousDefis] = useState<
-    { challengeId: number; title: string; summary: string }[]
+    {
+      challengeId: number;
+      title: string;
+      summary: string;
+      points: number | null;
+      duration: string | null;
+    }[]
   >([]);
 
   const { show: showToast } = useToast();
@@ -86,35 +106,60 @@ export default function Defi5Page() {
         setStartedAt(now);
       }
 
-      // Load previous challenge submissions for inspiration
-      const { data: subs } = await supabase
-        .from("submissions")
-        .select("challenge_id, payload")
-        .eq("team_id", session.team_id)
-        .in("challenge_id", [1, 2, 3, 4])
-        .order("challenge_id");
+      // Team code (for retrieving the final document later)
+      const { data: team } = await supabase
+        .from("teams")
+        .select("code")
+        .eq("id", session.team_id)
+        .single();
+      if (team?.code) setTeamCode(team.code);
 
-      const challengeTitles: Record<number, string> = {
-        1: "La Pré-admission",
-        2: "La Synthèse à 4 voix",
-        3: "La Chasse aux mauvais prompts",
-        4: "Une info, cinq destinataires",
-      };
+      // Load previous challenges: latest submission (points + summary) and the
+      // time the team took (from team_progress).
+      const [{ data: subs }, { data: prog }] = await Promise.all([
+        supabase
+          .from("submissions")
+          .select("challenge_id, payload, created_at")
+          .eq("team_id", session.team_id)
+          .in("challenge_id", [1, 2, 3, 4])
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("team_progress")
+          .select("challenge_id, started_at, finished_at")
+          .eq("team_id", session.team_id)
+          .in("challenge_id", [1, 2, 3, 4]),
+      ]);
 
-      if (subs) {
-        setPreviousDefis(
-          subs.map((s) => ({
-            challengeId: s.challenge_id,
-            title: challengeTitles[s.challenge_id] ?? `Défi ${s.challenge_id}`,
-            summary:
-              typeof s.payload === "object" && s.payload !== null
-                ? (s.payload as Record<string, unknown>).ai_output as string ??
-                  (s.payload as Record<string, unknown>).pro_output as string ??
-                  "Défi complété"
-                : "Défi complété",
-          }))
+      const durationByChallenge: Record<number, string | null> = {};
+      for (const p of prog ?? []) {
+        durationByChallenge[p.challenge_id] = formatDuration(
+          p.started_at,
+          p.finished_at
         );
       }
+
+      // Keep only the latest submission per challenge.
+      const seen = new Set<number>();
+      const recap: typeof previousDefis = [];
+      for (const s of subs ?? []) {
+        if (seen.has(s.challenge_id)) continue;
+        seen.add(s.challenge_id);
+        const payload = s.payload as Record<string, unknown> | null;
+        const summary =
+          (payload?.ai_output as string) ??
+          (payload?.pro_output as string) ??
+          (payload?.output as string) ??
+          "Défi complété";
+        recap.push({
+          challengeId: s.challenge_id,
+          title: challengeTitle(s.challenge_id),
+          summary,
+          points: computeChallengeScore(s.challenge_id, payload),
+          duration: durationByChallenge[s.challenge_id] ?? null,
+        });
+      }
+      recap.sort((a, b) => a.challengeId - b.challengeId);
+      setPreviousDefis(recap);
     }
     init();
   }, []);
@@ -262,7 +307,10 @@ export default function Defi5Page() {
               Construisez votre Pacte IA collectif
             </p>
           </div>
-          <Timer durationSec={1800} startedAt={startedAt} />
+          <div className="flex items-center gap-3 shrink-0">
+            <InstructionsButton content={CHALLENGE_INTROS[CHALLENGE_ID]} />
+            <Timer durationSec={1800} startedAt={startedAt} />
+          </div>
         </div>
 
         <FadeTransition phaseKey={phase}>
@@ -276,12 +324,22 @@ export default function Defi5Page() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 {previousDefis.map((d) => (
                   <div key={d.challengeId} className="border-2 border-black p-4">
-                    <h3 className="font-bold text-black mb-1">
-                      Défi {d.challengeId} — {d.title}
-                    </h3>
-                    <p className="text-sm text-[#4A4A4A] line-clamp-4">
-                      {d.summary.slice(0, 200)}
-                      {d.summary.length > 200 ? "..." : ""}
+                    <div className="flex justify-between items-start gap-2 mb-2">
+                      <h3 className="font-bold text-black">
+                        Défi {d.challengeId} — {d.title}
+                      </h3>
+                      {d.points != null && (
+                        <span className="shrink-0 text-sm font-bold text-white bg-[#2D5A3D] px-2 py-0.5">
+                          {d.points}/20
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-[#4A4A4A] mb-2">
+                      {d.duration ? `⏱ Temps : ${d.duration}` : "⏱ Temps non mesuré"}
+                    </p>
+                    <p className="text-sm text-[#4A4A4A] line-clamp-3">
+                      {d.summary.slice(0, 180)}
+                      {d.summary.length > 180 ? "…" : ""}
                     </p>
                   </div>
                 ))}
@@ -349,15 +407,39 @@ export default function Defi5Page() {
               <h2 className="text-2xl font-bold text-black mb-4">
                 Votre Pacte IA
               </h2>
-              <StreamedOutput content={pactOutput} loading={generating} />
+
+              {/* While streaming */}
+              {phase === "generation" && generating && (
+                <StreamedOutput content={pactOutput} loading={generating} />
+              )}
+
+              {/* Editable once generated */}
               {phase === "generation" && !generating && (
-                <div className="flex justify-center mt-4">
-                  <button
-                    onClick={handleSavePact}
-                    className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl"
-                  >
-                    Valider le Pacte et voter
-                  </button>
+                <>
+                  <p className="text-sm text-[#4A4A4A] mb-2">
+                    Relisez et <strong>modifiez librement</strong> votre Pacte avant de le valider.
+                  </p>
+                  <textarea
+                    value={pactOutput}
+                    onChange={(e) => setPactOutput(e.target.value)}
+                    rows={16}
+                    className="w-full border-2 border-black p-4 text-black bg-white focus:border-[#2D5A3D] focus:outline-none font-mono text-sm"
+                  />
+                  <div className="flex justify-center mt-4">
+                    <button
+                      onClick={handleSavePact}
+                      className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl"
+                    >
+                      Valider le Pacte et voter
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {/* Read-only after validation */}
+              {(phase === "vote" || phase === "finalized") && (
+                <div className="border-2 border-black p-6">
+                  <Markdown content={pactOutput} />
                 </div>
               )}
             </section>
@@ -427,15 +509,43 @@ export default function Defi5Page() {
 
         {/* Finalized */}
         {phase === "finalized" && (
-          <section className="mb-8 text-center">
-            <div className="border-2 border-[#2D5A3D] p-8">
-              <p className="text-3xl font-bold text-[#2D5A3D] mb-4">
-                Bravo !
-              </p>
+          <section className="mb-8">
+            <div className="border-2 border-[#2D5A3D] p-8 text-center mb-6">
+              <p className="text-3xl font-bold text-[#2D5A3D] mb-3">Bravo !</p>
               <p className="text-xl text-[#4A4A4A]">
-                Votre Pacte IA est finalisé. Il sera imprimé et remis à votre
-                équipe.
+                Votre Pacte IA est finalisé et enregistré.
               </p>
+              {teamCode && (
+                <p className="text-[#4A4A4A] mt-3">
+                  Code équipe : <strong className="text-black text-lg">{teamCode}</strong>{" "}
+                  — conservez-le pour récupérer votre document.
+                </p>
+              )}
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-4 mb-6">
+              <button
+                onClick={() => window.print()}
+                className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D]"
+              >
+                Exporter en PDF
+              </button>
+              <button
+                onClick={() =>
+                  downloadMarkdown(`${teamCode || "equipe"}-pacte.md`, pactOutput)
+                }
+                className="px-6 py-3 bg-white text-[#2D5A3D] font-semibold border-2 border-[#2D5A3D]"
+              >
+                Télécharger en .md
+              </button>
+            </div>
+
+            {/* Printable document (isolated by print CSS) */}
+            <div id="printable-pact" className="border-2 border-black p-8">
+              <h1 className="text-2xl font-bold text-black mb-4">
+                Pacte IA{teamCode ? ` — Équipe ${teamCode}` : ""}
+              </h1>
+              <Markdown content={pactOutput} />
             </div>
           </section>
         )}

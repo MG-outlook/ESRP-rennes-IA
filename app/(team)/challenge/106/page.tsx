@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import InstructionsButton from "@/components/shared/InstructionsButton";
 import ChallengeIntro from "@/components/shared/ChallengeIntro";
 import { CHALLENGE_INTROS } from "@/lib/challenges/intros";
 import Timer from "@/components/shared/Timer";
@@ -108,7 +109,10 @@ export default function BonusFPage() {
               Écrivez avec l&apos;IA, à la première personne, un fragment du journal de Camille.
             </p>
           </div>
-          <Timer durationSec={720} startedAt={startedAt} />
+          <div className="flex items-center gap-3 shrink-0">
+            <InstructionsButton content={CHALLENGE_INTROS[CHALLENGE_ID]} />
+            <Timer durationSec={720} startedAt={startedAt} />
+          </div>
         </div>
 
         <section className="mb-8">

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import InstructionsButton from "@/components/shared/InstructionsButton";
 import ChallengeIntro from "@/components/shared/ChallengeIntro";
 import { CHALLENGE_INTROS } from "@/lib/challenges/intros";
 import Timer from "@/components/shared/Timer";
@@ -211,6 +212,8 @@ export default function Defi3Page() {
       accuracy: score,
     });
 
+    const bonusCorrect = bonusAnswer === DEFI3_BONUS.correctId;
+    const points = Math.max(0, Math.min(20, score + (bonusCorrect ? 2 : 0)));
     await supabase.from("submissions").insert({
       team_id: teamId,
       challenge_id: CHALLENGE_ID,
@@ -218,7 +221,8 @@ export default function Defi3Page() {
         case_results: caseResults,
         score,
         bonus_answer: bonusAnswer,
-        bonus_correct: bonusAnswer === DEFI3_BONUS.correctId,
+        bonus_correct: bonusCorrect,
+        points,
       },
       ai_provider: "proxy",
       model: "ai-proxy",
@@ -258,7 +262,10 @@ export default function Defi3Page() {
               Identifiez les biais dans les réponses IA, puis réécrivez le prompt
             </p>
           </div>
-          <Timer durationSec={1200} startedAt={startedAt} />
+          <div className="flex items-center gap-3 shrink-0">
+            <InstructionsButton content={CHALLENGE_INTROS[CHALLENGE_ID]} />
+            <Timer durationSec={1200} startedAt={startedAt} />
+          </div>
         </div>
 
         <FadeTransition phaseKey={phase === "results" ? "results" : `case-${currentCase}`}>
