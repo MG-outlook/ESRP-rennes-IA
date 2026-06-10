@@ -7,6 +7,7 @@ import ChallengeIntro from "@/components/shared/ChallengeIntro";
 import { CHALLENGE_INTROS } from "@/lib/challenges/intros";
 import Timer from "@/components/shared/Timer";
 import StreamedOutput from "@/components/shared/StreamedOutput";
+import Markdown from "@/components/shared/Markdown";
 import SubmitButton from "@/components/shared/SubmitButton";
 import { streamFromProxy } from "@/lib/ai/proxy";
 import { BONUS_D_SUBVENTION_PROMPT } from "@/lib/ai/prompts";
@@ -16,6 +17,7 @@ const CHALLENGE_ID = 104;
 export default function BonusDPage() {
   const [teamId, setTeamId] = useState<string | null>(null);
   const [startedAt, setStartedAt] = useState<string | null>(null);
+  const [pact, setPact] = useState<string>("");
   const [projectName, setProjectName] = useState("");
   const [objective, setObjective] = useState("");
   const [budget, setBudget] = useState("");
@@ -53,6 +55,27 @@ export default function BonusDPage() {
         });
         setStartedAt(now);
       }
+
+      // Load the team's Défi 5 project sheet (Pacte) so they can reuse it here.
+      const { data: pactRow } = await supabase
+        .from("pacts")
+        .select("description")
+        .eq("team_id", session.team_id)
+        .maybeSingle();
+      if (pactRow?.description) {
+        setPact(pactRow.description);
+      } else {
+        const { data: sub } = await supabase
+          .from("submissions")
+          .select("payload")
+          .eq("team_id", session.team_id)
+          .eq("challenge_id", 5)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        const fromSub = (sub?.payload as Record<string, unknown> | null)?.pact;
+        if (typeof fromSub === "string") setPact(fromSub);
+      }
     }
     init();
   }, []);
@@ -64,11 +87,15 @@ export default function BonusDPage() {
     setGenerating(true);
     setDraftOutput("");
 
+    const pactBlock = pact.trim()
+      ? `\n\nFiche projet de l'équipe (Pacte IA du Défi 5), à réutiliser comme base :\n${pact}`
+      : "";
+
     await streamFromProxy({
       systemPrompt: BONUS_D_SUBVENTION_PROMPT,
       messages: [{
         role: "user",
-        content: `Nom du projet : ${projectName}\nObjectif principal : ${objective}\nBudget estimé : ${budget}`,
+        content: `Nom du projet : ${projectName}\nObjectif principal : ${objective}\nBudget estimé : ${budget}${pactBlock}`,
       }],
       challengeId: CHALLENGE_ID,
       teamId,
@@ -77,7 +104,7 @@ export default function BonusDPage() {
       onDone: () => setGenerating(false),
       onError: () => setGenerating(false),
     });
-  }, [teamId, generating, allFilled, projectName, objective, budget]);
+  }, [teamId, generating, allFilled, projectName, objective, budget, pact]);
 
   const handleSubmit = useCallback(async () => {
     if (!teamId || submitState !== "idle") return;
@@ -127,6 +154,23 @@ export default function BonusDPage() {
             <Timer durationSec={480} startedAt={startedAt} />
           </div>
         </div>
+
+        {/* Project sheet from Défi 5 (Pacte) */}
+        {pact ? (
+          <details className="mb-8 border-2 border-[#2D5A3D]" open>
+            <summary className="cursor-pointer font-bold text-[#2D5A3D] px-4 py-3 bg-[#F0F5F1]">
+              📋 Votre fiche projet (Pacte du Défi 5) — cliquez pour replier
+            </summary>
+            <div className="p-6 border-t-2 border-[#2D5A3D] max-h-[360px] overflow-y-auto">
+              <Markdown content={pact} />
+            </div>
+          </details>
+        ) : (
+          <div className="mb-8 border-2 border-[#B8B8B8] bg-[#F5F5F5] p-4 text-sm text-[#4A4A4A]">
+            Aucune fiche projet du Défi 5 trouvée pour votre équipe. Vous pouvez
+            tout de même remplir les champs ci-dessous.
+          </div>
+        )}
 
         {/* Inputs */}
         <section className="mb-8 flex flex-col gap-4">
