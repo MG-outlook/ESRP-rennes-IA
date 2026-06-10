@@ -63,7 +63,7 @@ export default function BonusFPage() {
       messages: [{ role: "user", content: `Moment choisi : ${moment}` }],
       challengeId: CHALLENGE_ID,
       teamId,
-      maxTokens: 500,
+      maxTokens: 4000,
       onChunk: (t) => setJournal((p) => p + t),
       onDone: () => setGenerating(false),
       onError: () => setGenerating(false),

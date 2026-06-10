@@ -28,17 +28,30 @@ interface PorteReadyPayload {
 }
 
 function parseReady(text: string): PorteReadyPayload | null {
-  const match = text.match(/<READY>([\s\S]*?)<\/READY>/);
+  const start = text.indexOf("<READY>");
+  if (start === -1) return null;
+  let body = text.slice(start + "<READY>".length);
+  const end = body.indexOf("</READY>");
+  if (end !== -1) body = body.slice(0, end);
+  // Extract the JSON object even if surrounded by stray text, and tolerate a
+  // trailing comma before the closing brace.
+  const match = body.match(/\{[\s\S]*\}/);
   if (!match) return null;
+  const cleaned = match[0].replace(/,\s*([}\]])/g, "$1");
   try {
-    return JSON.parse(match[1].trim());
+    return JSON.parse(cleaned) as PorteReadyPayload;
   } catch {
     return null;
   }
 }
 
 function stripReadyBlock(text: string): string {
-  return text.replace(/<READY>[\s\S]*?<\/READY>/, "").trim();
+  // Remove a complete block, or — while streaming — everything from an opening
+  // <READY> tag onward, so the raw JSON is never shown to the team.
+  return text
+    .replace(/<READY>[\s\S]*?<\/READY>/, "")
+    .replace(/<READY>[\s\S]*$/, "")
+    .trim();
 }
 
 export default function PortePage() {
@@ -105,6 +118,63 @@ export default function PortePage() {
     setTimeout(() => setRevealed(true), 500);
   }
 
+  /**
+   * Streams one Gardien turn for the given conversation, appending a fresh
+   * assistant bubble and updating it as tokens arrive (with any <READY> block
+   * stripped from the display). Returns the full raw assistant text.
+   */
+  async function streamGardien(convo: Message[]): Promise<string> {
+    const res = await fetch("/api/porte-chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify({ messages: convo }),
+    });
+    if (!res.ok) throw new Error("Erreur serveur");
+
+    const reader = res.body!.getReader();
+    const decoder = new TextDecoder();
+    let assistantContent = "";
+    let streamDone = false;
+
+    setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+
+    while (!streamDone) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value);
+      for (const line of chunk.split("\n")) {
+        if (!line.startsWith("data: ")) continue;
+        const data = line.slice(6).trim();
+        if (data === "[DONE]") {
+          streamDone = true;
+          break;
+        }
+        try {
+          const parsed = JSON.parse(data);
+          const delta = parsed.choices?.[0]?.delta?.content;
+          if (delta) {
+            assistantContent += delta;
+            const displayContent = stripReadyBlock(assistantContent);
+            setMessages((prev) => {
+              const updated = [...prev];
+              updated[updated.length - 1] = {
+                role: "assistant",
+                content: displayContent,
+              };
+              return updated;
+            });
+          }
+        } catch {
+          // skip unparseable
+        }
+      }
+    }
+
+    reader.cancel().catch(() => {});
+    return assistantContent;
+  }
+
   async function sendMessage(e: React.FormEvent) {
     e.preventDefault();
     const text = input.trim();
@@ -119,76 +189,32 @@ export default function PortePage() {
     await persistMessage("user", text);
 
     try {
-      const res = await fetch("/api/porte-chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "same-origin",
-        body: JSON.stringify({ messages: newMessages }),
-      });
-
-      if (!res.ok) throw new Error("Erreur serveur");
-
-      const reader = res.body!.getReader();
-      const decoder = new TextDecoder();
-      let assistantContent = "";
-      let streamDone = false;
-
-      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
-
-      while (!streamDone) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const chunk = decoder.decode(value);
-        const lines = chunk.split("\n");
-
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
-          const data = line.slice(6).trim();
-          if (data === "[DONE]") {
-            streamDone = true;
-            break;
-          }
-
-          try {
-            const parsed = JSON.parse(data);
-            const delta = parsed.choices?.[0]?.delta?.content;
-            if (delta) {
-              assistantContent += delta;
-              const displayContent = stripReadyBlock(assistantContent);
-              setMessages((prev) => {
-                const updated = [...prev];
-                updated[updated.length - 1] = {
-                  role: "assistant",
-                  content: displayContent,
-                };
-                return updated;
-              });
-            }
-          } catch {
-            // skip unparseable
-          }
-        }
-      }
-
-      reader.cancel().catch(() => {});
-
+      let assistantContent = await streamGardien(newMessages);
       await persistMessage("assistant", assistantContent);
 
-      // Check for <READY> block
-      const payload = parseReady(assistantContent);
+      let payload = parseReady(assistantContent);
+
+      // If a READY block was emitted but its JSON was invalid, ask the Gardien
+      // once — silently — to re-seal it. The correction instruction is sent to
+      // the API only; it never appears in the visible conversation.
+      if (!payload && assistantContent.includes("<READY>")) {
+        const correctionConvo: Message[] = [
+          ...newMessages,
+          { role: "assistant", content: assistantContent },
+          {
+            role: "user",
+            content:
+              "Ton bloc <READY> n'était pas un JSON valide. Renvoie UNIQUEMENT le bloc <READY>{...}</READY> avec un JSON strictement valide (guillemets droits, pas de virgule finale), et rien d'autre.",
+          },
+        ];
+        const corrected = await streamGardien(correctionConvo);
+        await persistMessage("assistant", corrected);
+        payload = parseReady(corrected);
+        assistantContent = corrected;
+      }
+
       if (payload) {
         await handleReadyPayload(payload);
-      } else {
-        // Check if malformed READY - retry
-        if (assistantContent.includes("<READY>") && !payload) {
-          const retryMsg: Message = {
-            role: "user",
-            content: "Reformule ton bloc <READY> en JSON valide.",
-          };
-          setMessages((prev) => [...prev, retryMsg]);
-          // Don't auto-retry to avoid loops - user can resend
-        }
       }
     } catch {
       setMessages((prev) => [

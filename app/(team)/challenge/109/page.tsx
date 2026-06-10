@@ -65,7 +65,7 @@ export default function BonusIPage() {
       messages: [{ role: "user", content: `Courrier :\n\n${courrier}` }],
       challengeId: CHALLENGE_ID,
       teamId,
-      maxTokens: 900,
+      maxTokens: 4000,
       onChunk: (t) => setGlossaire((p) => p + t),
       onDone: () => setGenerating(false),
       onError: () => setGenerating(false),

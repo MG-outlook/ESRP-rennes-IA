@@ -147,7 +147,7 @@ export default function Defi3Page() {
       messages: [{ role: "user", content: rewrittenPrompt }],
       challengeId: CHALLENGE_ID,
       teamId,
-      maxTokens: 2200,
+      maxTokens: 4000,
       onChunk: (t) => setRewriteOutput((p) => p + t),
       onDone: () => setRewriting(false),
       onError: () => setRewriting(false),

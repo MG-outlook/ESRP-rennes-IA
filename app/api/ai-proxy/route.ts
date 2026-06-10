@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
   const stream = streamChatResponse(
     {
       messages,
-      maxTokens: body.health_check ? 5 : body.max_tokens ?? 2048,
+      maxTokens: body.health_check ? 5 : body.max_tokens ?? 4000,
       temperature: 0.5,
       signal: req.signal,
     },

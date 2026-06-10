@@ -83,7 +83,7 @@ export default function BonusBPage() {
         : allMessages,
       challengeId: CHALLENGE_ID,
       teamId,
-      maxTokens: 500,
+      maxTokens: 4000,
       onChunk: (t) => {
         assistantText += t;
         setMessages((prev) => {

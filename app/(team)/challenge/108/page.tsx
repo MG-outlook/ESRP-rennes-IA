@@ -70,7 +70,7 @@ export default function BonusHPage() {
       }],
       challengeId: CHALLENGE_ID,
       teamId,
-      maxTokens: 800,
+      maxTokens: 4000,
       onChunk: (t) => setProtocolOutput((p) => p + t),
       onDone: () => setGenerating(false),
       onError: () => setGenerating(false),
