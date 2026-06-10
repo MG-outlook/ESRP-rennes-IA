@@ -20,22 +20,10 @@ import {
 import {
   useChallengeInit,
   finishChallenge,
-  parseJsonObject,
 } from "@/lib/challenges/general-helpers";
+import { sanitizeSvg, parseJsonObject } from "@/lib/challenges/general-pure";
 
 const CHALLENGE_ID = 201;
-
-/** Removes scripts and event handlers from model-generated SVG before render. */
-function sanitizeSvg(raw: string): string {
-  let s = raw.replace(/```svg|```/g, "").trim();
-  const start = s.indexOf("<svg");
-  const end = s.lastIndexOf("</svg>");
-  if (start !== -1 && end !== -1) s = s.slice(start, end + 6);
-  s = s.replace(/<script[\s\S]*?<\/script>/gi, "");
-  s = s.replace(/\son\w+\s*=\s*"[^"]*"/gi, "");
-  s = s.replace(/\son\w+\s*=\s*'[^']*'/gi, "");
-  return s;
-}
 
 type Phase = "compose" | "result";
 

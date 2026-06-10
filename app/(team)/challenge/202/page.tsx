@@ -21,8 +21,13 @@ import {
 import {
   useChallengeInit,
   finishChallenge,
-  parseJsonObject,
 } from "@/lib/challenges/general-helpers";
+import {
+  parseJsonObject,
+  extractGauge,
+  stripGauge,
+  stripGaugeStreaming,
+} from "@/lib/challenges/general-pure";
 
 const CHALLENGE_ID = 202;
 
@@ -119,7 +124,7 @@ export default function GenBPage() {
       maxTokens: 600,
       onChunk: (t) => {
         raw += t;
-        const shown = raw.replace(/\n?\s*JAUGE\s*:\s*\d+\s*$/i, "");
+        const shown = stripGaugeStreaming(raw);
         setMessages((prev) => {
           const u = [...prev];
           u[u.length - 1] = { role: "assistant", content: shown };
@@ -127,9 +132,8 @@ export default function GenBPage() {
         });
       },
       onDone: () => {
-        const m = raw.match(/JAUGE\s*:\s*(\d+)/i);
-        const newGauge = m ? Math.max(0, Math.min(100, Number(m[1]))) : gauge;
-        const shown = raw.replace(/\n?\s*JAUGE\s*:\s*\d+\s*/i, "").trim();
+        const newGauge = extractGauge(raw) ?? gauge;
+        const shown = stripGauge(raw);
         const finalConvo: Msg[] = [...convo, { role: "assistant", content: shown }];
         setMessages(finalConvo);
         setGauge(newGauge);

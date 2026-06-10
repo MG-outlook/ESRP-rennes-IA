@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
+export { parseJsonObject } from "./general-pure";
+
 /** Resolves the team + starts (or restores) the team_progress row. */
 export function useChallengeInit(challengeId: number) {
   const [teamId, setTeamId] = useState<string | null>(null);
@@ -65,15 +67,4 @@ export async function finishChallenge(
     .update({ finished_at: new Date().toISOString() })
     .eq("team_id", teamId)
     .eq("challenge_id", challengeId);
-}
-
-/** Extracts the first {...} JSON object from a model response, or null. */
-export function parseJsonObject<T>(text: string): T | null {
-  const match = text.match(/\{[\s\S]*\}/);
-  if (!match) return null;
-  try {
-    return JSON.parse(match[0]) as T;
-  } catch {
-    return null;
-  }
 }
