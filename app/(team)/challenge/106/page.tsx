@@ -111,7 +111,7 @@ export default function BonusFPage() {
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <InstructionsButton content={CHALLENGE_INTROS[CHALLENGE_ID]} />
-            <Timer durationSec={720} startedAt={startedAt} />
+            <Timer durationSec={720} startedAt={startedAt} challengeId={CHALLENGE_ID} />
           </div>
         </div>
 
