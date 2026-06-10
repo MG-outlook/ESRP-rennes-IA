@@ -1,7 +1,7 @@
 // Documents fictifs du dossier de Camille Renaud.
 // Source : docs/03-camille-documents.md (à valider par Réjane Certain).
 
-type DocumentKind =
+export type DocumentKind =
   | "mdph_letter"
   | "motivation_letter"
   | "medical_sheet"

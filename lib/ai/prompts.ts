@@ -414,6 +414,39 @@ export const DEFI4_RECIPIENTS: Recipient[] = [
   },
 ];
 
+/**
+ * Défi 4 — refonte « Trois courriers, un seul prompt ».
+ *
+ * Note de la direction (demande hiérarchique), nombre d'essais, prompt système
+ * de génération (neutre : c'est le prompt de l'équipe qui fait la qualité) et
+ * prompt du juge IA de fin de défi.
+ */
+export const DEFI4_MAX_ATTEMPTS = 3;
+
+export const DEFI4_BRIEF = `NOTE DE SERVICE — Direction de l'ESRP Rennes
+
+À l'attention de l'équipe d'accompagnement.
+
+Camille Renaud a obtenu un stage en entreprise (accueil-secrétariat, 3 semaines). Merci de préparer dès aujourd'hui, et d'un seul envoi, TROIS courriers pour officialiser ce stage :
+1. un courrier à Camille elle-même, en langage simple (FALC) ;
+2. un courrier administratif à la MDPH ;
+3. un courrier officiel à l'entreprise d'accueil.
+
+Utilisez l'IA pour les produire tous les trois en même temps. Pensez à ne lui donner que les documents réellement utiles.
+
+La Direction.`;
+
+export const DEFI4_GENERATION_SYSTEM_PROMPT = `Tu es un assistant de rédaction administrative à l'ESRP Rennes. Tu réponds à la demande de l'équipe en t'appuyant UNIQUEMENT sur les documents fournis ci-dessous. Si une information demandée n'y figure pas, ne l'invente pas : écris [à compléter]. Présente ta réponse en Markdown clair (un titre par courrier, puis le corps du courrier).`;
+
+export const DEFI4_JUDGE_SYSTEM_PROMPT = `Tu es un évaluateur d'atelier IA. Une équipe de l'ESRP devait obtenir, en UN SEUL prompt, trois courriers à partir des documents de Camille : (1) à Camille en FALC (langage simple, phrases courtes, bienveillant), (2) à la MDPH (ton administratif, références dossier), (3) à l'entreprise d'accueil (ton officiel cordial, modalités du stage).
+
+Tu évalues deux dimensions, chacune notée de 0 à 10 :
+- "prompt_quality" : clarté et complétude du prompt de l'équipe. Demande-t-il bien les 3 courriers ? Précise-t-il chaque destinataire, le ton attendu, le FALC pour Camille, et les informations à inclure ?
+- "documents_quality" : qualité et justesse des 3 courriers produits. Les 3 sont-ils présents ? Exacts au regard des documents ? Le ton est-il adapté à chaque destinataire ? Le FALC est-il respecté pour Camille ?
+
+Réponds UNIQUEMENT par un JSON valide sur une seule ligne, sans aucun texte autour ni bloc de code :
+{"prompt_quality":n,"documents_quality":n,"commentaire":"une à deux phrases de synthèse","conseils":["conseil court","conseil court"]}`;
+
 /* ------------------------------------------------------------------ */
 /* Défi 5 — Notre projet                                              */
 /* ------------------------------------------------------------------ */

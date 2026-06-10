@@ -38,17 +38,17 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
     note: "Le but : comprendre que la qualité d'une réponse IA dépend d'abord de la qualité — et de la neutralité — de la question.",
   },
   4: {
-    title: "Défi 4 — Une info, cinq destinataires",
+    title: "Défi 4 — Trois courriers, un seul prompt",
     subtitle:
-      "« Camille a un stage. La même info à dire à 5 personnes très différentes. L'IA décline, vous ajustez. »",
+      "« La direction vous demande d'officialiser le stage de Camille auprès de 3 destinataires. En un seul prompt. »",
     duration: "20 min",
     steps: [
-      "Lisez la convention de stage de Camille (langage administratif).",
-      "Pariez : sur les 5 versions que l'IA va produire, combien seront utilisables sans aucune retouche ?",
-      "L'IA génère 5 versions du message : pour Camille (FALC), ses parents, l'entreprise, le médecin, la MDPH.",
-      "Relisez chaque version et ajustez : OK telle quelle, modifier, ou régénérer.",
+      "Lisez la demande de la direction : 3 courriers à produire (à Camille en FALC, à la MDPH, à l'entreprise).",
+      "Choisissez quels documents l'IA doit avoir en mémoire — elle ne verra QUE ceux que vous cochez.",
+      "Écrivez UN seul prompt pour obtenir les 3 courriers d'un coup. Vous avez 3 essais maximum.",
+      "L'IA évalue à la fin : qualité de votre prompt, qualité des courriers, avec un malus si vous avez multiplié les essais.",
     ],
-    note: "Une même information n'a pas la même forme selon à qui on l'adresse. L'IA décline, mais c'est vous qui jugez la justesse.",
+    note: "Le bon réflexe IA : donner le bon contexte (les bons documents) et une consigne précise — du premier coup. C'est ce qui fait gagner du temps.",
   },
   5: {
     title: "Défi 5 — Notre projet",
