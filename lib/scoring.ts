@@ -18,6 +18,11 @@ export const CHALLENGE_TITLES: Record<number, string> = {
   108: "Bonus H — Le scénario de crise",
   109: "Bonus I — Le glossaire qui sauve",
   110: "Bonus J — La carte mentale du parcours",
+  201: "Défi A — Le pictogramme express",
+  202: "Défi B — Le client mystère",
+  203: "Défi C — La chasse à l'hallu",
+  204: "Défi D — Le caméléon",
+  205: "Défi E — La fabrique à idées",
 };
 
 export function challengeTitle(id: number): string {

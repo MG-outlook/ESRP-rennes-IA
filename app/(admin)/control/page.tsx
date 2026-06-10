@@ -35,6 +35,17 @@ const CHALLENGES = [
   { id: 5, title: "Notre projet" },
 ];
 
+// Défis « généralistes » (track general) — sans lien avec Camille.
+const GENERAL_CHALLENGES = [
+  { id: 201, title: "A — Pictogramme" },
+  { id: 202, title: "B — Client mystère" },
+  { id: 203, title: "C — Chasse à l'hallu" },
+  { id: 204, title: "D — Caméléon" },
+  { id: 205, title: "E — Fabrique à idées" },
+];
+
+const ALL_MAIN = [...CHALLENGES, ...GENERAL_CHALLENGES];
+
 const BONUS_CHALLENGES = [
   { id: 101, title: "Doublons" },
   { id: 102, title: "Coach entretien" },
@@ -249,10 +260,12 @@ export default function ControlPage() {
         )}
       </section>
 
-      {/* Défi actif */}
+      {/* Défi actif — deux listes */}
       <section className="border-2 border-black p-4 sm:p-6 mb-6 sm:mb-8">
         <h2 className="text-2xl font-bold text-black mb-4">Défi actif</h2>
-        <div className="flex flex-wrap gap-2">
+
+        <h3 className="font-bold text-black mb-2">Parcours Camille</h3>
+        <div className="flex flex-wrap gap-2 mb-5">
           {CHALLENGES.map((c) => (
             <button
               key={c.id}
@@ -267,9 +280,29 @@ export default function ControlPage() {
             </button>
           ))}
         </div>
-        <p className="text-sm text-[#4A4A4A] mt-2">
-          Actif : {workshopState.active_challenge_id !== null
-            ? CHALLENGES.find((c) => c.id === workshopState.active_challenge_id)?.title ?? `#${workshopState.active_challenge_id}`
+
+        <h3 className="font-bold text-black mb-2">Défis généralistes</h3>
+        <div className="flex flex-wrap gap-2">
+          {GENERAL_CHALLENGES.map((c) => (
+            <button
+              key={c.id}
+              onClick={() => handleSetChallenge(c.id)}
+              className={`px-4 py-2 border-2 font-semibold ${
+                workshopState.active_challenge_id === c.id
+                  ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
+                  : "bg-white border-[#2D5A3D] text-[#2D5A3D]"
+              }`}
+            >
+              {c.title}
+            </button>
+          ))}
+        </div>
+
+        <p className="text-sm text-[#4A4A4A] mt-4">
+          Actif :{" "}
+          {workshopState.active_challenge_id !== null
+            ? ALL_MAIN.find((c) => c.id === workshopState.active_challenge_id)
+                ?.title ?? `#${workshopState.active_challenge_id}`
             : "Aucun"}
         </p>
       </section>
