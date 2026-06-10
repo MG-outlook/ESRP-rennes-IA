@@ -11,6 +11,66 @@ export interface ChallengeIntroContent {
 }
 
 export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
+  201: {
+    title: "Défi A — Le pictogramme express",
+    subtitle: "« Faire comprendre une consigne sans une seule ligne de texte. »",
+    duration: "13 min",
+    steps: [
+      "Une consigne simple vous est tirée au sort.",
+      "Rédigez un prompt pour que l'IA dessine un pictogramme clair (boutons d'aide à disposition) + une légende de 5 mots max.",
+      "Test à l'aveugle : une IA « tierce » voit le visuel sans le texte et devine le message.",
+      "Score automatique selon la clarté réelle, la qualité du prompt et l'accessibilité.",
+    ],
+    note: "L'IA produit aussi du visuel : un atout direct pour le FALC et l'accessibilité.",
+  },
+  202: {
+    title: "Défi B — Le client mystère",
+    subtitle: "« S'entraîner à convaincre, sans enjeu réel. »",
+    duration: "14 min",
+    steps: [
+      "Choisissez un interlocuteur (collègue inquiet, partenaire sceptique, financeur).",
+      "Dialoguez avec lui via l'IA pour faire évoluer sa position. Une jauge monte selon vos arguments.",
+      "Objectif : dépasser 75/100 avant la fin des échanges.",
+      "Bilan : score sur l'atteinte de l'objectif, l'argumentation et la posture.",
+    ],
+    note: "L'IA ne joue jamais une personne accompagnée : seulement un acteur externe ou collectif.",
+  },
+  203: {
+    title: "Défi C — La chasse à l'hallu",
+    subtitle: "« L'IA se trompe avec aplomb. Le pro garde le dernier mot. »",
+    duration: "12 min",
+    steps: [
+      "Lisez une note rédigée par l'IA : elle a l'air sérieuse… mais contient des pièges.",
+      "Repérez les passages problématiques et indiquez pourquoi (faux, jargon, inventé, inapproprié, donnée sensible).",
+      "Attention aux fausses alertes : signaler un passage correct fait perdre des points.",
+      "Correction automatique : les pièges réels sont révélés, avec votre score.",
+    ],
+    note: "Le réflexe à muscler : ne jamais croire l'IA sur parole.",
+  },
+  204: {
+    title: "Défi D — Le caméléon",
+    subtitle: "« Un même message, plusieurs publics, sans trahir le sens. »",
+    duration: "14 min",
+    steps: [
+      "Lisez la note d'origine, puis faites-en produire 3 versions (pro, FALC, partenaire).",
+      "Ajustez la version FALC — c'est elle qui passe le test.",
+      "Test aller-retour : l'IA reconstruit le message d'origine à partir du seul FALC.",
+      "Score selon la fidélité du sens, l'accessibilité FALC et l'adaptation aux publics.",
+    ],
+    note: "Bien simplifier, c'est garder l'essentiel sans le perdre en route.",
+  },
+  205: {
+    title: "Défi E — La fabrique à idées",
+    subtitle: "« L'IA comme partenaire de créativité, pas d'exécution. »",
+    duration: "13 min",
+    steps: [
+      "Deux cartes sont tirées au sort : une situation et une contrainte forte.",
+      "Faites générer 10 usages concrets de l'IA, dont 3 audacieux.",
+      "Sélectionnez UNE idée et défendez-la en 3 lignes.",
+      "Score selon l'originalité, la faisabilité, le respect de la contrainte et l'éthique.",
+    ],
+    note: "La contrainte casse les idées convenues — et fait surgir l'inattendu.",
+  },
   1: {
     title: "Défi 1 — La Pré-admission",
     subtitle:
