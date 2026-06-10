@@ -202,12 +202,20 @@ export default function DashboardPage() {
     <main className="min-h-screen bg-white p-4 sm:p-6">
       <div className="flex items-center justify-between gap-3 flex-wrap mb-6">
         <h1 className="text-2xl sm:text-4xl font-bold text-black">Dashboard — Vue projetée</h1>
-        <div className={`px-4 py-2 border-2 font-semibold text-sm ${
-          aiStatus === "ok"
-            ? "border-[#2D5A3D] text-[#2D5A3D]"
-            : "border-black bg-black text-white"
-        }`}>
-          {aiStatus === "ok" ? "IA : OK" : "IA : MODE DÉGRADÉ"}
+        <div className="flex items-center gap-3">
+          <a
+            href="/classement"
+            className="px-4 py-2 border-2 border-[#2D5A3D] text-[#2D5A3D] font-semibold text-sm hover:bg-[#2D5A3D] hover:text-white"
+          >
+            🏆 Classement final
+          </a>
+          <div className={`px-4 py-2 border-2 font-semibold text-sm ${
+            aiStatus === "ok"
+              ? "border-[#2D5A3D] text-[#2D5A3D]"
+              : "border-black bg-black text-white"
+          }`}>
+            {aiStatus === "ok" ? "IA : OK" : "IA : MODE DÉGRADÉ"}
+          </div>
         </div>
       </div>
 
