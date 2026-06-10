@@ -212,6 +212,8 @@ export default function Defi3Page() {
       accuracy: score,
     });
 
+    const bonusCorrect = bonusAnswer === DEFI3_BONUS.correctId;
+    const points = Math.max(0, Math.min(20, score + (bonusCorrect ? 2 : 0)));
     await supabase.from("submissions").insert({
       team_id: teamId,
       challenge_id: CHALLENGE_ID,
@@ -219,7 +221,8 @@ export default function Defi3Page() {
         case_results: caseResults,
         score,
         bonus_answer: bonusAnswer,
-        bonus_correct: bonusAnswer === DEFI3_BONUS.correctId,
+        bonus_correct: bonusCorrect,
+        points,
       },
       ai_provider: "proxy",
       model: "ai-proxy",

@@ -216,6 +216,7 @@ Courriers produits par l'IA :
         verdict,
         malus,
         final_score: finalScore,
+        points: finalScore,
       },
       ai_provider: "proxy",
       model: "ai-proxy",

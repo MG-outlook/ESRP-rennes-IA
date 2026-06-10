@@ -195,6 +195,19 @@ export default function Defi2Page() {
   const handleSubmit = useCallback(async () => {
     if (!teamId || submitState !== "idle") return;
     setSubmitState("loading");
+    // Score (/20): correctly kept useful notes + correctly discarded
+    // off-topic/contradictory ones, over the notes that have a "right" action.
+    const relevant = DEFI2_OBSERVATIONS.filter((o) => o.kind !== "redundant").length;
+    let correct = 0;
+    for (const o of DEFI2_OBSERVATIONS) {
+      const c = sorts[o.id];
+      if (o.kind === "useful") {
+        if (c && c !== "jeter") correct++;
+      } else if (o.kind === "offtopic" || o.kind === "contradictory") {
+        if (c === "jeter") correct++;
+      }
+    }
+    const points = relevant > 0 ? Math.round((20 * correct) / relevant) : 0;
     const supabase = createClient();
     await supabase.from("submissions").insert({
       team_id: teamId,
@@ -204,6 +217,7 @@ export default function Defi2Page() {
         pro_output: proOutput,
         falc_output: falcOutput,
         falc_eval: falcEval,
+        points,
       },
       ai_provider: "proxy",
       model: "ai-proxy",

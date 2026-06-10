@@ -4,6 +4,22 @@ import { useEffect, useState, useCallback } from "react";
 import { adminFetch } from "@/lib/admin/client";
 import { getAIStatus, onAIStatusChange, startHealthCheck } from "@/lib/ai/health";
 import Skeleton from "@/components/shared/Skeleton";
+import Markdown from "@/components/shared/Markdown";
+import {
+  challengeTitle,
+  computeChallengeScore,
+  extractDocuments,
+} from "@/lib/scoring";
+
+function downloadMarkdown(filename: string, content: string) {
+  const blob = new Blob([content], { type: "text/markdown;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 interface ProgressRow {
   team_id: string;
@@ -39,15 +55,6 @@ interface SubmissionDetail {
   created_at: string;
   payload: Record<string, unknown>;
 }
-
-const CHALLENGE_TITLES: Record<number, string> = {
-  0: "La Porte",
-  1: "Pré-admission",
-  2: "Synthèse 4 voix",
-  3: "Mauvais prompts",
-  4: "5 destinataires",
-  5: "Notre projet",
-};
 
 function formatComposition(comp: Record<string, number> | null): string {
   if (!comp) return "—";
@@ -127,9 +134,8 @@ export default function DashboardPage() {
         animator: t.animator,
         composition: t.composition as Record<string, number> | null,
         currentChallenge,
-        currentChallengeTitle: currentChallenge !== null
-          ? CHALLENGE_TITLES[currentChallenge] ?? `Défi ${currentChallenge}`
-          : null,
+        currentChallengeTitle:
+          currentChallenge !== null ? challengeTitle(currentChallenge) : null,
         totalScore: scoreMap[t.id] ?? 0,
         progressPhase,
       };
@@ -262,23 +268,59 @@ export default function DashboardPage() {
             {submissions.length === 0 ? (
               <p className="text-[#4A4A4A]">Aucune soumission.</p>
             ) : (
-              <div className="flex flex-col gap-3">
-                {submissions.map((sub) => (
-                  <div key={sub.id} className="border border-[#B8B8B8] p-3">
-                    <div className="flex justify-between text-sm text-[#4A4A4A] mb-1">
-                      <span className="font-semibold">
-                        Défi {sub.challenge_id} — {CHALLENGE_TITLES[sub.challenge_id] ?? `#${sub.challenge_id}`}
-                      </span>
-                      <span>{new Date(sub.created_at).toLocaleTimeString("fr-FR")}</span>
+              <div className="flex flex-col gap-4">
+                {submissions.map((sub) => {
+                  const teamCode = teams.find((t) => t.id === selectedTeam)?.code ?? "equipe";
+                  const points = computeChallengeScore(sub.challenge_id, sub.payload);
+                  const docs = extractDocuments(sub.payload);
+                  return (
+                    <div key={sub.id} className="border-2 border-black p-4">
+                      <div className="flex justify-between items-center text-sm mb-2 flex-wrap gap-2">
+                        <span className="font-bold text-black">
+                          Défi {sub.challenge_id} — {challengeTitle(sub.challenge_id)}
+                        </span>
+                        <span className="flex items-center gap-3 text-[#4A4A4A]">
+                          {points != null && (
+                            <span className="font-bold text-[#2D5A3D]">{points}/20</span>
+                          )}
+                          <span>{new Date(sub.created_at).toLocaleTimeString("fr-FR")}</span>
+                        </span>
+                      </div>
+
+                      {docs.length === 0 ? (
+                        <p className="text-sm text-[#B8B8B8]">Pas de document texte.</p>
+                      ) : (
+                        <div className="flex flex-col gap-3">
+                          {docs.map((doc, i) => (
+                            <div key={i} className="border border-[#B8B8B8] p-3">
+                              <div className="flex justify-between items-center mb-2">
+                                <span className="font-semibold text-black text-sm">
+                                  {doc.label}
+                                </span>
+                                <button
+                                  onClick={() =>
+                                    downloadMarkdown(
+                                      `${teamCode}-defi${sub.challenge_id}-${doc.label
+                                        .toLowerCase()
+                                        .replace(/[^a-z0-9]+/g, "-")}.md`,
+                                      doc.markdown
+                                    )
+                                  }
+                                  className="text-xs px-3 py-1 border-2 border-[#2D5A3D] text-[#2D5A3D] font-semibold hover:bg-[#2D5A3D] hover:text-white"
+                                >
+                                  Télécharger .md
+                                </button>
+                              </div>
+                              <div className="text-sm max-h-[260px] overflow-y-auto border-t border-[#E0E0E0] pt-2">
+                                <Markdown content={doc.markdown} />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    <p className="text-xs text-[#B8B8B8]">
-                      Provider: {sub.ai_provider}
-                    </p>
-                    <pre className="text-xs text-[#4A4A4A] mt-1 max-h-[100px] overflow-y-auto whitespace-pre-wrap">
-                      {JSON.stringify(sub.payload, null, 2).slice(0, 500)}
-                    </pre>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

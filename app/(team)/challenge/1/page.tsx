@@ -161,11 +161,16 @@ export default function Defi1Page() {
   const handleSubmitScore = useCallback(async () => {
     if (!teamId || submitState !== "idle") return;
     setSubmitState("loading");
+    const gap = betRoles.reduce(
+      (sum, r) => sum + Math.abs((predictions[r] ?? 0) - DEFI1_TRUTH_COUNTS[r]),
+      0
+    );
+    const points = Math.max(0, Math.min(20, 20 - gap));
     const supabase = createClient();
     await supabase.from("submissions").insert({
       team_id: teamId,
       challenge_id: CHALLENGE_ID,
-      payload: { ai_output: aiOutput, predictions, truth: DEFI1_TRUTH_COUNTS },
+      payload: { ai_output: aiOutput, predictions, truth: DEFI1_TRUTH_COUNTS, points },
       ai_provider: "proxy",
       model: "ai-proxy",
     });
@@ -176,7 +181,7 @@ export default function Defi1Page() {
       .eq("challenge_id", CHALLENGE_ID);
     setSubmitState("done");
     showToast("Réponse enregistrée", "success");
-  }, [teamId, submitState, aiOutput, predictions, showToast]);
+  }, [teamId, submitState, aiOutput, predictions, betRoles, showToast]);
 
   useEffect(() => {
     if (phase === "generation" && !generating && !aiOutput) handleGenerate();
