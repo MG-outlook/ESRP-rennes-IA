@@ -1,4 +1,4 @@
-// Contenu pédagogique des défis — Fresque de l'IA ESRP Rennes.
+// Contenu pédagogique des défis — CAMPUS EPNAK IA, ESRP Rennes.
 // Source de vérité : docs/01-fiches-defis-v2.md + docs/03-camille-documents.md.
 
 /* ------------------------------------------------------------------ */

@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ToastProvider } from "@/lib/hooks/useToast";
+import VersionBadge from "@/components/shared/VersionBadge";
 
 export const metadata: Metadata = {
-  title: "Fresque de l'IA — ESRP Rennes",
-  description: "Atelier Fresque de l'IA — EPNAK ESRP Rennes — 16 juillet 2026",
+  title: "CAMPUS EPNAK IA",
+  description: "CAMPUS EPNAK IA — EPNAK ESRP Rennes",
 };
 
 export default function RootLayout({
@@ -15,6 +16,7 @@ export default function RootLayout({
   return (
     <html lang="fr" className="h-full">
       <body className="min-h-full flex flex-col">
+        <VersionBadge />
         <ToastProvider>{children}</ToastProvider>
       </body>
     </html>

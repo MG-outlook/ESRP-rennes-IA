@@ -177,9 +177,9 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-white p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-4xl font-bold text-black">Dashboard — Vue projetée</h1>
+    <main className="min-h-screen bg-white p-4 sm:p-6">
+      <div className="flex items-center justify-between gap-3 flex-wrap mb-6">
+        <h1 className="text-2xl sm:text-4xl font-bold text-black">Dashboard — Vue projetée</h1>
         <div className={`px-4 py-2 border-2 font-semibold text-sm ${
           aiStatus === "ok"
             ? "border-[#2D5A3D] text-[#2D5A3D]"
@@ -259,8 +259,8 @@ export default function DashboardPage() {
 
       {/* Detail modal */}
       {selectedTeam && (
-        <div className="fixed inset-0 z-40 bg-black/30 flex items-center justify-center p-8">
-          <div className="bg-white border-2 border-black max-w-3xl w-full max-h-[80vh] overflow-y-auto p-6">
+        <div className="fixed inset-0 z-40 bg-black/30 flex items-center justify-center p-2 sm:p-6">
+          <div className="bg-white border-2 border-black max-w-3xl w-full max-h-[85vh] overflow-y-auto p-4 sm:p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-black">
                 Équipe {teams.find((t) => t.id === selectedTeam)?.code}
