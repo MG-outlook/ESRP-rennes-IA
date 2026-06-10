@@ -53,10 +53,16 @@ export async function POST(req: NextRequest) {
   try {
     switch (action) {
       case "get_state": {
-        const [teams, state] = await Promise.all([
+        const [teams, archived, state] = await Promise.all([
           supabase
             .from("teams")
             .select("id, code, password, animator, composition, porte_passed_at")
+            .is("archived_at", null)
+            .order("code"),
+          supabase
+            .from("teams")
+            .select("id, code, animator")
+            .not("archived_at", "is", null)
             .order("code"),
           supabase
             .from("workshop_state")
@@ -67,6 +73,7 @@ export async function POST(req: NextRequest) {
         if (teams.error) throw teams.error;
         return NextResponse.json({
           teams: teams.data ?? [],
+          archived_teams: archived.data ?? [],
           workshop_state:
             state.data ?? {
               is_paused: false,
@@ -76,11 +83,84 @@ export async function POST(req: NextRequest) {
         });
       }
 
+      case "create_team": {
+        const code = String(body.code ?? "").trim();
+        const animator = (body.animator as string)?.trim() || null;
+        if (!/^\d{4}$/.test(code)) {
+          return NextResponse.json(
+            { error: "Code à 4 chiffres requis." },
+            { status: 400 }
+          );
+        }
+        const { data: existing } = await supabase
+          .from("teams")
+          .select("id")
+          .eq("code", code)
+          .maybeSingle();
+        if (existing) {
+          return NextResponse.json(
+            { error: `Le code ${code} existe déjà.` },
+            { status: 400 }
+          );
+        }
+        const { error } = await supabase.from("teams").insert({ code, animator });
+        if (error) throw error;
+        return NextResponse.json({ ok: true });
+      }
+
+      case "archive_team": {
+        const { error } = await supabase
+          .from("teams")
+          .update({ archived_at: nowIso() })
+          .eq("id", body.team_id as string);
+        if (error) throw error;
+        return NextResponse.json({ ok: true });
+      }
+
+      case "restore_team": {
+        const { error } = await supabase
+          .from("teams")
+          .update({ archived_at: null })
+          .eq("id", body.team_id as string);
+        if (error) throw error;
+        return NextResponse.json({ ok: true });
+      }
+
+      case "reset_team": {
+        const teamId = body.team_id as string;
+        // Wipe the team's run, then reset its identity fields back to a fresh state.
+        await supabase.from("team_progress").delete().eq("team_id", teamId);
+        await supabase.from("submissions").delete().eq("team_id", teamId);
+        await supabase.from("predictions").delete().eq("team_id", teamId);
+        await supabase.from("pacts").delete().eq("team_id", teamId);
+        await supabase.from("porte_messages").delete().eq("team_id", teamId);
+        await supabase.from("events").delete().eq("team_id", teamId);
+        await supabase
+          .from("votes")
+          .delete()
+          .or(`voter_team_id.eq.${teamId},voted_team_id.eq.${teamId}`);
+        await supabase.from("team_sessions").delete().eq("team_id", teamId);
+        const { error } = await supabase
+          .from("teams")
+          .update({
+            password: null,
+            composition: {},
+            intention: null,
+            singularite: null,
+            team_essence: null,
+            porte_passed_at: null,
+          })
+          .eq("id", teamId);
+        if (error) throw error;
+        return NextResponse.json({ ok: true });
+      }
+
       case "get_dashboard": {
         const [teams, progress, subs] = await Promise.all([
           supabase
             .from("teams")
             .select("id, code, password, animator, composition")
+            .is("archived_at", null)
             .order("code"),
           supabase
             .from("team_progress")

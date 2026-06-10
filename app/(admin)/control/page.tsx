@@ -20,12 +20,18 @@ interface WorkshopState {
   active_challenge_id: number | null;
 }
 
+interface ArchivedTeam {
+  id: string;
+  code: string;
+  animator: string | null;
+}
+
 const CHALLENGES = [
   { id: 0, title: "La Porte" },
   { id: 1, title: "Pré-admission" },
-  { id: 2, title: "Synthèse 4 voix" },
+  { id: 2, title: "Tri des observations" },
   { id: 3, title: "Mauvais prompts" },
-  { id: 4, title: "5 destinataires" },
+  { id: 4, title: "Trois courriers" },
   { id: 5, title: "Notre projet" },
 ];
 
@@ -51,21 +57,27 @@ export default function ControlPage() {
     pause_reason: null,
     active_challenge_id: null,
   });
+  const [archivedTeams, setArchivedTeams] = useState<ArchivedTeam[]>([]);
   const [loading, setLoading] = useState(true);
   const [pauseReason, setPauseReason] = useState("");
   const [unlocking, setUnlocking] = useState<string | null>(null);
   const [bonusChallenge, setBonusChallenge] = useState(101);
   const [bonusTargets, setBonusTargets] = useState<Set<string>>(new Set());
+  const [newCode, setNewCode] = useState("");
+  const [newAnimator, setNewAnimator] = useState("");
+  const [busyTeam, setBusyTeam] = useState<string | null>(null);
 
   const { show: showToast } = useToast();
 
   const fetchData = useCallback(async () => {
     try {
-      const { teams, workshop_state } = await adminFetch<{
+      const { teams, archived_teams, workshop_state } = await adminFetch<{
         teams: Team[];
+        archived_teams: ArchivedTeam[];
         workshop_state: WorkshopState;
       }>("get_state");
       setTeams(teams);
+      setArchivedTeams(archived_teams ?? []);
       setWorkshopState(workshop_state);
     } catch (e) {
       showToast((e as Error).message, "error");
@@ -73,6 +85,63 @@ export default function ControlPage() {
       setLoading(false);
     }
   }, [showToast]);
+
+  async function handleCreateTeam(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      await adminAction("create_team", {
+        code: newCode.trim(),
+        animator: newAnimator.trim() || null,
+      });
+      showToast(`Équipe ${newCode.trim()} créée`, "success");
+      setNewCode("");
+      setNewAnimator("");
+      fetchData();
+    } catch (err) {
+      showToast((err as Error).message, "error");
+    }
+  }
+
+  async function handleResetTeam(team: Team) {
+    if (
+      !window.confirm(
+        `Réinitialiser l'équipe ${team.code} ? Toute sa progression et ses documents seront effacés. Cette action est irréversible.`
+      )
+    )
+      return;
+    setBusyTeam(team.id);
+    try {
+      await adminAction("reset_team", { team_id: team.id });
+      showToast(`Équipe ${team.code} réinitialisée`, "success");
+      fetchData();
+    } catch (err) {
+      showToast((err as Error).message, "error");
+    }
+    setBusyTeam(null);
+  }
+
+  async function handleArchiveTeam(team: Team) {
+    if (!window.confirm(`Archiver l'équipe ${team.code} ?`)) return;
+    setBusyTeam(team.id);
+    try {
+      await adminAction("archive_team", { team_id: team.id });
+      showToast(`Équipe ${team.code} archivée`, "info");
+      fetchData();
+    } catch (err) {
+      showToast((err as Error).message, "error");
+    }
+    setBusyTeam(null);
+  }
+
+  async function handleRestoreTeam(team: ArchivedTeam) {
+    try {
+      await adminAction("restore_team", { team_id: team.id });
+      showToast(`Équipe ${team.code} restaurée`, "success");
+      fetchData();
+    } catch (err) {
+      showToast((err as Error).message, "error");
+    }
+  }
 
   useEffect(() => {
     fetchData();
@@ -145,13 +214,15 @@ export default function ControlPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white p-8">
-      <h1 className="text-4xl font-bold text-black mb-8">Panneau de contrôle</h1>
+    <main className="min-h-screen bg-white p-4 sm:p-6 lg:p-8">
+      <h1 className="text-3xl sm:text-4xl font-bold text-black mb-6 sm:mb-8">
+        Panneau de contrôle
+      </h1>
 
       {/* Pause globale */}
-      <section className="border-2 border-black p-6 mb-8">
+      <section className="border-2 border-black p-4 sm:p-6 mb-6 sm:mb-8">
         <h2 className="text-2xl font-bold text-black mb-4">Pause globale</h2>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
           <input
             type="text"
             value={pauseReason}
@@ -162,7 +233,7 @@ export default function ControlPage() {
           />
           <button
             onClick={handlePauseToggle}
-            className={`px-6 py-3 font-semibold border-2 text-xl ${
+            className={`px-6 py-3 font-semibold border-2 text-xl shrink-0 ${
               workshopState.is_paused
                 ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
                 : "bg-[#8B3A3A] border-[#8B3A3A] text-white"
@@ -179,7 +250,7 @@ export default function ControlPage() {
       </section>
 
       {/* Défi actif */}
-      <section className="border-2 border-black p-6 mb-8">
+      <section className="border-2 border-black p-4 sm:p-6 mb-6 sm:mb-8">
         <h2 className="text-2xl font-bold text-black mb-4">Défi actif</h2>
         <div className="flex flex-wrap gap-2">
           {CHALLENGES.map((c) => (
@@ -204,17 +275,54 @@ export default function ControlPage() {
       </section>
 
       {/* Équipes */}
-      <section className="border-2 border-black p-6 mb-8">
+      <section className="border-2 border-black p-4 sm:p-6 mb-6 sm:mb-8">
         <h2 className="text-2xl font-bold text-black mb-4">Équipes</h2>
+
+        {/* Créer une équipe */}
+        <form
+          onSubmit={handleCreateTeam}
+          className="flex flex-col sm:flex-row sm:items-end gap-3 mb-6 border-2 border-[#B8B8B8] p-3"
+        >
+          <label className="flex flex-col text-sm font-semibold text-black">
+            Code (4 chiffres)
+            <input
+              type="text"
+              inputMode="numeric"
+              maxLength={4}
+              value={newCode}
+              onChange={(e) => setNewCode(e.target.value)}
+              placeholder="ex : 7421"
+              className="mt-1 border-2 border-black px-3 py-2 text-black focus:border-[#2D5A3D] focus:outline-none w-full sm:w-32"
+            />
+          </label>
+          <label className="flex flex-col text-sm font-semibold text-black flex-1">
+            Animateur (optionnel)
+            <input
+              type="text"
+              value={newAnimator}
+              onChange={(e) => setNewAnimator(e.target.value)}
+              placeholder="ex : Réjane"
+              className="mt-1 border-2 border-black px-3 py-2 text-black focus:border-[#2D5A3D] focus:outline-none"
+            />
+          </label>
+          <button
+            type="submit"
+            disabled={!/^\d{4}$/.test(newCode.trim())}
+            className="px-5 py-2 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] disabled:opacity-50 shrink-0"
+          >
+            + Ajouter
+          </button>
+        </form>
+
         <div className="overflow-x-auto">
-        <table className="w-full min-w-[600px] border-collapse">
+        <table className="w-full min-w-[640px] border-collapse">
           <thead>
             <tr className="border-b-2 border-black text-left">
               <th scope="col" className="p-3">Code</th>
               <th scope="col" className="p-3">Animateur</th>
               <th scope="col" className="p-3">Mot de passe</th>
               <th scope="col" className="p-3">Statut</th>
-              <th scope="col" className="p-3">Action</th>
+              <th scope="col" className="p-3">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -233,25 +341,71 @@ export default function ControlPage() {
                   )}
                 </td>
                 <td className="p-3">
-                  {!team.porte_passed_at && (
+                  <div className="flex flex-wrap gap-2">
+                    {!team.porte_passed_at && (
+                      <button
+                        onClick={() => handleUnlock(team.id)}
+                        disabled={unlocking === team.id}
+                        className="px-3 py-2 bg-[#8B3A3A] text-white text-sm font-semibold border-2 border-[#8B3A3A] disabled:opacity-50"
+                      >
+                        {unlocking === team.id ? <Spinner size="sm" /> : "Débloquer"}
+                      </button>
+                    )}
                     <button
-                      onClick={() => handleUnlock(team.id)}
-                      disabled={unlocking === team.id}
-                      className="px-4 py-2 bg-[#8B3A3A] text-white font-semibold border-2 border-[#8B3A3A] disabled:opacity-50"
+                      onClick={() => handleResetTeam(team)}
+                      disabled={busyTeam === team.id}
+                      className="px-3 py-2 bg-white text-[#8B3A3A] text-sm font-semibold border-2 border-[#8B3A3A] disabled:opacity-50"
                     >
-                      {unlocking === team.id ? <Spinner size="sm" /> : "Débloquer"}
+                      Reset
                     </button>
-                  )}
+                    <button
+                      onClick={() => handleArchiveTeam(team)}
+                      disabled={busyTeam === team.id}
+                      className="px-3 py-2 bg-white text-[#4A4A4A] text-sm font-semibold border-2 border-[#B8B8B8] disabled:opacity-50"
+                    >
+                      Archiver
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
         </div>
+
+        {/* Équipes archivées */}
+        {archivedTeams.length > 0 && (
+          <details className="mt-6">
+            <summary className="cursor-pointer font-semibold text-[#4A4A4A]">
+              Équipes archivées ({archivedTeams.length})
+            </summary>
+            <div className="flex flex-wrap gap-2 mt-3">
+              {archivedTeams.map((t) => (
+                <div
+                  key={t.id}
+                  className="flex items-center gap-2 border-2 border-[#B8B8B8] px-3 py-2"
+                >
+                  <span className="font-bold text-black">{t.code}</span>
+                  {t.animator && (
+                    <span className="text-sm text-[#4A4A4A] capitalize">
+                      {t.animator}
+                    </span>
+                  )}
+                  <button
+                    onClick={() => handleRestoreTeam(t)}
+                    className="text-sm text-[#2D5A3D] underline"
+                  >
+                    Restaurer
+                  </button>
+                </div>
+              ))}
+            </div>
+          </details>
+        )}
       </section>
 
       {/* Bonus activation */}
-      <section className="border-2 border-black p-6">
+      <section className="border-2 border-black p-4 sm:p-6">
         <h2 className="text-2xl font-bold text-black mb-4">Activer un bonus</h2>
         <div className="flex flex-wrap gap-2 mb-4">
           {BONUS_CHALLENGES.map((b) => (

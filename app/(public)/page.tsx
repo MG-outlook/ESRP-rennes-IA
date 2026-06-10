@@ -25,11 +25,11 @@ export default function HomePage() {
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen p-8 bg-white">
-      <h1 className="font-bold text-black mb-4">
-        Fresque de l'IA
+      <h1 className="font-bold text-black mb-4 text-center">
+        CAMPUS EPNAK IA
       </h1>
-      <p className="text-[#4A4A4A] mb-8">
-        EPNAK — ESRP Rennes — 16 juillet 2026
+      <p className="text-[#4A4A4A] mb-8 text-center">
+        EPNAK — ESRP Rennes
       </p>
 
       <form onSubmit={handleSubmit} className="flex flex-col items-center gap-4">
