@@ -180,16 +180,22 @@ export const GEN_D_ORIGINAL = `Note interne — Réorganisation des plannings d'
 
 À compter du lundi 7 septembre, l'organisation des ateliers évolue. Les ateliers du matin débuteront à 9 h 15 au lieu de 9 h 00, afin de laisser un temps d'accueil plus souple. La pause de milieu de matinée est allongée de dix minutes. Les ateliers de l'après-midi restent inchangés. Un planning actualisé sera affiché dans chaque salle. Pour toute question, adressez-vous à l'équipe de coordination.`;
 
-export const GEN_D_GENERATE_PROMPT = `Tu reçois une note interne professionnelle. Produis-en TROIS versions qui disent EXACTEMENT la même chose, sans rien inventer ni ajouter, et sans aucune donnée personnelle :
-- "pro" : registre professionnel concis ;
-- "falc" : Facile À Lire et à Comprendre (phrases de moins de 12 mots, mots simples, une seule idée par phrase, ton rassurant, pas d'acronyme) ;
-- "partenaire" : version courte et institutionnelle pour un partenaire extérieur.
-Réponds UNIQUEMENT par un JSON valide sur une ligne : {"pro":"...","falc":"...","partenaire":"..."}`;
+// L'équipe rédige elle-même le prompt. On fournit la note en contexte via le
+// system prompt ; la consigne de l'équipe est envoyée comme message utilisateur.
+// La qualité du résultat dépend donc directement de la qualité du prompt rédigé.
+export const GEN_D_SYSTEM_PROMPT = `Tu es un assistant IA généraliste. Voici une note interne professionnelle à traiter :
 
-export const GEN_D_RECONSTRUCT_PROMPT = `On te donne UNIQUEMENT une version en langage simplifié (FALC) d'une note interne professionnelle. Reconstitue la note professionnelle d'origine la plus probable, dans un registre professionnel normal. N'invente aucun détail qui ne soit déduisible du texte fourni. Réponds par le seul texte reconstruit.`;
+"""
+${GEN_D_ORIGINAL}
+"""
 
-export const GEN_D_EVAL_PROMPT = `Tu es évaluateur FALC et communication pour un atelier IA médico-social. Note d'origine : {ORIGINAL}. Version reconstruite à partir du seul FALC : {RECONSTRUIT}. Les trois versions produites par l'équipe : {VERSIONS}.
-Évalue sur 20 : fidélité du sens (8, selon l'écart de sens entre l'original et le reconstruit), accessibilité FALC (6 : phrases courtes, mots simples, une idée par phrase, ton non anxiogène), adaptation multi-publics (6 : les trois registres sont réellement calibrés). Vérifie qu'aucune donnée personnelle n'apparaît. Court et bienveillant. ${JSON_VERDICT_SHAPE}`;
+Applique fidèlement la consigne rédigée par l'utilisateur à cette note. N'invente aucune information qui ne figure pas dans la note et n'ajoute aucune donnée personnelle. Réponds directement avec le résultat demandé, en Markdown clair et bien séparé par public si plusieurs versions sont demandées.`;
+
+export const GEN_D_EVAL_PROMPT = `Tu es évaluateur FALC et communication pour un atelier IA médico-social. Une équipe devait obtenir, à partir d'une seule note interne, TROIS messages adaptés à trois publics : l'équipe (registre professionnel), une personne accompagnée (FALC) et un partenaire extérieur (institutionnel). Elle a rédigé elle-même le prompt.
+Note d'origine : {ORIGINAL}.
+Prompt rédigé par l'équipe : {PROMPT}.
+Résultat produit par l'IA et choisi par l'équipe : {RESULTAT}.
+Évalue sur 20 : qualité du prompt (6 : demande explicitement les trois versions pour les trois publics, précise les contraintes FALC, interdit d'inventer), fidélité du sens (6 : le résultat dit la même chose que l'original sans rien inventer), accessibilité FALC (5 : la version pour la personne accompagnée a des phrases courtes, des mots simples, une idée par phrase, un ton non anxiogène), adaptation multi-publics (3 : les trois registres sont réellement distincts et calibrés). Vérifie qu'aucune donnée personnelle n'apparaît. Court et bienveillant. ${JSON_VERDICT_SHAPE}`;
 
 /* ------------------------------------------------------------------ */
 /* Défi E — La fabrique à idées (cartes-contraintes)                  */

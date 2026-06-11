@@ -63,15 +63,15 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
     title: "Défi D — Le caméléon",
     subtitle: "« Un même message, plusieurs publics, sans trahir le sens. »",
     objective:
-      "Voir que l'IA sait adapter un même message à plusieurs publics (pro, FALC, partenaire) sans en trahir le sens.",
+      "Voir que l'IA sait adapter un même message à plusieurs publics (pro, FALC, partenaire) sans en trahir le sens — à condition de bien le lui demander.",
     duration: "14 min",
     steps: [
-      "Lisez la note d'origine, puis faites-en produire 3 versions (pro, FALC, partenaire).",
-      "Ajustez la version FALC — c'est elle qui passe le test.",
-      "Test aller-retour : l'IA reconstruit le message d'origine à partir du seul FALC.",
-      "Score selon la fidélité du sens, l'accessibilité FALC et l'adaptation aux publics.",
+      "Lisez la note d'origine à transmettre à trois publics : l'équipe (pro), une personne accompagnée (FALC) et un partenaire extérieur.",
+      "Rédigez vous-même un prompt pour que l'IA produise les trois versions d'un coup, sans rien trahir.",
+      "Vous avez 3 essais : ajustez votre prompt d'un essai à l'autre pour obtenir le meilleur résultat.",
+      "Comparez vos 3 essais, choisissez le meilleur : l'IA l'évalue alors et attribue les points.",
     ],
-    note: "Bien simplifier, c'est garder l'essentiel sans le perdre en route.",
+    note: "C'est votre prompt qui fait la qualité du résultat : un bon prompt dit quoi produire, pour qui, et ce qu'il ne faut pas inventer.",
   },
   205: {
     title: "Défi E — La fabrique à idées",
@@ -238,10 +238,11 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
     duration: "12 min",
     steps: [
       "Choisissez un moment du parcours de Camille.",
-      "L'IA écrit avec vous, à la première personne, un fragment de son journal intime.",
-      "Lisez ce que ça fait de se mettre à sa place.",
+      "Rédigez votre consigne à l'IA : l'émotion dominante, ce que Camille réalise, le ton à éviter.",
+      "Vous avez 3 essais : comparez-les et choisissez le fragment le plus juste et le plus digne.",
+      "L'IA donne son regard sur la justesse du texte ; vous notez ce que ce changement de point de vue vous fait comprendre.",
     ],
-    note: "Changer de point de vue — écrire « je » à la place de Camille — aide à mieux comprendre son vécu.",
+    note: "Changer de point de vue — écrire « je » à la place de Camille — aide à mieux comprendre son vécu. C'est votre consigne et votre choix qui font la justesse du texte.",
   },
   107: {
     title: "Bonus G — Le pitch en 30 secondes",
@@ -251,10 +252,11 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
     duration: "15 min",
     steps: [
       "Donnez 3 éléments forts de Camille : une compétence, une motivation, un projet.",
-      "L'IA rédige un pitch de présentation de 30 secondes.",
-      "Écoutez-le lu à voix haute.",
+      "Faites générer deux pitchs (ajustez les éléments entre les deux essais).",
+      "Écoutez-les à voix haute et comparez-les.",
+      "Choisissez le meilleur et dites, en une ligne, pourquoi.",
     ],
-    note: "Présenter quelqu'un en 30 secondes, de façon valorisante et juste, est un vrai exercice. L'IA donne un point de départ.",
+    note: "Présenter quelqu'un en 30 secondes, de façon valorisante et juste, est un vrai exercice. L'IA donne un point de départ — c'est votre choix qui tranche.",
   },
   108: {
     title: "Bonus H — Le scénario de crise",
@@ -290,11 +292,11 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
       "Voir que l'IA peut structurer un compte-rendu en arborescence visuelle pour révéler, d'un coup d'œil, la cohérence d'un parcours.",
     duration: "12 min",
     steps: [
-      "L'IA reçoit le compte-rendu pluri-pro de Camille.",
-      "Elle en produit une structure en arborescence.",
-      "La plateforme l'affiche en carte mentale visuelle.",
-      "Simplifiez, réorganisez, exportez.",
+      "Rédigez une consigne décrivant la carte voulue : point central, grandes branches, niveau de détail.",
+      "Faites générer deux structures et comparez-les.",
+      "Choisissez la plus claire.",
+      "Simplifiez et réorganisez le plan à votre main — la carte se met à jour.",
     ],
-    note: "Une carte mentale rend visible, en un coup d'œil, la cohérence — ou les angles morts — d'un parcours.",
+    note: "Une carte mentale rend visible, en un coup d'œil, la cohérence — ou les angles morts — d'un parcours. C'est en la réorganisant que vous vous l'appropriez.",
   },
 };

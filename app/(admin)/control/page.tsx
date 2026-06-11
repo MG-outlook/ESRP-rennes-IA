@@ -267,7 +267,7 @@ export default function ControlPage() {
 
   return (
     <main className="min-h-screen bg-white p-4 sm:p-6 lg:p-8">
-      <div className="mx-auto w-full max-w-screen-xl 2xl:max-w-screen-2xl">
+      <div className="mx-auto w-full max-w-7xl">
       <h1 className="text-3xl sm:text-4xl font-bold text-black mb-6 sm:mb-8">
         Panneau de contrôle
       </h1>
@@ -330,7 +330,7 @@ export default function ControlPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Parcours Camille */}
-          <div>
+          <div className="min-w-0">
             <div className="flex items-center justify-between mb-2 gap-2">
               <h3 className="font-bold text-black">Parcours Camille</h3>
               <div className="flex gap-2">
@@ -348,13 +348,13 @@ export default function ControlPage() {
                 </button>
               </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="flex flex-wrap gap-2">
               {CHALLENGES.map((c) => (
                 <button
                   key={c.id}
                   onClick={() => handleToggleChallenge(c.id)}
                   aria-pressed={openIds.has(c.id)}
-                  className={`flex items-center gap-2 px-4 py-2 border-2 font-semibold text-left ${
+                  className={`flex items-center gap-2 px-4 py-2 border-2 font-semibold ${
                     openIds.has(c.id)
                       ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
                       : "bg-white border-black text-black"
@@ -370,7 +370,7 @@ export default function ControlPage() {
           </div>
 
           {/* Défis généralistes */}
-          <div>
+          <div className="min-w-0">
             <div className="flex items-center justify-between mb-2 gap-2">
               <h3 className="font-bold text-black">Défis généralistes</h3>
               <div className="flex gap-2">
@@ -388,7 +388,7 @@ export default function ControlPage() {
                 </button>
               </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="flex flex-wrap gap-2">
               {GENERAL_CHALLENGES.map((c) => (
                 <button
                   key={c.id}
