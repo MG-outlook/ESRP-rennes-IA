@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
             .order("code"),
           supabase
             .from("workshop_state")
-            .select("is_paused, pause_reason, active_challenge_id")
+            .select("is_paused, pause_reason, active_challenge_id, active_challenge_ids")
             .eq("id", 1)
             .maybeSingle(),
         ]);
@@ -79,6 +79,7 @@ export async function POST(req: NextRequest) {
               is_paused: false,
               pause_reason: null,
               active_challenge_id: null,
+              active_challenge_ids: [],
             },
         });
       }
@@ -231,9 +232,40 @@ export async function POST(req: NextRequest) {
       }
 
       case "set_active_challenge": {
+        // Legacy single-challenge open. Kept for backward compatibility; mirrors
+        // the value into the open set so both columns stay consistent.
+        const id = body.challenge_id as number | null;
         const { error } = await supabase
           .from("workshop_state")
-          .update({ active_challenge_id: body.challenge_id as number })
+          .update({
+            active_challenge_id: id,
+            active_challenge_ids: id != null ? [id] : [],
+          })
+          .eq("id", 1);
+        if (error) throw error;
+        return NextResponse.json({ ok: true });
+      }
+
+      case "set_open_challenges": {
+        // Open an arbitrary set of challenges at once. The authoritative source
+        // is active_challenge_ids; active_challenge_id is mirrored to the single
+        // value when exactly one challenge is open, else null.
+        const raw = Array.isArray(body.challenge_ids)
+          ? (body.challenge_ids as unknown[])
+          : [];
+        const ids = Array.from(
+          new Set(
+            raw
+              .map((v) => Number(v))
+              .filter((n) => Number.isInteger(n) && n > 0)
+          )
+        ).sort((a, b) => a - b);
+        const { error } = await supabase
+          .from("workshop_state")
+          .update({
+            active_challenge_ids: ids,
+            active_challenge_id: ids.length === 1 ? ids[0] : null,
+          })
           .eq("id", 1);
         if (error) throw error;
         return NextResponse.json({ ok: true });

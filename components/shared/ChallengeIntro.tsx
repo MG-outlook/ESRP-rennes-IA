@@ -5,6 +5,8 @@ import { ReactNode } from "react";
 interface ChallengeIntroProps {
   title: string;
   subtitle?: string;
+  /** One-line learning objective: what this challenge teaches about AI. */
+  objective?: string;
   /** Numbered "how it works" steps. Plain strings or rich nodes. */
   steps: ReactNode[];
   /** Optional closing note (the pedagogical point of the challenge). */
@@ -24,6 +26,7 @@ interface ChallengeIntroProps {
 export default function ChallengeIntro({
   title,
   subtitle,
+  objective,
   steps,
   note,
   duration,
@@ -36,6 +39,12 @@ export default function ChallengeIntro({
         <h1 className="text-4xl font-bold text-black">{title}</h1>
         {subtitle && (
           <p className="text-[#4A4A4A] mt-3 text-lg italic">{subtitle}</p>
+        )}
+        {objective && (
+          <p className="mt-4 border-l-4 border-[#2D5A3D] bg-[#F0F5F1] px-4 py-3 text-black">
+            <span className="font-bold text-[#2D5A3D]">🎯 Objectif — </span>
+            {objective}
+          </p>
         )}
 
         <section className="border-2 border-black p-8 mt-8 bg-[#F5F5F5]">

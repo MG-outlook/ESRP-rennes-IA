@@ -4,7 +4,10 @@ import { ToastProvider } from "@/lib/hooks/useToast";
 import VersionBadge from "@/components/shared/VersionBadge";
 
 export const metadata: Metadata = {
-  title: "CAMPUS EPNAK IA",
+  title: {
+    default: "CAMPUS EPNAK IA",
+    template: "%s · CAMPUS EPNAK IA",
+  },
   description: "CAMPUS EPNAK IA — EPNAK ESRP Rennes",
 };
 

@@ -116,15 +116,6 @@ export default function ClassementPage() {
                 >
                   <div className="text-5xl mb-2">{MEDAL[i]}</div>
                   <div className="text-3xl font-bold">{t.code}</div>
-                  {t.animator && (
-                    <div
-                      className={`text-sm capitalize ${
-                        i === 0 ? "text-white/80" : "text-[#4A4A4A]"
-                      }`}
-                    >
-                      {t.animator}
-                    </div>
-                  )}
                   <div className="text-4xl font-bold mt-3">{t.score} pts</div>
                   <div
                     className={`text-sm mt-1 ${
@@ -150,11 +141,6 @@ export default function ClassementPage() {
                         {i + 4}
                       </span>
                       <span className="text-2xl font-bold text-black">{t.code}</span>
-                      {t.animator && (
-                        <span className="text-sm text-[#4A4A4A] capitalize">
-                          {t.animator}
-                        </span>
-                      )}
                     </div>
                     <div className="flex items-baseline gap-4">
                       <span className="text-sm text-[#4A4A4A]">⏱ {formatMs(t.timeMs)}</span>
