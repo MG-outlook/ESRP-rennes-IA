@@ -63,15 +63,15 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
     title: "Défi D — Le caméléon",
     subtitle: "« Un même message, plusieurs publics, sans trahir le sens. »",
     objective:
-      "Voir que l'IA sait adapter un même message à plusieurs publics (pro, FALC, partenaire) sans en trahir le sens.",
+      "Voir que l'IA sait adapter un même message à plusieurs publics (pro, FALC, partenaire) sans en trahir le sens — à condition de bien le lui demander.",
     duration: "14 min",
     steps: [
-      "Lisez la note d'origine, puis faites-en produire 3 versions (pro, FALC, partenaire).",
-      "Ajustez la version FALC — c'est elle qui passe le test.",
-      "Test aller-retour : l'IA reconstruit le message d'origine à partir du seul FALC.",
-      "Score selon la fidélité du sens, l'accessibilité FALC et l'adaptation aux publics.",
+      "Lisez la note d'origine à transmettre à trois publics : l'équipe (pro), une personne accompagnée (FALC) et un partenaire extérieur.",
+      "Rédigez vous-même un prompt pour que l'IA produise les trois versions d'un coup, sans rien trahir.",
+      "Vous avez 3 essais : ajustez votre prompt d'un essai à l'autre pour obtenir le meilleur résultat.",
+      "Comparez vos 3 essais, choisissez le meilleur : l'IA l'évalue alors et attribue les points.",
     ],
-    note: "Bien simplifier, c'est garder l'essentiel sans le perdre en route.",
+    note: "C'est votre prompt qui fait la qualité du résultat : un bon prompt dit quoi produire, pour qui, et ce qu'il ne faut pas inventer.",
   },
   205: {
     title: "Défi E — La fabrique à idées",
