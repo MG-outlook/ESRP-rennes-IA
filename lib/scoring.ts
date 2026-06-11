@@ -71,6 +71,9 @@ const DOC_LABELS: Record<string, string> = {
   rewrittenPrompt: "Prompt réécrit par l'équipe",
   chosenOutput: "Version retenue",
   prompt: "Prompt de l'équipe",
+  reflection: "Ce que l'équipe a compris",
+  justification: "Justification du choix",
+  feedback: "Regard de l'IA",
   // Anciens destinataires du Défi 4 (format imbriqué)
   camille: "Courrier à Camille",
   parents: "Courrier aux parents",

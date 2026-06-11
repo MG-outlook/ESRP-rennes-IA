@@ -654,6 +654,16 @@ export const BONUS_F_MOMENTS: string[] = [
   "Le jour d'un petit succès inattendu",
 ];
 
+// Retour qualitatif (pas de note chiffrée) sur le fragment choisi par l'équipe :
+// on évalue la justesse, la dignité et l'absence de jugement, pas la « performance ».
+export const BONUS_F_FEEDBACK_PROMPT = `Tu es un regard bienveillant et exigeant sur l'écriture à la première personne en contexte médico-social. Une équipe a fait écrire par l'IA un fragment du journal intime de Camille, puis a choisi celui-ci :
+
+"""
+{FRAGMENT}
+"""
+
+En 3 ou 4 phrases maximum, dis ce que ce fragment réussit (donne-t-il une voix digne et nuancée à Camille ?) et le seul point de vigilance le plus important (caricature du handicap, pathos, jugement, jargon qui « parle à sa place »). Reste concret, sans jargon, sans note chiffrée. Adresse-toi à l'équipe en la vouvoyant.`;
+
 /* ------------------------------------------------------------------ */
 /* Bonus G — Le pitch en 30 secondes                                  */
 /* ------------------------------------------------------------------ */
