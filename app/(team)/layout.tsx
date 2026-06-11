@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import PauseOverlay from "@/components/PauseOverlay";
 import DegradedBanner from "@/components/shared/DegradedBanner";
 import ChallengeNavigator from "@/components/ChallengeNavigator";
+
+export const metadata: Metadata = {
+  title: "Défis",
+};
 
 export default async function TeamLayout({
   children,

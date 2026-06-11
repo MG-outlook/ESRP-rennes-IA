@@ -4,6 +4,12 @@
 export interface ChallengeIntroContent {
   title: string;
   subtitle?: string;
+  /**
+   * One-line learning objective: what this challenge helps participants
+   * understand about what AI can (and cannot) do. Shown prominently under the
+   * subtitle so every challenge makes sense to the people doing it.
+   */
+  objective?: string;
   steps: string[];
   note?: string;
   duration?: string;
@@ -14,6 +20,8 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
   201: {
     title: "Défi A — Le pictogramme express",
     subtitle: "« Faire comprendre une consigne sans une seule ligne de texte. »",
+    objective:
+      "Découvrir que l'IA ne produit pas que du texte : elle génère aussi du visuel, un vrai atout pour l'accessibilité et le FALC.",
     duration: "13 min",
     steps: [
       "Une consigne simple vous est tirée au sort.",
@@ -26,6 +34,8 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
   202: {
     title: "Défi B — Le client mystère",
     subtitle: "« S'entraîner à convaincre, sans enjeu réel. »",
+    objective:
+      "Comprendre que l'IA peut servir de partenaire d'entraînement pour argumenter et convaincre, sans aucun enjeu réel.",
     duration: "14 min",
     steps: [
       "Choisissez un interlocuteur (collègue inquiet, partenaire sceptique, financeur).",
@@ -38,6 +48,8 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
   203: {
     title: "Défi C — La chasse à l'hallu",
     subtitle: "« L'IA se trompe avec aplomb. Le pro garde le dernier mot. »",
+    objective:
+      "Intégrer une limite essentielle : l'IA peut se tromper avec assurance — le réflexe clé est de ne jamais la croire sur parole.",
     duration: "12 min",
     steps: [
       "Lisez une note rédigée par l'IA : elle a l'air sérieuse… mais contient des pièges.",
@@ -50,6 +62,8 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
   204: {
     title: "Défi D — Le caméléon",
     subtitle: "« Un même message, plusieurs publics, sans trahir le sens. »",
+    objective:
+      "Voir que l'IA sait adapter un même message à plusieurs publics (pro, FALC, partenaire) sans en trahir le sens.",
     duration: "14 min",
     steps: [
       "Lisez la note d'origine, puis faites-en produire 3 versions (pro, FALC, partenaire).",
@@ -62,6 +76,8 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
   205: {
     title: "Défi E — La fabrique à idées",
     subtitle: "« L'IA comme partenaire de créativité, pas d'exécution. »",
+    objective:
+      "Expérimenter l'IA comme partenaire de créativité : faire émerger des usages concrets et inattendus, à vous de trancher.",
     duration: "13 min",
     steps: [
       "Deux cartes sont tirées au sort : une situation et une contrainte forte.",
@@ -75,6 +91,8 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
     title: "Défi 1 — La Pré-admission",
     subtitle:
       "« Le dossier de Camille vient d'arriver. Que voit chaque métier dans le même dossier ? »",
+    objective:
+      "Comprendre que l'IA sait synthétiser un dossier dense en une fiche pluri-métiers — mais qu'elle ne voit que ce que vous lui donnez.",
     duration: "20 min",
     steps: [
       "Lisez le dossier de Camille : trois documents (courrier MDPH, lettre de motivation, fiche médicale).",
@@ -88,6 +106,8 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
     title: "Défi 2 — Le tri des observations",
     subtitle:
       "« Trois mois plus tard, on fait le point sur Camille. Mais toutes les notes ne se valent pas. »",
+    objective:
+      "Saisir que l'IA assemble ce qu'on lui donne sans rien inventer : la qualité du tri en entrée fait la qualité de la synthèse en sortie.",
     duration: "15 min",
     steps: [
       "On vous donne 16 notes prises sur Camille après 3 mois de formation.",
@@ -101,6 +121,8 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
     title: "Défi 3 — La Chasse aux mauvais prompts",
     subtitle:
       "« Quatre prompts maladroits à propos de Camille. Devinez le biais avant qu'il sorte. Puis corrigez. »",
+    objective:
+      "Comprendre que la qualité d'une réponse IA dépend d'abord de la qualité — et de la neutralité — de la question qu'on lui pose.",
     duration: "20 min",
     steps: [
       "On vous montre un prompt maladroit et la réponse de l'IA à propos de Camille.",
@@ -114,6 +136,8 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
     title: "Défi 4 — Trois courriers, un seul prompt",
     subtitle:
       "« La direction vous demande d'officialiser le stage de Camille auprès de 3 destinataires. En un seul prompt. »",
+    objective:
+      "Découvrir qu'avec le bon contexte et une consigne précise, l'IA produit plusieurs livrables d'un coup — et fait gagner un temps réel.",
     duration: "20 min",
     steps: [
       "Lisez la demande de la direction : 3 courriers à produire (à Camille en FALC, à la MDPH, à l'entreprise).",
@@ -127,6 +151,8 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
     title: "Défi 5 — Notre projet",
     subtitle:
       "« Vous avez vu ce que l'IA peut faire pour Camille. Maintenant, qu'en faites-vous chez vous, lundi matin ? »",
+    objective:
+      "Transformer ce que vous avez appris sur l'IA en un projet concret et réaliste à mener dans votre propre service.",
     duration: "20 min",
     steps: [
       "Choisissez parmi les défis précédents celui qui résonne le plus avec vos préoccupations métier.",
@@ -139,6 +165,8 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
   101: {
     title: "Bonus A — Le détective des doublons",
     subtitle: "« 4 rapports sur Camille. Combien d'informations sont répétées ? »",
+    objective:
+      "Voir que l'IA repère vite les redondances entre plusieurs documents — précieux quand l'information circule mal.",
     duration: "10 min",
     steps: [
       "Lisez les 4 rapports rédigés par différents professionnels sur Camille.",
@@ -151,6 +179,8 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
   102: {
     title: "Bonus B — Le coach d'entretien",
     subtitle: "« Camille passe un entretien dans une PME. Préparez-la avec l'IA. »",
+    objective:
+      "Comprendre que l'IA est un partenaire d'entraînement patient et disponible pour préparer un entretien.",
     duration: "15 min",
     steps: [
       "L'IA joue le rôle d'un coach d'entretien et vous pose des questions.",
@@ -162,6 +192,8 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
   103: {
     title: "Bonus C — La pièce manquante",
     subtitle: "« Le dossier MDPH de Camille a perdu une pièce. La décision est en suspens. »",
+    objective:
+      "Découvrir que l'IA peut jouer l'assistant administratif spécialisé pour rédiger un courrier technique comme un recours (RAPO).",
     duration: "15 min",
     steps: [
       "Une pièce justificative manque au dossier de Camille : il faut faire un recours (RAPO).",
@@ -174,6 +206,8 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
   104: {
     title: "Bonus D — Brouillon de subvention",
     subtitle: "« Votre projet IA a besoin de financement. 8 minutes chrono. »",
+    objective:
+      "Constater que l'IA produit en quelques minutes un premier brouillon structuré là où il faudrait des heures.",
     duration: "10 min",
     steps: [
       "L'IA propose une structure type : contexte, projet, budget, impact, indicateurs.",
@@ -185,6 +219,8 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
   105: {
     title: "Bonus E — Vrai ou Faux IA",
     subtitle: "« 10 affirmations sur l'IA. Vrai, Faux, ou Nuancé ? »",
+    objective:
+      "Démêler le vrai du faux sur l'IA pour cerner ce qu'elle peut et ne peut pas faire, sans idées reçues.",
     duration: "10 min",
     steps: [
       "Lisez chaque affirmation sur l'intelligence artificielle.",
@@ -197,6 +233,8 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
   106: {
     title: "Bonus F — Le journal de Camille",
     subtitle: "« Et si on écrivait, à la première personne, un fragment du journal de Camille ? »",
+    objective:
+      "Explorer l'IA comme outil d'empathie : changer de point de vue et écrire « je » pour mieux comprendre le vécu de Camille.",
     duration: "12 min",
     steps: [
       "Choisissez un moment du parcours de Camille.",
@@ -208,6 +246,8 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
   107: {
     title: "Bonus G — Le pitch en 30 secondes",
     subtitle: "« 3 éléments forts de Camille. L'IA rédige le pitch. Écoutez-le. »",
+    objective:
+      "Voir que l'IA donne un point de départ solide pour présenter quelqu'un de façon valorisante et juste.",
     duration: "15 min",
     steps: [
       "Donnez 3 éléments forts de Camille : une compétence, une motivation, un projet.",
@@ -219,6 +259,8 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
   108: {
     title: "Bonus H — Le scénario de crise",
     subtitle: "« Camille manque 3 jours sans prévenir. Que fait l'équipe ? »",
+    objective:
+      "Comprendre que l'IA peut proposer un protocole structuré à adapter — jamais à appliquer sans le jugement du professionnel.",
     duration: "15 min",
     steps: [
       "Choisissez un scénario de crise autour de l'absence de Camille.",
@@ -231,6 +273,8 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
   109: {
     title: "Bonus I — Le glossaire qui sauve",
     subtitle: "« Un courrier plein de sigles. Produisez un mini-glossaire FALC. »",
+    objective:
+      "Découvrir que l'IA traduit instantanément le jargon administratif en langage simple (FALC) directement réutilisable.",
     duration: "10 min",
     steps: [
       "Lisez le courrier administratif reçu par Camille — plein d'acronymes (RAPO, CDAPH, RQTH…).",
@@ -242,6 +286,8 @@ export const CHALLENGE_INTROS: Record<number, ChallengeIntroContent> = {
   110: {
     title: "Bonus J — La carte mentale du parcours",
     subtitle: "« À partir du compte-rendu de Camille, produisez une carte mentale visuelle. »",
+    objective:
+      "Voir que l'IA peut structurer un compte-rendu en arborescence visuelle pour révéler, d'un coup d'œil, la cohérence d'un parcours.",
     duration: "12 min",
     steps: [
       "L'IA reçoit le compte-rendu pluri-pro de Camille.",

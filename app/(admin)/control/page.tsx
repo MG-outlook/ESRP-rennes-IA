@@ -18,6 +18,7 @@ interface WorkshopState {
   is_paused: boolean;
   pause_reason: string | null;
   active_challenge_id: number | null;
+  active_challenge_ids: number[];
 }
 
 interface ArchivedTeam {
@@ -67,6 +68,7 @@ export default function ControlPage() {
     is_paused: false,
     pause_reason: null,
     active_challenge_id: null,
+    active_challenge_ids: [],
   });
   const [archivedTeams, setArchivedTeams] = useState<ArchivedTeam[]>([]);
   const [loading, setLoading] = useState(true);
@@ -89,7 +91,15 @@ export default function ControlPage() {
       }>("get_state");
       setTeams(teams);
       setArchivedTeams(archived_teams ?? []);
-      setWorkshopState(workshop_state);
+      // Fall back to the legacy single field if the open set is empty, so the
+      // UI is correct even on rows written before the multi-open migration.
+      const ids =
+        workshop_state.active_challenge_ids?.length
+          ? workshop_state.active_challenge_ids
+          : workshop_state.active_challenge_id != null
+            ? [workshop_state.active_challenge_id]
+            : [];
+      setWorkshopState({ ...workshop_state, active_challenge_ids: ids });
     } catch (e) {
       showToast((e as Error).message, "error");
     } finally {
@@ -170,9 +180,40 @@ export default function ControlPage() {
     }
   }
 
-  async function handleSetChallenge(challengeId: number) {
-    await adminAction("set_active_challenge", { challenge_id: challengeId });
-    showToast(`Defi ${challengeId} active`, "success");
+  // Open set: the challenges currently open to teams. Several can be open at
+  // once; when more than one is open, teams choose from a menu in the lobby.
+  const openIds = new Set(workshopState.active_challenge_ids ?? []);
+
+  async function setOpenChallenges(ids: number[]) {
+    const sorted = [...new Set(ids)].sort((a, b) => a - b);
+    // Optimistic update so toggles feel instant despite the 4s poll.
+    setWorkshopState((prev) => ({
+      ...prev,
+      active_challenge_ids: sorted,
+      active_challenge_id: sorted.length === 1 ? sorted[0] : null,
+    }));
+    try {
+      await adminAction("set_open_challenges", { challenge_ids: sorted });
+    } catch (e) {
+      showToast((e as Error).message, "error");
+      fetchData();
+    }
+  }
+
+  function handleToggleChallenge(challengeId: number) {
+    const next = new Set(openIds);
+    if (next.has(challengeId)) next.delete(challengeId);
+    else next.add(challengeId);
+    setOpenChallenges([...next]);
+  }
+
+  function handleOpenMany(ids: number[]) {
+    setOpenChallenges([...new Set([...openIds, ...ids])]);
+  }
+
+  function handleCloseMany(ids: number[]) {
+    const remove = new Set(ids);
+    setOpenChallenges([...openIds].filter((id) => !remove.has(id)));
   }
 
   async function handleUnlock(teamId: string) {
@@ -226,6 +267,7 @@ export default function ControlPage() {
 
   return (
     <main className="min-h-screen bg-white p-4 sm:p-6 lg:p-8">
+      <div className="mx-auto w-full max-w-screen-xl 2xl:max-w-screen-2xl">
       <h1 className="text-3xl sm:text-4xl font-bold text-black mb-6 sm:mb-8">
         Panneau de contrôle
       </h1>
@@ -260,50 +302,126 @@ export default function ControlPage() {
         )}
       </section>
 
-      {/* Défi actif — deux listes */}
+      {/* Défis ouverts — plusieurs défis peuvent être ouverts à la fois */}
       <section className="border-2 border-black p-4 sm:p-6 mb-6 sm:mb-8">
-        <h2 className="text-2xl font-bold text-black mb-4">Défi actif</h2>
-
-        <h3 className="font-bold text-black mb-2">Parcours Camille</h3>
-        <div className="flex flex-wrap gap-2 mb-5">
-          {CHALLENGES.map((c) => (
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <h2 className="text-2xl font-bold text-black">Défis ouverts</h2>
+          <div className="flex flex-wrap gap-2">
             <button
-              key={c.id}
-              onClick={() => handleSetChallenge(c.id)}
-              className={`px-4 py-2 border-2 font-semibold ${
-                workshopState.active_challenge_id === c.id
-                  ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
-                  : "bg-white border-black text-black"
-              }`}
+              onClick={() => handleOpenMany(ALL_MAIN.map((c) => c.id))}
+              className="px-3 py-2 border-2 border-[#2D5A3D] bg-[#2D5A3D] text-white text-sm font-semibold"
             >
-              {c.id}. {c.title}
+              Ouvrir tous les défis
             </button>
-          ))}
+            <button
+              onClick={() => handleCloseMany(ALL_MAIN.map((c) => c.id))}
+              disabled={openIds.size === 0}
+              className="px-3 py-2 border-2 border-[#8B3A3A] text-[#8B3A3A] text-sm font-semibold disabled:opacity-40"
+            >
+              Tout fermer
+            </button>
+          </div>
         </div>
 
-        <h3 className="font-bold text-black mb-2">Défis généralistes</h3>
-        <div className="flex flex-wrap gap-2">
-          {GENERAL_CHALLENGES.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => handleSetChallenge(c.id)}
-              className={`px-4 py-2 border-2 font-semibold ${
-                workshopState.active_challenge_id === c.id
-                  ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
-                  : "bg-white border-[#2D5A3D] text-[#2D5A3D]"
-              }`}
-            >
-              {c.title}
-            </button>
-          ))}
+        <p className="text-sm text-[#4A4A4A] mb-4">
+          Cochez un ou plusieurs défis. Quand plusieurs défis sont ouverts, chaque
+          équipe choisit le sien depuis la salle d&apos;attente.
+        </p>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Parcours Camille */}
+          <div>
+            <div className="flex items-center justify-between mb-2 gap-2">
+              <h3 className="font-bold text-black">Parcours Camille</h3>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleOpenMany(CHALLENGES.map((c) => c.id))}
+                  className="text-sm text-[#2D5A3D] underline"
+                >
+                  Tout ouvrir
+                </button>
+                <button
+                  onClick={() => handleCloseMany(CHALLENGES.map((c) => c.id))}
+                  className="text-sm text-[#8B3A3A] underline"
+                >
+                  Fermer
+                </button>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {CHALLENGES.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => handleToggleChallenge(c.id)}
+                  aria-pressed={openIds.has(c.id)}
+                  className={`flex items-center gap-2 px-4 py-2 border-2 font-semibold text-left ${
+                    openIds.has(c.id)
+                      ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
+                      : "bg-white border-black text-black"
+                  }`}
+                >
+                  <span aria-hidden>{openIds.has(c.id) ? "☑" : "☐"}</span>
+                  <span>
+                    {c.id}. {c.title}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Défis généralistes */}
+          <div>
+            <div className="flex items-center justify-between mb-2 gap-2">
+              <h3 className="font-bold text-black">Défis généralistes</h3>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleOpenMany(GENERAL_CHALLENGES.map((c) => c.id))}
+                  className="text-sm text-[#2D5A3D] underline"
+                >
+                  Tout ouvrir
+                </button>
+                <button
+                  onClick={() => handleCloseMany(GENERAL_CHALLENGES.map((c) => c.id))}
+                  className="text-sm text-[#8B3A3A] underline"
+                >
+                  Fermer
+                </button>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {GENERAL_CHALLENGES.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => handleToggleChallenge(c.id)}
+                  aria-pressed={openIds.has(c.id)}
+                  className={`flex items-center gap-2 px-4 py-2 border-2 font-semibold text-left ${
+                    openIds.has(c.id)
+                      ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
+                      : "bg-white border-[#2D5A3D] text-[#2D5A3D]"
+                  }`}
+                >
+                  <span aria-hidden>{openIds.has(c.id) ? "☑" : "☐"}</span>
+                  <span>{c.title}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         <p className="text-sm text-[#4A4A4A] mt-4">
-          Actif :{" "}
-          {workshopState.active_challenge_id !== null
-            ? ALL_MAIN.find((c) => c.id === workshopState.active_challenge_id)
-                ?.title ?? `#${workshopState.active_challenge_id}`
-            : "Aucun"}
+          Ouverts :{" "}
+          {openIds.size > 0 ? (
+            <span className="font-semibold text-black">
+              {[...openIds]
+                .sort((a, b) => a - b)
+                .map(
+                  (id) => ALL_MAIN.find((c) => c.id === id)?.title ?? `#${id}`
+                )
+                .join(" · ")}
+            </span>
+          ) : (
+            "Aucun"
+          )}
         </p>
       </section>
 
@@ -491,6 +609,7 @@ export default function ControlPage() {
           Activer pour {bonusTargets.size} équipe{bonusTargets.size > 1 ? "s" : ""}
         </button>
       </section>
+      </div>
     </main>
   );
 }

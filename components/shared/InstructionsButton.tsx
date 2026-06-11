@@ -50,7 +50,13 @@ export default function InstructionsButton({
 
             <p className="font-bold text-black">{content.title}</p>
             {content.subtitle && (
-              <p className="italic text-[#4A4A4A] mt-1 mb-4">{content.subtitle}</p>
+              <p className="italic text-[#4A4A4A] mt-1">{content.subtitle}</p>
+            )}
+            {content.objective && (
+              <p className="mt-3 mb-4 border-l-4 border-[#2D5A3D] bg-[#F0F5F1] px-3 py-2 text-black text-sm">
+                <span className="font-bold text-[#2D5A3D]">🎯 Objectif — </span>
+                {content.objective}
+              </p>
             )}
 
             <ol className="list-decimal pl-6 space-y-2 text-black text-lg">

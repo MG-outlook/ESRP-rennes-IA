@@ -54,7 +54,7 @@ export default function ChallengeNavigator() {
       const [{ data: state }, { data: bonus }] = await Promise.all([
         supabase
           .from("workshop_state")
-          .select("active_challenge_id")
+          .select("active_challenge_id, active_challenge_ids")
           .eq("id", 1)
           .maybeSingle(),
         supabase
@@ -67,23 +67,48 @@ export default function ChallengeNavigator() {
           .limit(1),
       ]);
 
-      let target = "/lobby";
-      const activeId = state?.active_challenge_id ?? null;
+      // The set of currently-open challenges. Several can be open at once;
+      // fall back to the legacy single field for rows written before the
+      // multi-open migration.
+      const openIds: number[] = (
+        state?.active_challenge_ids?.length
+          ? state.active_challenge_ids
+          : state?.active_challenge_id != null
+            ? [state.active_challenge_id]
+            : []
+      ).filter((id: number) => id > 0);
 
-      // A pending bonus takes priority over the global active challenge.
-      if (bonus && bonus.length > 0) {
-        target = `/challenge/${bonus[0].challenge_id}`;
-      } else if (activeId !== null && activeId > 0) {
-        // Go to the active challenge UNLESS the team already finished it — in
-        // that case it waits in the lobby for the animator to open the next one.
+      async function isFinished(challengeId: number): Promise<boolean> {
         const { data: ap } = await supabase
           .from("team_progress")
           .select("finished_at")
-          .eq("team_id", teamId)
-          .eq("challenge_id", activeId)
+          .eq("team_id", teamId!)
+          .eq("challenge_id", challengeId)
           .maybeSingle();
-        if (!ap || ap.finished_at === null) {
-          target = `/challenge/${activeId}`;
+        return !!ap && ap.finished_at !== null;
+      }
+
+      let target = "/lobby";
+      const onChallengeMatch = path.match(/^\/challenge\/(\d+)/);
+      const onChallengeId = onChallengeMatch ? Number(onChallengeMatch[1]) : null;
+
+      if (bonus && bonus.length > 0) {
+        // A pending bonus takes priority over the global open challenges.
+        target = `/challenge/${bonus[0].challenge_id}`;
+      } else if (openIds.length === 1) {
+        // Single challenge open: keep the guided, lockstep behaviour — push the
+        // team there unless it already finished it (then it waits in the lobby).
+        const id = openIds[0];
+        if (!(await isFinished(id))) target = `/challenge/${id}`;
+      } else if (openIds.length > 1) {
+        // Several challenges open: teams pick from the lobby menu. Don't yank a
+        // team off a challenge it's currently (and validly) working on.
+        if (
+          onChallengeId !== null &&
+          openIds.includes(onChallengeId) &&
+          !(await isFinished(onChallengeId))
+        ) {
+          target = `/challenge/${onChallengeId}`;
         }
       }
 

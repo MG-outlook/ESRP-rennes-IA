@@ -62,7 +62,7 @@ async function main() {
   // Reset workshop_state
   const { error: stateError } = await supabase
     .from("workshop_state")
-    .upsert({ id: 1, is_paused: false, active_challenge_id: null });
+    .upsert({ id: 1, is_paused: false, active_challenge_id: null, active_challenge_ids: [] });
 
   if (stateError) {
     console.warn("Warning: could not reset workshop_state:", stateError.message);
