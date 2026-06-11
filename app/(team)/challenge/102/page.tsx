@@ -7,11 +7,27 @@ import { CHALLENGE_INTROS } from "@/lib/challenges/intros";
 import Timer from "@/components/shared/Timer";
 import SubmitButton from "@/components/shared/SubmitButton";
 import Markdown from "@/components/shared/Markdown";
+import DossierAppui from "@/components/challenges/DossierAppui";
+import SuggestionChips from "@/components/shared/SuggestionChips";
+import { getDocumentContent } from "@/components/challenges/DocumentCamille";
 import { streamFromProxy } from "@/lib/ai/proxy";
-import { BONUS_B_COACH_PROMPT } from "@/lib/ai/prompts";
+import { BONUS_B_COACH_PROMPT, BONUS_B_STARTERS } from "@/lib/ai/prompts";
 
 const CHALLENGE_ID = 102;
 const MAX_ROUNDS = 3;
+
+// Le coach reçoit le dossier réel de Camille : ses conseils restent fidèles à
+// sa situation (parcours, restrictions, stage visé) au lieu d'être génériques.
+const COACH_SYSTEM_PROMPT = `${BONUS_B_COACH_PROMPT}
+
+### Lettre de motivation de Camille
+${getDocumentContent("motivation_letter")}
+
+### Fiche de liaison médicale (extraits utiles à l'entretien)
+${getDocumentContent("medical_sheet")}
+
+### Convention de stage visée
+${getDocumentContent("convention_stage")}`;
 
 interface Message {
   role: "user" | "assistant";
@@ -80,7 +96,7 @@ export default function BonusBPage() {
     setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
     await streamFromProxy({
-      systemPrompt: BONUS_B_COACH_PROMPT,
+      systemPrompt: COACH_SYSTEM_PROMPT,
       messages: allMessages.length === 0
         ? [{ role: "user", content: "Commence l'entretien. Pose ta première question." }]
         : allMessages,
@@ -151,6 +167,11 @@ export default function BonusBPage() {
           </div>
         </div>
 
+        <DossierAppui
+          intro="Camille passe un entretien chez Bureaux & Solutions (pôle accueil-secrétariat, stage de 3 semaines). Le coach connaît son dossier : appuyez vos échanges sur les faits réels, il vous reprendra si vous vous en éloignez."
+          docs={["motivation_letter", "convention_stage", "medical_sheet"]}
+        />
+
         {/* Chat */}
         <div className="border-2 border-black p-6 mb-6 min-h-[300px] max-h-[500px] overflow-y-auto flex flex-col gap-4">
           {messages.map((msg, i) => (
@@ -177,7 +198,17 @@ export default function BonusBPage() {
 
         {/* Input */}
         {round < MAX_ROUNDS && !streaming && (
-          <div className="flex gap-3 mb-6">
+          <div className="mb-6">
+            {round === 0 && messages.length > 0 && (
+              <div className="mb-3">
+                <SuggestionChips
+                  suggestions={BONUS_B_STARTERS}
+                  onPick={setInput}
+                  label="Idées de demandes au coach (à adapter) :"
+                />
+              </div>
+            )}
+            <div className="flex gap-3">
             <input
               type="text"
               value={input}
@@ -193,6 +224,7 @@ export default function BonusBPage() {
             >
               Envoyer
             </button>
+            </div>
           </div>
         )}
 
