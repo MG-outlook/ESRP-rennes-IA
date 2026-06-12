@@ -7,6 +7,11 @@ interface ChallengeIntroProps {
   subtitle?: string;
   /** One-line learning objective: what this challenge teaches about AI. */
   objective?: string;
+  /**
+   * "Pourquoi ce défi ?" — 2-3 phrases sur le concept IA démontré et ce que
+   * ça change au quotidien. Affiché sous l'objectif, avant les étapes.
+   */
+  pourquoi?: string;
   /** Numbered "how it works" steps. Plain strings or rich nodes. */
   steps: ReactNode[];
   /** Optional closing note (the pedagogical point of the challenge). */
@@ -27,6 +32,7 @@ export default function ChallengeIntro({
   title,
   subtitle,
   objective,
+  pourquoi,
   steps,
   note,
   duration,
@@ -44,6 +50,12 @@ export default function ChallengeIntro({
           <p className="mt-4 border-l-4 border-[#2D5A3D] bg-[#F0F5F1] px-4 py-3 text-black">
             <span className="font-bold text-[#2D5A3D]">🎯 Objectif — </span>
             {objective}
+          </p>
+        )}
+        {pourquoi && (
+          <p className="mt-3 border-l-4 border-black bg-[#F5F5F5] px-4 py-3 text-black">
+            <span className="font-bold text-black">💡 Pourquoi ce défi ? </span>
+            {pourquoi}
           </p>
         )}
 

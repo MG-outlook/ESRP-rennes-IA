@@ -45,7 +45,15 @@ const GENERAL_CHALLENGES = [
   { id: 205, title: "E — Fabrique à idées" },
 ];
 
-const ALL_MAIN = [...CHALLENGES, ...GENERAL_CHALLENGES];
+// Cas d'usage métier : mises en situation du quotidien professionnel.
+const USECASE_CHALLENGES = [
+  { id: 301, title: "1 — Mission documentaire" },
+  { id: 302, title: "2 — Simulateur d'entretien" },
+  { id: 303, title: "3 — Débrief vocal" },
+  { id: 304, title: "4 — Synthèse copil" },
+];
+
+const ALL_MAIN = [...CHALLENGES, ...GENERAL_CHALLENGES, ...USECASE_CHALLENGES];
 
 const BONUS_CHALLENGES = [
   { id: 101, title: "Doublons" },
@@ -398,6 +406,44 @@ export default function ControlPage() {
                     openIds.has(c.id)
                       ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
                       : "bg-white border-[#2D5A3D] text-[#2D5A3D]"
+                  }`}
+                >
+                  <span aria-hidden>{openIds.has(c.id) ? "☑" : "☐"}</span>
+                  <span>{c.title}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Cas d'usage métier */}
+          <div className="min-w-0">
+            <div className="flex items-center justify-between mb-2 gap-2">
+              <h3 className="font-bold text-black">Cas d&apos;usage métier</h3>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleOpenMany(USECASE_CHALLENGES.map((c) => c.id))}
+                  className="text-sm text-[#2D5A3D] underline"
+                >
+                  Tout ouvrir
+                </button>
+                <button
+                  onClick={() => handleCloseMany(USECASE_CHALLENGES.map((c) => c.id))}
+                  className="text-sm text-[#8B3A3A] underline"
+                >
+                  Fermer
+                </button>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {USECASE_CHALLENGES.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => handleToggleChallenge(c.id)}
+                  aria-pressed={openIds.has(c.id)}
+                  className={`flex items-center gap-2 px-4 py-2 border-2 font-semibold text-left ${
+                    openIds.has(c.id)
+                      ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
+                      : "bg-white border-black text-black"
                   }`}
                 >
                   <span aria-hidden>{openIds.has(c.id) ? "☑" : "☐"}</span>
