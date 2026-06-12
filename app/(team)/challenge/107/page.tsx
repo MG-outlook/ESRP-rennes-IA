@@ -7,8 +7,10 @@ import { CHALLENGE_INTROS } from "@/lib/challenges/intros";
 import Timer from "@/components/shared/Timer";
 import Spinner from "@/components/shared/Spinner";
 import SubmitButton from "@/components/shared/SubmitButton";
+import DossierAppui from "@/components/challenges/DossierAppui";
+import SuggestionChips from "@/components/shared/SuggestionChips";
 import { streamFromProxy } from "@/lib/ai/proxy";
-import { BONUS_G_PITCH_PROMPT } from "@/lib/ai/prompts";
+import { BONUS_G_PITCH_PROMPT, BONUS_G_SUGGESTIONS } from "@/lib/ai/prompts";
 import { useChallengeInit, finishChallenge } from "@/lib/challenges/general-helpers";
 
 const CHALLENGE_ID = 107;
@@ -136,6 +138,10 @@ export default function BonusGPage() {
         {/* Phase 1 : éléments + génération (jusqu'à 2 essais) */}
         {phase === "write" && (
           <section className="mb-8">
+            <DossierAppui
+              intro="Camille se présente pour le stage d'accueil-secrétariat chez Bureaux & Solutions. Piochez ses vrais atouts dans le dossier — sa lettre et la fiche médicale (aptitudes conservées) en regorgent."
+              docs={["motivation_letter", "medical_sheet"]}
+            />
             <div className="flex flex-col gap-4 mb-4">
               <label className="flex flex-col gap-1">
                 <span className="font-bold text-black">Une compétence forte</span>
@@ -146,6 +152,12 @@ export default function BonusGPage() {
                   disabled={running || attempts.length >= MAX_ATTEMPTS}
                   placeholder="Ex : sens de l'organisation, relationnel…"
                   className="border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-50"
+                />
+                <SuggestionChips
+                  suggestions={BONUS_G_SUGGESTIONS.competence}
+                  onPick={setCompetence}
+                  disabled={running || attempts.length >= MAX_ATTEMPTS}
+                  label="Tiré du dossier de Camille :"
                 />
               </label>
               <label className="flex flex-col gap-1">
@@ -158,6 +170,12 @@ export default function BonusGPage() {
                   placeholder="Ex : envie d'un métier de bureau avec du lien humain"
                   className="border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-50"
                 />
+                <SuggestionChips
+                  suggestions={BONUS_G_SUGGESTIONS.motivation}
+                  onPick={setMotivation}
+                  disabled={running || attempts.length >= MAX_ATTEMPTS}
+                  label="Tiré du dossier de Camille :"
+                />
               </label>
               <label className="flex flex-col gap-1">
                 <span className="font-bold text-black">Un projet</span>
@@ -168,6 +186,12 @@ export default function BonusGPage() {
                   disabled={running || attempts.length >= MAX_ATTEMPTS}
                   placeholder="Ex : un poste d'accueil-secrétariat"
                   className="border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-50"
+                />
+                <SuggestionChips
+                  suggestions={BONUS_G_SUGGESTIONS.projet}
+                  onPick={setProjet}
+                  disabled={running || attempts.length >= MAX_ATTEMPTS}
+                  label="Tiré du dossier de Camille :"
                 />
               </label>
             </div>

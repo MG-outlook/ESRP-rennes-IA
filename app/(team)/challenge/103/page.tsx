@@ -8,8 +8,13 @@ import { CHALLENGE_INTROS } from "@/lib/challenges/intros";
 import Timer from "@/components/shared/Timer";
 import StreamedOutput from "@/components/shared/StreamedOutput";
 import SubmitButton from "@/components/shared/SubmitButton";
+import DossierAppui from "@/components/challenges/DossierAppui";
 import { streamFromProxy } from "@/lib/ai/proxy";
-import { BONUS_C_RAPO_PROMPT, BONUS_C_RAPO_FALC_PROMPT } from "@/lib/ai/prompts";
+import {
+  BONUS_C_RAPO_PROMPT,
+  BONUS_C_RAPO_FALC_PROMPT,
+  BONUS_C_SITUATIONS,
+} from "@/lib/ai/prompts";
 
 const CHALLENGE_ID = 103;
 
@@ -141,11 +146,40 @@ export default function BonusCPage() {
           </div>
         </div>
 
+        <DossierAppui
+          intro="Camille a obtenu sa RQTH et une orientation ESRP (réf. MDPH35-RQTH-2025-04217). Mais une décision de la MDPH pose problème et un recours (RAPO) doit partir sous 2 mois. Les documents ci-dessous contiennent toutes les références utiles."
+          docs={["mdph_letter", "medical_sheet"]}
+          defaultOpen
+        />
+
         {/* Situation input */}
         <section className="mb-8">
           <h2 className="text-2xl font-bold text-black mb-4">
             Décrivez la situation
           </h2>
+          <p className="text-[#4A4A4A] mb-3">
+            Choisissez une situation réelle comme point de départ — puis{" "}
+            <strong>adaptez-la</strong> : précisez, ajoutez des références du
+            dossier, reformulez avec vos mots.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+            {BONUS_C_SITUATIONS.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => setSituation(s.text)}
+                disabled={!!rapoOutput || generating}
+                className={`border-2 p-3 text-left disabled:opacity-50 ${
+                  situation === s.text
+                    ? "border-[#2D5A3D] bg-[#F0F5F1]"
+                    : "border-black bg-white hover:border-[#2D5A3D]"
+                }`}
+              >
+                <p className="font-bold text-black text-sm mb-1">{s.label}</p>
+                <p className="text-xs text-[#4A4A4A] line-clamp-3">{s.text}</p>
+              </button>
+            ))}
+          </div>
           <textarea
             value={situation}
             onChange={(e) => setSituation(e.target.value)}

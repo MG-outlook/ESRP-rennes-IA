@@ -17,6 +17,7 @@ export default function BonusHPage() {
   const [teamId, setTeamId] = useState<string | null>(null);
   const [startedAt, setStartedAt] = useState<string | null>(null);
   const [selectedScenario, setSelectedScenario] = useState<string | null>(null);
+  const [teamSms, setTeamSms] = useState("");
   const [protocolOutput, setProtocolOutput] = useState("");
   const [generating, setGenerating] = useState(false);
   const [submitState, setSubmitState] = useState<"idle" | "loading" | "done">("idle");
@@ -56,7 +57,7 @@ export default function BonusHPage() {
   }, []);
 
   const handleGenerate = useCallback(async () => {
-    if (!teamId || generating || !selectedScenario) return;
+    if (!teamId || generating || !selectedScenario || !teamSms.trim()) return;
     setGenerating(true);
     setProtocolOutput("");
 
@@ -67,7 +68,7 @@ export default function BonusHPage() {
       systemPrompt: BONUS_H_CRISE_PROMPT,
       messages: [{
         role: "user",
-        content: `Scénario de crise : "${scenario.label}"\nContexte : ${scenario.context}\nGénère un protocole en 4 étapes + un SMS d'alerte.`,
+        content: `Scénario de crise : "${scenario.label}"\nContexte : ${scenario.context}\n\nSMS rédigé par l'équipe (premier contact) :\n"""${teamSms.trim()}"""\n\nGénère le protocole en 4 étapes, ton SMS de premier contact, puis ton regard sur le SMS de l'équipe.`,
       }],
       challengeId: CHALLENGE_ID,
       teamId,
@@ -76,7 +77,7 @@ export default function BonusHPage() {
       onDone: () => setGenerating(false),
       onError: () => setGenerating(false),
     });
-  }, [teamId, generating, selectedScenario]);
+  }, [teamId, generating, selectedScenario, teamSms]);
 
   const handleSubmit = useCallback(async () => {
     if (!teamId || submitState !== "idle") return;
@@ -86,7 +87,7 @@ export default function BonusHPage() {
     await supabase.from("submissions").insert({
       team_id: teamId,
       challenge_id: CHALLENGE_ID,
-      payload: { scenario: selectedScenario, protocol: protocolOutput },
+      payload: { scenario: selectedScenario, teamSms, protocol: protocolOutput },
       ai_provider: "proxy",
       model: "ai-proxy",
     });
@@ -98,7 +99,7 @@ export default function BonusHPage() {
       .eq("challenge_id", CHALLENGE_ID);
 
     setSubmitState("done");
-  }, [teamId, submitState, selectedScenario, protocolOutput]);
+  }, [teamId, submitState, selectedScenario, teamSms, protocolOutput]);
 
   const [introDone, setIntroDone] = useState(false);
   if (!introDone)
@@ -151,14 +152,41 @@ export default function BonusHPage() {
           </div>
         </section>
 
+        {/* À vous d'abord : le SMS de l'équipe, avant celui de l'IA */}
+        {selectedScenario && (
+          <section className="mb-8">
+            <h2 className="text-2xl font-bold text-black mb-2">
+              À vous d&apos;abord : votre SMS de premier contact
+            </h2>
+            <p className="text-[#4A4A4A] mb-3">
+              Avant de voir la proposition de l&apos;IA, rédigez en équipe le SMS
+              que <strong>vous</strong> enverriez à Camille. L&apos;IA proposera
+              ensuite le sien — et donnera son regard sur le vôtre.
+            </p>
+            <textarea
+              value={teamSms}
+              onChange={(e) => setTeamSms(e.target.value)}
+              disabled={generating || !!protocolOutput}
+              rows={3}
+              maxLength={320}
+              placeholder="Bonjour Camille, …"
+              className="w-full border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-50 resize-none"
+            />
+            <p className="text-xs text-[#4A4A4A] mt-1">
+              {teamSms.length}/320 caractères — un SMS, pas une lettre.
+            </p>
+          </section>
+        )}
+
         {/* Generate */}
         {selectedScenario && !protocolOutput && !generating && (
           <div className="flex justify-center mb-8">
             <button
               onClick={handleGenerate}
-              className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl"
+              disabled={!teamSms.trim()}
+              className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl disabled:opacity-50"
             >
-              Générer le protocole
+              Comparer avec l&apos;IA
             </button>
           </div>
         )}
@@ -167,7 +195,7 @@ export default function BonusHPage() {
         {(protocolOutput || generating) && (
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-black mb-4">
-              Protocole de crise
+              La proposition de l&apos;IA — et son regard sur votre SMS
             </h2>
             <StreamedOutput content={protocolOutput} loading={generating} />
           </section>

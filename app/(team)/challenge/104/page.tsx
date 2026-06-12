@@ -10,7 +10,7 @@ import StreamedOutput from "@/components/shared/StreamedOutput";
 import Markdown from "@/components/shared/Markdown";
 import SubmitButton from "@/components/shared/SubmitButton";
 import { streamFromProxy } from "@/lib/ai/proxy";
-import { BONUS_D_SUBVENTION_PROMPT } from "@/lib/ai/prompts";
+import { BONUS_D_SUBVENTION_PROMPT, BONUS_D_EXAMPLES } from "@/lib/ai/prompts";
 
 const CHALLENGE_ID = 104;
 
@@ -171,6 +171,38 @@ export default function BonusDPage() {
             tout de même remplir les champs ci-dessous.
           </div>
         )}
+
+        {/* Example projects (one click fills the three fields, team adapts) */}
+        <section className="mb-6">
+          <p className="text-[#4A4A4A] mb-3">
+            Pas de projet sous la main ? Partez d&apos;un exemple crédible —
+            puis <strong>adaptez chaque champ</strong> à votre réalité.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {BONUS_D_EXAMPLES.map((ex) => (
+              <button
+                key={ex.label}
+                type="button"
+                onClick={() => {
+                  setProjectName(ex.projectName);
+                  setObjective(ex.objective);
+                  setBudget(ex.budget);
+                }}
+                disabled={!!draftOutput || generating}
+                className={`border-2 p-3 text-left disabled:opacity-50 ${
+                  projectName === ex.projectName
+                    ? "border-[#2D5A3D] bg-[#F0F5F1]"
+                    : "border-black bg-white hover:border-[#2D5A3D]"
+                }`}
+              >
+                <p className="font-bold text-black text-sm mb-1">{ex.label}</p>
+                <p className="text-xs text-[#4A4A4A] line-clamp-3">
+                  {ex.projectName} — {ex.objective}
+                </p>
+              </button>
+            ))}
+          </div>
+        </section>
 
         {/* Inputs */}
         <section className="mb-8 flex flex-col gap-4">

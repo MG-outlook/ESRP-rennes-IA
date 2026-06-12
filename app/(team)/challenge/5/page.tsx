@@ -11,7 +11,7 @@ import SubmitButton from "@/components/shared/SubmitButton";
 import FadeTransition from "@/components/shared/FadeTransition";
 import Markdown from "@/components/shared/Markdown";
 import { streamFromProxy } from "@/lib/ai/proxy";
-import { DEFI5_CADRAGE_PROMPT, DEFI5_QUESTIONS } from "@/lib/ai/prompts";
+import { DEFI5_CADRAGE_PROMPT, DEFI5_QUESTIONS, DEFI5_IDEES } from "@/lib/ai/prompts";
 import { challengeTitle, computeChallengeScore, formatDuration } from "@/lib/scoring";
 import { useAutoSave, useAutoSaveRestore } from "@/lib/hooks/useAutoSave";
 import { useToast } from "@/lib/hooks/useToast";
@@ -366,6 +366,48 @@ export default function Defi5Page() {
             <h2 className="text-2xl font-bold text-black mb-4">
               5 questions de cadrage
             </h2>
+
+            {/* Banque d'idées : amorce la réponse « Pour quoi faire ? » */}
+            <details className="mb-6 border-2 border-black">
+              <summary className="cursor-pointer font-bold text-black px-4 py-3 bg-[#F5F5F5]">
+                💡 Banque d&apos;idées — des usages IA vus aujourd&apos;hui, à
+                adapter à votre service
+              </summary>
+              <div className="border-t-2 border-black p-4 flex flex-col gap-4">
+                <p className="text-sm text-[#4A4A4A]">
+                  Cliquez sur une idée pour amorcer la question 2 (« Pour quoi
+                  faire ? ») — puis adaptez-la à votre réalité de service.
+                </p>
+                {DEFI5_IDEES.map((group) => (
+                  <div key={group.theme}>
+                    <p className="font-bold text-black text-sm mb-2">
+                      {group.theme}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {group.ideas.map((idea) => (
+                        <button
+                          key={idea}
+                          type="button"
+                          onClick={() =>
+                            setAnswers((prev) => {
+                              const next = [...prev];
+                              next[1] = next[1].trim()
+                                ? `${next[1].trim()}\n${idea}`
+                                : idea;
+                              return next;
+                            })
+                          }
+                          className="px-3 py-1.5 border-2 border-[#B8B8B8] text-sm text-[#4A4A4A] text-left bg-white hover:border-[#2D5A3D] hover:text-[#2D5A3D]"
+                        >
+                          {idea}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </details>
+
             <div className="flex flex-col gap-6">
               {DEFI5_QUESTIONS.map((q, i) => (
                 <div key={i} className="border-2 border-black p-4">

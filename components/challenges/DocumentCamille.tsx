@@ -102,6 +102,10 @@ export function getDocumentContent(kind: DocumentKind): string {
   return DOCUMENTS[kind].content;
 }
 
+export function getDocumentTitle(kind: DocumentKind): string {
+  return DOCUMENTS[kind].title;
+}
+
 export default function DocumentCamille({ kind }: { kind: DocumentKind }) {
   const document = DOCUMENTS[kind];
   return (

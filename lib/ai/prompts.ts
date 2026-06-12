@@ -461,19 +461,128 @@ export const DEFI5_QUESTIONS: string[] = [
   "Comment saura-t-on que ça marche ? (un indicateur simple)",
 ];
 
+/**
+ * Défi 5 — banque d'idées d'usages IA médico-sociaux, inspirées des défis du
+ * jour. Cliquables : elles amorcent la réponse « Pour quoi faire ? » et
+ * évitent la page blanche, sans imposer.
+ */
+export const DEFI5_IDEES: { theme: string; ideas: string[] }[] = [
+  {
+    theme: "Organisationnel",
+    ideas: [
+      "Pré-remplir les trames de synthèses pluri-pro à partir des observations triées (cf. Défi 2)",
+      "Premier brouillon des courriers récurrents : convocations, conventions, relances (cf. Défi 4)",
+      "Comptes-rendus de réunion à partir de notes brutes, relus avant diffusion",
+      "Repérer les doublons et contradictions entre rapports (cf. Bonus A)",
+    ],
+  },
+  {
+    theme: "Accompagnement des personnes",
+    ideas: [
+      "Traduire en FALC les courriers remis aux personnes accompagnées (cf. Bonus I)",
+      "Préparer les entretiens d'embauche des stagiaires en simulation (cf. Bonus B)",
+      "Adapter un même message à plusieurs destinataires : personne, famille, partenaire (cf. Défi 4)",
+      "Aider à rédiger les recours et démarches complexes type RAPO (cf. Bonus C)",
+    ],
+  },
+  {
+    theme: "Accessibilité & communication",
+    ideas: [
+      "Glossaire FALC partagé des sigles du médico-social, affiché et distribué",
+      "Pictogrammes et supports visuels pour les consignes d'atelier (cf. Défi A)",
+      "Cartes mentales des parcours pour préparer les points d'étape (cf. Bonus J)",
+    ],
+  },
+];
+
 /* ------------------------------------------------------------------ */
 /* Bonus                                                              */
 /* ------------------------------------------------------------------ */
 
-export const BONUS_B_COACH_PROMPT = `Tu es un coach d'entretien d'embauche pour Camille, qui passe un entretien dans une PME locale (poste accueil/secrétariat). Tu aides l'équipe à préparer Camille : tu proposes des questions probables (RH classique, métier, ouverture), tu co-rédiges des réponses adaptées (ni trop scolaires, ni trop spontanées), et tu donnes un conseil corporel synthétique (regard, mains, respiration). Ton bienveillant et concret.`;
+export const BONUS_B_COACH_PROMPT = `Tu es un coach d'entretien d'embauche pour Camille, qui passe un entretien dans une PME locale (poste accueil/secrétariat). Tu aides l'équipe à préparer Camille : tu proposes des questions probables (RH classique, métier, ouverture), tu co-rédiges des réponses adaptées (ni trop scolaires, ni trop spontanées), et tu donnes un conseil corporel synthétique (regard, mains, respiration). Ton bienveillant et concret.
+
+Tu disposes ci-dessous du dossier réel de Camille : appuie-toi UNIQUEMENT sur ces faits (parcours, restrictions, motivations, stage). Si l'équipe avance quelque chose qui contredit le dossier, signale-le gentiment.`;
+
+/** Amorces de premières demandes au coach, à adapter par l'équipe. */
+export const BONUS_B_STARTERS: string[] = [
+  "Quelles questions risquent de déstabiliser Camille, et comment s'y préparer ?",
+  "Aide-nous à construire sa réponse à « Parlez-moi de vous »",
+  "Comment parler de l'accident et de la reconversion sans se justifier ?",
+  "Faut-il évoquer la RQTH en entretien ? Si oui, comment ?",
+];
 
 export const BONUS_C_RAPO_PROMPT = `Tu aides à rédiger un RAPO (recours administratif préalable obligatoire) clair et factuel à la MDPH, concernant le dossier de Camille (RQTH, réf. MDPH35-RQTH-2025-04217). Ton administratif courtois et rigoureux. Tu t'appuies sur les faits fournis, tu rappelles la référence du dossier et le motif du recours, et tu restes factuel.`;
 
 export const BONUS_C_RAPO_FALC_PROMPT = `Tu transformes un courrier administratif (RAPO) en version FALC destinée à Camille, pour lui expliquer simplement la démarche en cours. Phrases courtes (<15 mots), vocabulaire simple, vouvoiement bienveillant, aucun acronyme non expliqué.`;
 
+/**
+ * Bonus C — situations de recours réalistes, cohérentes avec le dossier de
+ * Camille, proposées comme point de départ (l'équipe reprend puis adapte).
+ */
+export interface RapoSituation {
+  id: string;
+  label: string;
+  text: string;
+}
+
+export const BONUS_C_SITUATIONS: RapoSituation[] = [
+  {
+    id: "piece_manquante",
+    label: "La pièce manquante",
+    text: "La MDPH a suspendu l'examen des aménagements du stage de Camille : la fiche de liaison du médecin du travail (Dr Lefèvre, du 5 février 2026) ne figurait pas dans le dossier transmis. La pièce existe, nous la joignons à ce recours. Nous demandons le réexamen rapide du dossier, le stage débutant le 31 août 2026.",
+  },
+  {
+    id: "duree_rqth",
+    label: "Une durée jugée insuffisante",
+    text: "La RQTH de Camille a été attribuée pour 5 ans, mais sans l'orientation complémentaire vers un dispositif d'accompagnement à l'emploi pourtant demandée et appuyée par l'avis du médecin du travail. Nous contestons cette omission et demandons que l'orientation soit complétée, au vu des restrictions d'aptitude constatées.",
+  },
+  {
+    id: "transport",
+    label: "Le transport adapté refusé",
+    text: "La demande de transport adapté déposée pour Camille a été rejetée au motif d'un « dossier incomplet », alors que la notification RQTH (réf. MDPH35-RQTH-2025-04217) mentionne des restrictions (station debout prolongée proscrite, fatigabilité) qui justifient ce besoin pour ses trajets quotidiens vers l'ESRP. Nous demandons le réexamen de la décision.",
+  },
+];
+
 export const BONUS_D_SUBVENTION_PROMPT = `Tu aides une équipe de l'ESRP à rédiger une demande de subvention crédible, courte et percutante (~400 mots) pour financer leur projet IA. Tu proposes une structure (contexte, projet, budget, impact, indicateurs) puis tu peaufines le texte à partir de leurs apports. Ton professionnel et convaincant.`;
 
-export const BONUS_H_CRISE_PROMPT = `Tu aides une équipe de l'ESRP à co-rédiger un protocole bienveillant de reprise de contact face à une situation difficile concernant Camille. Tu proposes un protocole en 4 étapes progressives (par ex. J+1 SMS, J+3 appel, J+5 visite, J+7 entretien) puis tu rédiges un SMS de premier contact, bienveillant et non culpabilisant. Rappelle que les protocoles réels de l'établissement priment. Ton humain, respectueux, non intrusif.`;
+/**
+ * Bonus D — exemples de projets IA médico-sociaux crédibles : un clic remplit
+ * les trois champs, l'équipe adapte ensuite à sa réalité.
+ */
+export interface SubventionExample {
+  label: string;
+  projectName: string;
+  objective: string;
+  budget: string;
+}
+
+export const BONUS_D_EXAMPLES: SubventionExample[] = [
+  {
+    label: "Accessibilité des écrits",
+    projectName: "FALC pour tous — ESRP Rennes",
+    objective:
+      "Traduire systématiquement en FALC, avec l'aide d'une IA souveraine et une relecture professionnelle, les courriers et documents remis aux personnes accompagnées, et constituer un glossaire partagé des sigles du médico-social.",
+    budget: "3 500 € sur 12 mois (licences IA + 2 journées de formation d'équipe)",
+  },
+  {
+    label: "Temps de réunion",
+    projectName: "Synthèses pluri-pro assistées",
+    objective:
+      "Réduire de moitié le temps de rédaction des synthèses trimestrielles : trames pré-remplies par l'IA à partir des observations triées par l'équipe, relecture et validation humaines systématiques.",
+    budget: "5 000 € sur 12 mois (licences, temps projet, évaluation)",
+  },
+  {
+    label: "Insertion professionnelle",
+    projectName: "Coach d'entretien EPNAK",
+    objective:
+      "Proposer aux stagiaires en fin de parcours des simulations d'entretien d'embauche assistées par IA (questions probables, réponses co-construites, posture), encadrées par les chargés d'insertion.",
+    budget: "4 500 € (équipement d'une salle, licences, temps d'animation)",
+  },
+];
+
+export const BONUS_H_CRISE_PROMPT = `Tu aides une équipe de l'ESRP à co-rédiger un protocole bienveillant de reprise de contact face à une situation difficile concernant Camille. Tu proposes un protocole en 4 étapes progressives (par ex. J+1 SMS, J+3 appel, J+5 visite, J+7 entretien) puis tu rédiges un SMS de premier contact, bienveillant et non culpabilisant. Rappelle que les protocoles réels de l'établissement priment. Ton humain, respectueux, non intrusif.
+
+L'équipe a d'abord rédigé SON propre SMS de premier contact (fourni dans le message). Termine ta réponse par une section « ## Votre SMS, notre regard » : en 3 phrases maximum, dis ce que leur SMS réussit, puis UNE amélioration concrète en le comparant au tien. Jamais de note chiffrée, jamais de condescendance : leur métier, c'est eux qui l'ont.`;
 
 export const BONUS_J_MINDMAP_PROMPT = `Tu transformes un compte-rendu pluri-professionnel concernant Camille en une carte mentale structurée du parcours, au format Markdown hiérarchique (titres avec #, ##, ###, listes). La racine est « Camille — parcours ESRP ». Tu organises en branches claires (situation, santé, formation, projet pro). Tu n'ajoutes aucune information absente du compte-rendu.`;
 
@@ -676,6 +785,32 @@ export const BONUS_G_PITCH_PROMPT = `Tu rédiges, à la PREMIÈRE PERSONNE (Cami
 - qui se termine par une phrase d'ouverture
 Tu rends UNIQUEMENT le texte du pitch, sans préambule.`;
 
+/**
+ * Bonus G — éléments forts tirés mot pour mot du dossier de Camille (lettre de
+ * motivation + fiche médicale), proposés en amorces cliquables par champ.
+ */
+export const BONUS_G_SUGGESTIONS: Record<
+  "competence" | "motivation" | "projet",
+  string[]
+> = {
+  competence: [
+    "16 ans d'expérience de magasinier : fiabilité et rigueur",
+    "Sens de l'organisation (papiers de la maison, scolarité, club de foot)",
+    "Bureautique de base : mails, traitement de texte, recherches",
+    "Relationnel facile, atout signalé par ses anciens collègues",
+  ],
+  motivation: [
+    "Une reconversion choisie et réfléchie après l'accident de 2023",
+    "Envie d'un métier de bureau qui garde du contact humain",
+    "« J'ai envie d'essayer. Vraiment. »",
+  ],
+  projet: [
+    "Un poste d'accueil-secrétariat dans une PME",
+    "Réussir le stage de 3 semaines chez Bureaux & Solutions",
+    "Se former au tertiaire en gardant un lien avec le terrain",
+  ],
+};
+
 /* ------------------------------------------------------------------ */
 /* Bonus I — Le glossaire qui sauve                                   */
 /* ------------------------------------------------------------------ */
@@ -686,4 +821,65 @@ export const BONUS_I_GLOSSAIRE_PROMPT = `Tu reçois un courrier administratif r�
 
 Réponds en Markdown, une ligne par terme : **TERME** : définition simple.
 N'invente pas de terme absent du courrier.`;
+
+/**
+ * Bonus I — « vérité terrain » de la chasse aux termes : les sigles et termes
+ * techniques réellement présents dans le courrier MDPH. L'équipe chasse
+ * d'abord elle-même, puis on révèle ce qu'elle a trouvé ou manqué, avant que
+ * l'IA ne produise le glossaire FALC.
+ */
+export interface GlossaryTerm {
+  id: string;
+  label: string;
+  /** Variantes acceptées, en minuscules sans accents. */
+  aliases: string[];
+}
+
+export const BONUS_I_TERMS: GlossaryTerm[] = [
+  {
+    id: "mdph",
+    label: "MDPH",
+    aliases: ["mdph", "maison departementale des personnes handicapees"],
+  },
+  {
+    id: "rqth",
+    label: "RQTH",
+    aliases: ["rqth", "reconnaissance de la qualite de travailleur handicape"],
+  },
+  {
+    id: "cdaph",
+    label: "CDAPH",
+    aliases: ["cdaph", "commission des droits et de l'autonomie"],
+  },
+  {
+    id: "esrp",
+    label: "ESRP",
+    aliases: ["esrp", "etablissement et service de readaptation professionnelle"],
+  },
+  {
+    id: "rapo",
+    label: "RAPO",
+    aliases: ["rapo", "recours administratif prealable obligatoire", "recours administratif"],
+  },
+  {
+    id: "instruction",
+    label: "Instruction (du dossier)",
+    aliases: ["instruction"],
+  },
+  {
+    id: "taux_incapacite",
+    label: "Taux d'incapacité",
+    aliases: ["taux d'incapacite", "taux incapacite", "incapacite"],
+  },
+  {
+    id: "notification",
+    label: "Notification",
+    aliases: ["notification"],
+  },
+  {
+    id: "amenagement_poste",
+    label: "Aménagement de poste",
+    aliases: ["amenagement de poste", "amenagement", "amenagements"],
+  },
+];
 
