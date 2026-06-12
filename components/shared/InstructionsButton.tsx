@@ -53,11 +53,18 @@ export default function InstructionsButton({
               <p className="italic text-[#4A4A4A] mt-1">{content.subtitle}</p>
             )}
             {content.objective && (
-              <p className="mt-3 mb-4 border-l-4 border-[#2D5A3D] bg-[#F0F5F1] px-3 py-2 text-black text-sm">
+              <p className="mt-3 border-l-4 border-[#2D5A3D] bg-[#F0F5F1] px-3 py-2 text-black text-sm">
                 <span className="font-bold text-[#2D5A3D]">🎯 Objectif — </span>
                 {content.objective}
               </p>
             )}
+            {content.pourquoi && (
+              <p className="mt-2 border-l-4 border-black bg-[#F5F5F5] px-3 py-2 text-black text-sm">
+                <span className="font-bold text-black">💡 Pourquoi ce défi ? </span>
+                {content.pourquoi}
+              </p>
+            )}
+            <div className="mb-4" />
 
             <ol className="list-decimal pl-6 space-y-2 text-black text-lg">
               {content.steps.map((step, i) => (

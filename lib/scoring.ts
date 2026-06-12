@@ -23,6 +23,10 @@ export const CHALLENGE_TITLES: Record<number, string> = {
   203: "Défi C — La chasse à l'hallu",
   204: "Défi D — Le caméléon",
   205: "Défi E — La fabrique à idées",
+  301: "Cas d'usage 1 — La mission documentaire",
+  302: "Cas d'usage 2 — Le simulateur d'entretien",
+  303: "Cas d'usage 3 — Le débrief vocal",
+  304: "Cas d'usage 4 — La synthèse d'accueil du copil",
 };
 
 export function challengeTitle(id: number): string {
