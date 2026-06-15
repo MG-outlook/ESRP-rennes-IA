@@ -4,6 +4,36 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 /**
+ * Unwraps a response that the model wrapped entirely in a fenced code block.
+ *
+ * Asked to "répondre en Markdown", models frequently return their whole answer
+ * inside ```` ```markdown … ``` ````. react-markdown then renders it as a code
+ * block — monospace, with the raw `##` and `**` showing — instead of formatted
+ * prose. We strip a leading fence (```` ``` ````/```` ```markdown ````/```` ```md ````)
+ * and its trailing counterpart. Written to also work mid-stream, when only the
+ * opening fence has arrived yet. Safe here because AI outputs are always prose,
+ * never genuine code snippets.
+ */
+function stripWrappingFence(md: string): string {
+  let s = md.trim();
+  const open = s.match(/^```[ \t]*([a-zA-Z]*)[ \t]*\r?\n/);
+  if (!open) return md;
+  const lang = open[1].toLowerCase();
+  if (lang !== "" && lang !== "markdown" && lang !== "md" && lang !== "text") {
+    return md; // a real code block (js, python…) — leave it alone
+  }
+  s = s.slice(open[0].length);
+  // Drop the closing fence when it sits at the very end (absent while streaming).
+  s = s.replace(/\r?\n?[ \t]*```[ \t]*$/, "");
+  return s;
+}
+
+/** Normalises unicode bullets (–, —, •, ·) at line start to Markdown "- ". */
+function normalizeBullets(md: string): string {
+  return md.replace(/^[ \t]*[–—•·][ \t]+/gm, "- ");
+}
+
+/**
  * Promotes inline "section titles" to real headings.
  *
  * Models routinely write a section header as bold text at the start of a
@@ -27,7 +57,9 @@ function normalizeHeadings(md: string): string {
  * and `**` markup.
  */
 export default function Markdown({ content }: { content: string }) {
-  const normalized = normalizeHeadings(content);
+  const normalized = normalizeHeadings(
+    normalizeBullets(stripWrappingFence(content))
+  );
   return (
     <div className="text-black leading-relaxed space-y-3">
       <ReactMarkdown
