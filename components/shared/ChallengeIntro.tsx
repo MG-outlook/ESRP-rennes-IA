@@ -80,7 +80,12 @@ export default function ChallengeIntro({
           )}
           <div className="flex justify-center mt-6">
             <button
-              onClick={onStart}
+              onClick={() => {
+                // Repart en haut de la page du défi : on doit voir le titre et
+                // les instructions, pas atterrir au milieu si l'intro a scrollé.
+                if (typeof window !== "undefined") window.scrollTo(0, 0);
+                onStart();
+              }}
               className="px-8 py-4 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl hover:bg-[#234a31] transition-colors"
             >
               {startLabel}

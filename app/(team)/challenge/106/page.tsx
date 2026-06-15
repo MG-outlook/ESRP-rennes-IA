@@ -325,7 +325,7 @@ export default function BonusFPage() {
             <div className="border-l-4 border-[#2D5A3D] bg-[#F0F5F1] p-4 mb-6">
               <h3 className="font-bold text-[#2D5A3D] mb-1">Le regard de l&apos;IA</h3>
               {feedback ? (
-                <p className="text-black whitespace-pre-line">{feedback}</p>
+                <Markdown content={feedback} />
               ) : (
                 <div className="flex items-center gap-2 text-[#4A4A4A]">
                   <Spinner size="sm" />

@@ -507,9 +507,9 @@ export default function Defi5Page() {
                     <h3 className="font-bold text-black mb-2">
                       Équipe {proj.teamCode}
                     </h3>
-                    <p className="text-[#4A4A4A] text-sm whitespace-pre-wrap mb-4 max-h-[200px] overflow-y-auto">
-                      {proj.description}
-                    </p>
+                    <div className="text-sm mb-4 max-h-[200px] overflow-y-auto">
+                      <Markdown content={proj.description} />
+                    </div>
                     <div className="flex gap-4">
                       {VOTE_CATEGORIES.map((cat) => (
                         <div key={cat} className="flex flex-col items-center gap-1">

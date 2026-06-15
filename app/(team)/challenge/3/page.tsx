@@ -11,6 +11,7 @@ import StreamedOutput from "@/components/shared/StreamedOutput";
 import SubmitButton from "@/components/shared/SubmitButton";
 import FadeTransition from "@/components/shared/FadeTransition";
 import Skeleton from "@/components/shared/Skeleton";
+import Markdown from "@/components/shared/Markdown";
 import { streamFromProxy } from "@/lib/ai/proxy";
 import {
   DEFI3_BIAS_CATEGORIES,
@@ -306,16 +307,16 @@ export default function Defi3Page() {
                 <h3 className="font-bold text-black mb-2">
                   Réponse de l&apos;IA :
                 </h3>
-                <p className="text-black whitespace-pre-wrap leading-relaxed">
-                  {cachedResponse || (
-                    <span className="flex flex-col gap-3">
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-5/6" />
-                      <Skeleton className="h-4 w-3/4" />
-                    </span>
-                  )}
-                </p>
+                {cachedResponse ? (
+                  <Markdown content={cachedResponse} />
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-5/6" />
+                    <Skeleton className="h-4 w-3/4" />
+                  </div>
+                )}
               </div>
             </section>
 
