@@ -232,8 +232,15 @@ export default function Uc1Page() {
                       <button
                         type="button"
                         onClick={() => setOpenDoc(openDoc === d.id ? null : d.id)}
-                        className="flex-1 text-left font-semibold text-black hover:text-[#2D5A3D]"
+                        className="flex-1 text-left font-semibold text-black hover:text-[#2D5A3D] flex items-center gap-2"
                       >
+                        <span
+                          className="shrink-0 text-xs"
+                          aria-hidden="true"
+                          style={{ transform: openDoc === d.id ? "rotate(90deg)" : "rotate(0deg)", display: "inline-block", transition: "transform 0.15s" }}
+                        >
+                          ▶
+                        </span>
                         {d.title}
                       </button>
                       <span className="shrink-0 text-xs px-2 py-0.5 border border-[#B8B8B8] text-[#4A4A4A]">
