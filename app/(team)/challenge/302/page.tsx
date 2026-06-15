@@ -273,15 +273,20 @@ export default function Uc2Page() {
 
             {phase === "chat" && (
               <>
-                <div className="flex gap-3">
-                  <input
-                    type="text"
+                <div className="flex gap-3 items-end">
+                  <textarea
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSend();
+                      }
+                    }}
                     disabled={streaming}
-                    placeholder="Votre réponse de candidat…"
-                    className="flex-1 border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-50"
+                    placeholder="Votre réponse de candidat… (Entrée pour envoyer, Maj+Entrée pour revenir à la ligne)"
+                    rows={3}
+                    className="flex-1 border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-50 resize-none"
                   />
                   <button
                     onClick={handleSend}
