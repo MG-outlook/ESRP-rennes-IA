@@ -34,6 +34,22 @@ function normalizeBullets(md: string): string {
 }
 
 /**
+ * Strips prose fences embedded inside the content (e.g. ```notes … ```).
+ * The outer wrapper is already removed by stripWrappingFence; this handles
+ * secondary fences the model sometimes adds around trailing sections like
+ * "Notes" or unlabelled separators. Real code fences (```js, ```python…)
+ * are left intact.
+ */
+function stripEmbeddedProseFences(md: string): string {
+  const PROSE = new Set(["", "markdown", "md", "text", "notes", "note"]);
+  return md.replace(
+    /^[ \t]*```[ \t]*([a-zA-Z]*)[ \t]*\r?\n([\s\S]*?)^[ \t]*```[ \t]*\r?$/gm,
+    (_m, lang: string, inner: string) =>
+      PROSE.has(lang.toLowerCase()) ? inner.trimEnd() : _m
+  );
+}
+
+/**
  * Promotes inline "section titles" to real headings.
  *
  * Models routinely write a section header as bold text at the start of a
@@ -58,7 +74,9 @@ function normalizeHeadings(md: string): string {
  */
 export default function Markdown({ content }: { content: string }) {
   const normalized = normalizeHeadings(
-    normalizeBullets(stripWrappingFence(content))
+    normalizeBullets(
+      stripEmbeddedProseFences(stripWrappingFence(content))
+    )
   );
   return (
     <div className="text-black leading-relaxed space-y-3">
