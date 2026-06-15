@@ -26,6 +26,16 @@ export default function InstructionsButton({
         Instructions
       </button>
 
+      {/* Bouton flottant bas-droite */}
+      <button
+        onClick={() => setOpen(true)}
+        title="Revoir les instructions du défi"
+        aria-label="Revoir les instructions du défi"
+        className="fixed bottom-6 right-6 z-40 w-12 h-12 flex items-center justify-center border-2 border-[#2D5A3D] bg-white text-[#2D5A3D] font-bold text-xl hover:bg-[#2D5A3D] hover:text-white transition-colors"
+      >
+        ?
+      </button>
+
       {open && (
         <div
           className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
