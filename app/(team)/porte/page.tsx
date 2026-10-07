@@ -55,6 +55,21 @@ function stripReadyBlock(text: string): string {
     .trim();
 }
 
+/**
+ * Charge utile neutre écrite quand la porte est franchie via le code
+ * administrateur (raccourci de démonstration). Les valeurs sont volontairement
+ * génériques : aucune équipe réelle n'est décrite ici.
+ */
+function buildBypassPayload(): PorteReadyPayload {
+  return {
+    composition: { admin: 0, medico_psy: 0, formateur: 0, insertion_pro: 0, autre: 0 },
+    intention: "Démonstration",
+    singularite: "Accès administrateur",
+    password: "DEMO-ADMIN",
+    team_essence: "Passage éclair pour la présentation.",
+  };
+}
+
 export default function PortePage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -180,6 +195,30 @@ export default function PortePage() {
     e.preventDefault();
     const text = input.trim();
     if (!text || streaming) return;
+
+    // Raccourci administrateur : si le texte saisi correspond exactement au code
+    // secret (vérifié côté serveur, PORTE_BYPASS_CODE), on franchit la porte
+    // immédiatement. Le code n'est jamais ajouté à la conversation ni enregistré,
+    // donc il reste invisible à l'écran pendant une présentation. Toute saisie
+    // qui ne correspond pas poursuit normalement le dialogue avec le Gardien.
+    try {
+      const res = await fetch("/api/porte-bypass", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ code: text }),
+      });
+      if (res.ok) {
+        const { match } = (await res.json()) as { match?: boolean };
+        if (match) {
+          setInput("");
+          await handleReadyPayload(buildBypassPayload());
+          return;
+        }
+      }
+    } catch {
+      // Échec réseau du contrôle : on ignore et on poursuit le flux normal.
+    }
 
     const userMsg: Message = { role: "user", content: text };
     const newMessages = [...messages, userMsg];
