@@ -22,7 +22,25 @@ NEXT_PUBLIC_SUPABASE_URL=https://<projet>.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<clé anon>
 # Optionnel : repli pour la connexion équipe si l'auth anonyme est désactivée
 SUPABASE_SERVICE_ROLE_KEY=<clé service role>
+# Optionnel : code secret pour franchir la Porte instantanément (démonstration)
+PORTE_BYPASS_CODE=<votre code personnel>
 ```
+
+## Raccourci « Porte » pour les démonstrations
+
+Pour gagner du temps lors d'une présentation, vous pouvez franchir la porte du
+Gardien sans dérouler la conversation. Définissez la variable
+`PORTE_BYPASS_CODE` (côté serveur uniquement — **pas** de préfixe
+`NEXT_PUBLIC_`, le code n'est donc jamais envoyé au navigateur ni visible dans
+le bundle), puis, sur la page `/porte`, saisissez ce code dans le champ de
+réponse et validez : la porte s'ouvre immédiatement.
+
+- Le code est vérifié côté serveur (`/api/porte-bypass`) par une comparaison à
+  temps constant ; vous êtes le seul à le connaître.
+- Il n'est **jamais** affiché à l'écran ni enregistré dans la conversation.
+- Tant que `PORTE_BYPASS_CODE` n'est pas défini, le raccourci est inactif.
+- Toute saisie qui ne correspond pas au code est traitée normalement comme un
+  message adressé au Gardien.
 
 ## Connexion équipe
 
