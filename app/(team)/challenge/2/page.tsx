@@ -20,6 +20,7 @@ import {
 } from "@/lib/ai/prompts";
 import { useAutoSave, useAutoSaveRestore } from "@/lib/hooks/useAutoSave";
 import { useToast } from "@/lib/hooks/useToast";
+import Icon from "@/components/shared/Icon";
 
 const CHALLENGE_ID = 2;
 
@@ -250,12 +251,12 @@ export default function Defi2Page() {
     );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-6xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-black">Défi 2 — Le tri des observations</h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <h1 className="text-4xl font-bold text-ink">Défi 2 — Le tri des observations</h1>
+            <p className="text-ink-2 mt-2">
               Triez les notes sur Camille, l&apos;IA en fait une synthèse pro et une version FALC
             </p>
           </div>
@@ -270,8 +271,8 @@ export default function Defi2Page() {
         {/* TRIAGE */}
         {phase === "triage" && (
           <section className="mb-8">
-            <div className="border-2 border-black p-5 mb-6 bg-[#F5F5F5]">
-              <p className="text-black">
+            <div className="border p-5 mb-6 bg-surface border-line">
+              <p className="text-ink">
                 Voici <strong>16 notes</strong> prises par l&apos;équipe sur Camille
                 après 3 mois. Toutes ne se valent pas : certaines se répètent, se
                 contredisent, ou n&apos;ont rien à faire dans un compte-rendu.
@@ -290,33 +291,33 @@ export default function Defi2Page() {
                     key={note.id}
                     className={`border-2 p-4 ${
                       current === "jeter"
-                        ? "border-[#B8B8B8] bg-[#F5F5F5] opacity-60"
+                        ? "border-line bg-surface opacity-60"
                         : kept
-                        ? "border-[#2D5A3D] bg-white"
-                        : "border-black bg-white"
+                        ? "border-brand bg-white"
+                        : "border-line bg-white"
                     }`}
                   >
-                    <p className="text-black mb-3">« {note.text} »</p>
+                    <p className="text-ink mb-3">« {note.text} »</p>
                     <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => setSort(note.id, "jeter")}
-                        className={`px-3 py-2 border-2 text-sm font-semibold ${
+                        className={`btn px-3 py-2 border-2 text-sm font-semibold ${
                           current === "jeter"
-                            ? "bg-[#8B3A3A] border-[#8B3A3A] text-white"
-                            : "bg-white border-[#8B3A3A] text-[#8B3A3A]"
+                            ? "bg-danger border-danger text-white"
+                            : "bg-white border-danger text-danger"
                         }`}
                       >
-                        🗑 Jeter
+                        <Icon name="trash" size={16} /> Jeter
                       </button>
-                      <span className="w-px bg-[#E0E0E0] mx-1" aria-hidden />
+                      <span className="w-px bg-line mx-1" aria-hidden />
                       {DIMENSIONS.map((dim) => (
                         <button
                           key={dim}
                           onClick={() => setSort(note.id, dim)}
-                          className={`px-3 py-2 border-2 text-sm font-semibold ${
+                          className={`btn px-3 py-2 border-2 text-sm font-semibold ${
                             current === dim
-                              ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
-                              : "bg-white border-black text-black"
+                              ? "bg-brand border-brand text-white"
+                              : "bg-white border-control text-ink"
                           }`}
                         >
                           {DEFI2_DIMENSION_LABELS[dim]}
@@ -332,11 +333,11 @@ export default function Defi2Page() {
               <button
                 onClick={handleGenerate}
                 disabled={!allSorted || keptCount === 0}
-                className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl disabled:opacity-50"
+                className="btn btn-primary px-6 py-3 text-xl disabled:opacity-50"
               >
                 Générer la synthèse
               </button>
-              <p className="text-sm text-[#4A4A4A]">
+              <p className="text-sm text-ink-2">
                 {allSorted
                   ? `${keptCount} note(s) gardée(s) sur 16`
                   : "Triez les 16 notes pour continuer"}
@@ -350,11 +351,11 @@ export default function Defi2Page() {
           <section className="mb-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div>
-                <h2 className="text-2xl font-bold text-black mb-4">Synthèse professionnelle</h2>
+                <h2 className="text-2xl font-bold text-ink mb-4">Synthèse professionnelle</h2>
                 <StreamedOutput content={proOutput} loading={proGenerating} />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-black mb-4">Version FALC (pour Camille)</h2>
+                <h2 className="text-2xl font-bold text-ink mb-4">Version FALC (pour Camille)</h2>
                 <StreamedOutput content={falcOutput} loading={falcGenerating} />
               </div>
             </div>
@@ -364,21 +365,21 @@ export default function Defi2Page() {
         {/* FALC EVAL — indicateur de qualité */}
         {falcEval && phase === "results" && (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-4">Qualité FALC</h2>
-            <div className="border-2 border-black p-6">
+            <h2 className="text-2xl font-bold text-ink mb-4">Qualité FALC</h2>
+            <div className="border p-6 border-line">
               <div className="flex items-center gap-4 mb-4">
-                <span className="text-4xl font-bold text-[#2D5A3D]">{falcEval.total}/10</span>
-                <span className="text-[#4A4A4A]">lisibilité pour Camille</span>
+                <span className="text-4xl font-bold text-brand">{falcEval.total}/10</span>
+                <span className="text-ink-2">lisibilité pour Camille</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-5 gap-3 mb-4">
                 {FALC_CRITERIA.map((c, i) => (
-                  <div key={c} className="border-2 border-[#B8B8B8] p-3 text-center">
-                    <div className="text-sm text-[#4A4A4A]">{c}</div>
-                    <div className="text-2xl font-bold text-black">{falcEval.scores?.[i] ?? "—"}/2</div>
+                  <div key={c} className="border-2 border-line p-3 text-center">
+                    <div className="text-sm text-ink-2">{c}</div>
+                    <div className="text-2xl font-bold text-ink">{falcEval.scores?.[i] ?? "—"}/2</div>
                   </div>
                 ))}
               </div>
-              <p className="text-[#4A4A4A]">{falcEval.commentaire}</p>
+              <p className="text-ink-2">{falcEval.commentaire}</p>
             </div>
           </section>
         )}
@@ -386,8 +387,8 @@ export default function Defi2Page() {
         {/* DEBRIEF DU TRI */}
         {phase === "results" && (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-2">Le débrief du tri</h2>
-            <p className="text-[#4A4A4A] mb-5">
+            <h2 className="text-2xl font-bold text-ink mb-2">Le débrief du tri</h2>
+            <p className="text-ink-2 mb-5">
               Ce que cachaient les notes : doublons, contradictions et hors-sujet.
               L&apos;IA n&apos;a écrit qu&apos;à partir de ce que vous lui avez donné.
             </p>
@@ -400,16 +401,16 @@ export default function Defi2Page() {
                     ? discarded
                     : true; // redondance : pas d'erreur grave si gardée
                 return (
-                  <div key={o.id} className="border-2 border-black p-4">
+                  <div key={o.id} className="border p-4 border-line">
                     <div className="flex items-start justify-between gap-3 flex-wrap">
-                      <p className="text-black flex-1">« {o.text} »</p>
+                      <p className="text-ink flex-1">« {o.text} »</p>
                       <span
                         className={`text-xs font-bold px-2 py-1 border-2 whitespace-nowrap ${
                           o.kind === "offtopic"
-                            ? "border-[#8B3A3A] text-[#8B3A3A]"
+                            ? "border-danger text-danger"
                             : o.kind === "contradictory"
-                            ? "border-[#B5651D] text-[#B5651D]"
-                            : "border-[#4A4A4A] text-[#4A4A4A]"
+                            ? "border-warning text-warning"
+                            : "border-control text-ink-2"
                         }`}
                       >
                         {o.kind === "offtopic"
@@ -420,14 +421,14 @@ export default function Defi2Page() {
                       </span>
                     </div>
                     {o.debrief && (
-                      <p className="text-sm text-[#4A4A4A] mt-2">{o.debrief}</p>
+                      <p className="text-sm text-ink-2 mt-2">{o.debrief}</p>
                     )}
                     <p className="text-sm mt-2 font-semibold">
                       {good ? (
-                        <span className="text-[#2D5A3D]">✓ Bien vu par l&apos;équipe</span>
+                        <span className="inline-flex items-center gap-1.5 text-success"><Icon name="check" size={16} strokeWidth={3} /> Bien vu par l&apos;équipe</span>
                       ) : (
-                        <span className="text-[#8B3A3A]">
-                          ⚠ Cette note avait été gardée — à rediscuter
+                        <span className="inline-flex items-center gap-1.5 text-danger">
+                          <Icon name="alert" size={16} /> Cette note avait été gardée — à rediscuter
                         </span>
                       )}
                     </p>

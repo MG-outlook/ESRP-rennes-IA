@@ -3,7 +3,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { adminFetch } from "@/lib/admin/client";
 import { getAIStatus, onAIStatusChange, startHealthCheck } from "@/lib/ai/health";
+import Link from "next/link";
 import Skeleton from "@/components/shared/Skeleton";
+import Icon from "@/components/shared/Icon";
 import Markdown from "@/components/shared/Markdown";
 import {
   challengeTitle,
@@ -68,12 +70,12 @@ interface SubmissionDetail {
 function formatComposition(comp: Record<string, number> | null): string {
   if (!comp) return "—";
   const parts: string[] = [];
-  if (comp.admin) parts.push(`${comp.admin}A`);
-  if (comp.medico_psy) parts.push(`${comp.medico_psy}MP`);
-  if (comp.formateur) parts.push(`${comp.formateur}F`);
-  if (comp.insertion_pro) parts.push(`${comp.insertion_pro}IP`);
-  if (comp.autre) parts.push(`${comp.autre}?`);
-  return parts.join(" ") || "—";
+  if (comp.formateur) parts.push(`Formation ${comp.formateur}`);
+  if (comp.medico_psy) parts.push(`Médico-psy ${comp.medico_psy}`);
+  if (comp.insertion_pro) parts.push(`Insertion ${comp.insertion_pro}`);
+  if (comp.admin) parts.push(`Admin ${comp.admin}`);
+  if (comp.autre) parts.push(`Autre ${comp.autre}`);
+  return parts.join(" · ") || "—";
 }
 
 export default function DashboardPage() {
@@ -199,31 +201,47 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-white p-4 sm:p-6">
-      <div className="flex items-center justify-between gap-3 flex-wrap mb-6">
-        <h1 className="text-2xl sm:text-4xl font-bold text-black">Dashboard — Vue projetée</h1>
-        <div className="flex items-center gap-3">
-          <a
-            href="/classement"
-            className="px-4 py-2 border-2 border-[#2D5A3D] text-[#2D5A3D] font-semibold text-sm hover:bg-[#2D5A3D] hover:text-white"
+    <main className="flex-1 bg-surface">
+      <div className="max-w-[1360px] mx-auto px-4 sm:px-6 py-8 flex flex-col gap-6">
+      <div className="flex items-end justify-between gap-4 flex-wrap">
+        <div className="flex flex-col gap-1.5">
+          <h1 className="text-3xl sm:text-4xl">Tableau de bord</h1>
+          <p className="text-ink-2">
+            Vue projetée des équipes. Cliquez sur une équipe pour lire ses productions.
+          </p>
+        </div>
+        <div className="flex items-center gap-3 flex-wrap">
+          <span
+            role="status"
+            className={`badge h-11 px-4 text-base ${
+              aiStatus === "ok"
+                ? "bg-success-soft text-success-strong"
+                : "bg-warning-soft text-warning"
+            }`}
           >
-            🏆 Classement final
-          </a>
-          <div className={`px-4 py-2 border-2 font-semibold text-sm ${
-            aiStatus === "ok"
-              ? "border-[#2D5A3D] text-[#2D5A3D]"
-              : "border-black bg-black text-white"
-          }`}>
-            {aiStatus === "ok" ? "IA : OK" : "IA : MODE DÉGRADÉ"}
-          </div>
+            {aiStatus === "ok" ? (
+              <>
+                <span className="w-2.5 h-2.5 rounded-full bg-success" aria-hidden />
+                IA disponible
+              </>
+            ) : (
+              <>
+                <Icon name="alert" size={18} strokeWidth={2.4} />
+                IA en mode dégradé
+              </>
+            )}
+          </span>
+          <Link href="/classement" className="btn btn-secondary px-4">
+            <Icon name="trophy" size={18} />
+            Classement final
+          </Link>
         </div>
       </div>
 
-      {/* 2×5 Grid */}
       {loading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 p-6">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,240px),1fr))] gap-4">
           {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className="border-2 border-black p-4">
+            <div key={i} className="bg-white border border-line rounded-xl p-4">
               <Skeleton className="h-6 w-1/2 mb-3" />
               <Skeleton className="h-4 w-full mb-2" />
               <Skeleton className="h-4 w-3/4 mb-2" />
@@ -232,94 +250,101 @@ export default function DashboardPage() {
           ))}
         </div>
       ) : (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+      <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,240px),1fr))] gap-4">
         {teams.map((team, idx) => (
-          <div
-            key={team.id}
-            className="border-2 border-black p-4 flex flex-col gap-2 cursor-pointer hover:border-[#2D5A3D]"
+          <li key={team.id}>
+          <button
+            type="button"
+            className="w-full h-full text-left flex flex-col gap-2.5 p-[18px] bg-white border border-line rounded-xl hover:border-brand transition-colors"
             onClick={() => openDetails(team.id)}
+            aria-label={`Équipe ${team.code}, rang ${idx + 1}, ${team.totalScore} points. Voir les productions`}
           >
-            {/* Rank + code + animator */}
-            <div className="flex justify-between items-center">
-              <span className="flex items-center gap-2">
+            <span className="w-full flex justify-between items-center gap-2">
+              <span className="flex items-center gap-2.5">
                 <span
-                  className={`inline-flex items-center justify-center w-7 h-7 text-sm font-bold border-2 ${
-                    idx === 0
-                      ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
-                      : "border-black text-black"
+                  className={`w-[30px] h-[30px] rounded-full inline-flex items-center justify-center text-[0.85rem] font-extrabold ${
+                    idx === 0 ? "bg-brand text-white" : "bg-brand-soft text-brand"
                   }`}
-                  title="Classement"
                 >
                   {idx + 1}
                 </span>
-                <span className="text-2xl font-bold text-black">{team.code}</span>
+                <span className="font-mono text-[1.6rem] font-bold">{team.code}</span>
               </span>
-              <span className="text-sm text-[#4A4A4A] capitalize">{team.animator ?? ""}</span>
-            </div>
+              <span className="text-[0.85rem] text-ink-2 capitalize">{team.animator ?? ""}</span>
+            </span>
 
-            {/* Password */}
-            <p className="text-lg font-semibold text-[#2D5A3D] truncate">
-              {team.password ?? "—"}
-            </p>
+            {team.password ? (
+              <span className="font-mono text-[0.9rem] font-bold text-success-strong break-all">
+                {team.password}
+              </span>
+            ) : (
+              <span className="text-[0.9rem] text-muted">Encore à la Porte</span>
+            )}
 
-            {/* Composition */}
-            <p className="text-sm text-[#4A4A4A] font-mono">
+            <span className="text-[0.8rem] leading-snug text-ink-2">
               {formatComposition(team.composition)}
-            </p>
+            </span>
 
-            {/* Current challenge */}
-            <div className="mt-auto pt-2 border-t border-[#B8B8B8]">
+            <span className="w-full mt-auto pt-2.5 border-t border-line flex justify-between items-center gap-2">
               {team.currentChallengeTitle ? (
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-semibold text-black">
+                <>
+                  <span className="text-[0.85rem] font-bold leading-snug">
                     {team.currentChallengeTitle}
                   </span>
-                  <span
-                    className={`text-xs px-2 py-0.5 ${
-                      team.progressPhase === "Terminé"
-                        ? "bg-[#2D5A3D] text-white"
-                        : "bg-[#F5F5F5] text-[#4A4A4A]"
-                    }`}
-                  >
-                    {team.progressPhase}
-                  </span>
-                </div>
+                  {team.progressPhase === "Terminé" ? (
+                    <span className="badge bg-success-soft text-success-strong">
+                      <Icon name="check" size={13} strokeWidth={3} />
+                      Terminé
+                    </span>
+                  ) : (
+                    <span className="badge bg-brand-soft text-brand-strong">
+                      <span className="w-[7px] h-[7px] rounded-full bg-brand" aria-hidden />
+                      {team.progressPhase}
+                    </span>
+                  )}
+                </>
               ) : (
-                <span className="text-sm text-[#B8B8B8]">Pas encore commencé</span>
+                <span className="text-[0.85rem] text-muted">Pas encore commencé</span>
               )}
-            </div>
+            </span>
 
-            {/* Score + total time */}
-            <div className="flex justify-between items-baseline">
-              <span className="text-sm text-[#4A4A4A]">⏱ {formatMs(team.totalTimeMs)}</span>
+            <span className="w-full flex justify-between items-baseline">
+              <span className="text-[0.8rem] text-ink-2">{formatMs(team.totalTimeMs)}</span>
               <span>
-                <span className="text-xl font-bold text-black">{team.totalScore}</span>
-                <span className="text-sm text-[#4A4A4A]"> pts</span>
+                <strong className="text-2xl font-extrabold">{team.totalScore}</strong>
+                <span className="text-[0.85rem] text-ink-2"> pts</span>
               </span>
-            </div>
-          </div>
+            </span>
+          </button>
+          </li>
         ))}
-      </div>
+      </ul>
       )}
+      </div>
 
       {/* Detail modal */}
       {selectedTeam && (
-        <div className="fixed inset-0 z-40 bg-black/30 flex items-center justify-center p-2 sm:p-6">
-          <div className="bg-white border-2 border-black max-w-3xl w-full max-h-[85vh] overflow-y-auto p-4 sm:p-6">
+        <div className="fixed inset-0 z-40 bg-ink/40 flex items-center justify-center p-2 sm:p-6">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Productions de l'équipe ${teams.find((t) => t.id === selectedTeam)?.code ?? ""}`}
+            className="bg-white rounded-2xl shadow-xl max-w-3xl w-full max-h-[85vh] overflow-y-auto p-4 sm:p-6"
+          >
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-black">
+              <h2 className="text-2xl font-bold text-ink">
                 Équipe {teams.find((t) => t.id === selectedTeam)?.code}
               </h2>
               <button
                 onClick={() => setSelectedTeam(null)}
-                className="px-4 py-2 border-2 border-black text-black font-semibold"
+                className="btn btn-secondary px-4 py-2 "
               >
                 Fermer
               </button>
             </div>
 
             {submissions.length === 0 ? (
-              <p className="text-[#4A4A4A]">Aucune soumission.</p>
+              <p className="text-ink-2">Aucune soumission.</p>
             ) : (
               <div className="flex flex-col gap-4">
                 {submissions.map((sub) => {
@@ -327,27 +352,27 @@ export default function DashboardPage() {
                   const points = computeChallengeScore(sub.challenge_id, sub.payload);
                   const docs = extractDocuments(sub.payload);
                   return (
-                    <div key={sub.id} className="border-2 border-black p-4">
+                    <div key={sub.id} className="border p-4 border-line">
                       <div className="flex justify-between items-center text-sm mb-2 flex-wrap gap-2">
-                        <span className="font-bold text-black">
+                        <span className="font-bold text-ink">
                           Défi {sub.challenge_id} — {challengeTitle(sub.challenge_id)}
                         </span>
-                        <span className="flex items-center gap-3 text-[#4A4A4A]">
+                        <span className="flex items-center gap-3 text-ink-2">
                           {points != null && (
-                            <span className="font-bold text-[#2D5A3D]">{points}/20</span>
+                            <span className="font-bold text-ink">{points}/20</span>
                           )}
                           <span>{new Date(sub.created_at).toLocaleTimeString("fr-FR")}</span>
                         </span>
                       </div>
 
                       {docs.length === 0 ? (
-                        <p className="text-sm text-[#B8B8B8]">Pas de document texte.</p>
+                        <p className="text-sm text-muted">Pas de document texte.</p>
                       ) : (
                         <div className="flex flex-col gap-3">
                           {docs.map((doc, i) => (
-                            <div key={i} className="border border-[#B8B8B8] p-3">
+                            <div key={i} className="border border-line p-3">
                               <div className="flex justify-between items-center mb-2">
-                                <span className="font-semibold text-black text-sm">
+                                <span className="font-semibold text-ink text-sm">
                                   {doc.label}
                                 </span>
                                 <button
@@ -359,12 +384,12 @@ export default function DashboardPage() {
                                       doc.markdown
                                     )
                                   }
-                                  className="text-xs px-3 py-1 border-2 border-[#2D5A3D] text-[#2D5A3D] font-semibold hover:bg-[#2D5A3D] hover:text-white"
+                                  className="btn btn-secondary text-xs px-3 py-1 "
                                 >
                                   Télécharger .md
                                 </button>
                               </div>
-                              <div className="text-sm max-h-[260px] overflow-y-auto border-t border-[#E0E0E0] pt-2">
+                              <div className="text-sm max-h-[260px] overflow-y-auto border-t border-line pt-2">
                                 <Markdown content={doc.markdown} />
                               </div>
                             </div>

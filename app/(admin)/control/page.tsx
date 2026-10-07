@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { adminFetch } from "@/lib/admin/client";
 import Spinner from "@/components/shared/Spinner";
 import { useToast } from "@/lib/hooks/useToast";
+import Icon from "@/components/shared/Icon";
 
 interface Team {
   id: string;
@@ -267,22 +268,22 @@ export default function ControlPage() {
 
   if (loading) {
     return (
-      <main className="flex items-center justify-center min-h-screen bg-white">
-        <p className="text-[#4A4A4A]">Chargement...</p>
+      <main className="flex items-center justify-center flex-1 bg-white">
+        <p className="text-ink-2">Chargement...</p>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-white p-4 sm:p-6 lg:p-8">
+    <main className="flex-1 bg-white p-4 sm:p-6 lg:p-8">
       <div className="mx-auto w-full max-w-7xl">
-      <h1 className="text-3xl sm:text-4xl font-bold text-black mb-6 sm:mb-8">
+      <h1 className="text-3xl sm:text-4xl font-bold text-ink mb-6 sm:mb-8">
         Panneau de contrôle
       </h1>
 
       {/* Pause globale */}
-      <section className="border-2 border-black p-4 sm:p-6 mb-6 sm:mb-8">
-        <h2 className="text-2xl font-bold text-black mb-4">Pause globale</h2>
+      <section className="border p-4 sm:p-6 mb-6 sm:mb-8 border-line">
+        <h2 className="text-2xl font-bold text-ink mb-4">Pause globale</h2>
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
           <input
             type="text"
@@ -290,48 +291,48 @@ export default function ControlPage() {
             onChange={(e) => setPauseReason(e.target.value)}
             placeholder="Raison de la pause (optionnel)..."
             disabled={workshopState.is_paused}
-            className="flex-1 border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-50"
+            className="field flex-1 px-4 py-3 disabled:opacity-50"
           />
           <button
             onClick={handlePauseToggle}
-            className={`px-6 py-3 font-semibold border-2 text-xl shrink-0 ${
+            className={`btn px-6 py-3 font-semibold border-2 text-xl shrink-0 ${
               workshopState.is_paused
-                ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
-                : "bg-[#8B3A3A] border-[#8B3A3A] text-white"
+                ? "bg-success border-success text-white"
+                : "bg-danger border-danger text-white"
             }`}
           >
-            {workshopState.is_paused ? "▶ Reprendre" : "⏸ Pause"}
+            {workshopState.is_paused ? "Reprendre" : "Pause"}
           </button>
         </div>
         {workshopState.is_paused && workshopState.pause_reason && (
-          <p className="mt-2 text-[#8B3A3A] font-semibold">
+          <p className="mt-2 text-danger font-semibold">
             En pause : {workshopState.pause_reason}
           </p>
         )}
       </section>
 
       {/* Défis ouverts — plusieurs défis peuvent être ouverts à la fois */}
-      <section className="border-2 border-black p-4 sm:p-6 mb-6 sm:mb-8">
+      <section className="border p-4 sm:p-6 mb-6 sm:mb-8 border-line">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-          <h2 className="text-2xl font-bold text-black">Défis ouverts</h2>
+          <h2 className="text-2xl font-bold text-ink">Défis ouverts</h2>
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => handleOpenMany(ALL_MAIN.map((c) => c.id))}
-              className="px-3 py-2 border-2 border-[#2D5A3D] bg-[#2D5A3D] text-white text-sm font-semibold"
+              className="btn btn-primary px-3 py-2 text-sm "
             >
               Ouvrir tous les défis
             </button>
             <button
               onClick={() => handleCloseMany(ALL_MAIN.map((c) => c.id))}
               disabled={openIds.size === 0}
-              className="px-3 py-2 border-2 border-[#8B3A3A] text-[#8B3A3A] text-sm font-semibold disabled:opacity-40"
+              className="px-3 py-2 border-2 border-danger text-danger text-sm font-semibold disabled:opacity-40"
             >
               Tout fermer
             </button>
           </div>
         </div>
 
-        <p className="text-sm text-[#4A4A4A] mb-4">
+        <p className="text-sm text-ink-2 mb-4">
           Cochez un ou plusieurs défis. Quand plusieurs défis sont ouverts, chaque
           équipe choisit le sien depuis la salle d&apos;attente.
         </p>
@@ -340,17 +341,17 @@ export default function ControlPage() {
           {/* Parcours Camille */}
           <div className="min-w-0">
             <div className="flex items-center justify-between mb-2 gap-2">
-              <h3 className="font-bold text-black">Parcours Camille</h3>
+              <h3 className="font-bold text-ink">Parcours Camille</h3>
               <div className="flex gap-2">
                 <button
                   onClick={() => handleOpenMany(CHALLENGES.map((c) => c.id))}
-                  className="text-sm text-[#2D5A3D] underline"
+                  className="text-sm text-brand underline"
                 >
                   Tout ouvrir
                 </button>
                 <button
                   onClick={() => handleCloseMany(CHALLENGES.map((c) => c.id))}
-                  className="text-sm text-[#8B3A3A] underline"
+                  className="text-sm text-danger underline"
                 >
                   Fermer
                 </button>
@@ -362,13 +363,13 @@ export default function ControlPage() {
                   key={c.id}
                   onClick={() => handleToggleChallenge(c.id)}
                   aria-pressed={openIds.has(c.id)}
-                  className={`flex items-center gap-2 px-4 py-2 border-2 font-semibold ${
+                  className={`btn flex items-center gap-2 px-4 py-2 border-2 font-semibold ${
                     openIds.has(c.id)
-                      ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
-                      : "bg-white border-black text-black"
+                      ? "bg-brand border-brand text-white"
+                      : "bg-white border-control text-ink"
                   }`}
                 >
-                  <span aria-hidden>{openIds.has(c.id) ? "☑" : "☐"}</span>
+                  <Icon name={openIds.has(c.id) ? "check-square" : "square"} />
                   <span>
                     {c.id}. {c.title}
                   </span>
@@ -380,17 +381,17 @@ export default function ControlPage() {
           {/* Défis généralistes */}
           <div className="min-w-0">
             <div className="flex items-center justify-between mb-2 gap-2">
-              <h3 className="font-bold text-black">Défis généralistes</h3>
+              <h3 className="font-bold text-ink">Défis généralistes</h3>
               <div className="flex gap-2">
                 <button
                   onClick={() => handleOpenMany(GENERAL_CHALLENGES.map((c) => c.id))}
-                  className="text-sm text-[#2D5A3D] underline"
+                  className="text-sm text-brand underline"
                 >
                   Tout ouvrir
                 </button>
                 <button
                   onClick={() => handleCloseMany(GENERAL_CHALLENGES.map((c) => c.id))}
-                  className="text-sm text-[#8B3A3A] underline"
+                  className="text-sm text-danger underline"
                 >
                   Fermer
                 </button>
@@ -402,13 +403,13 @@ export default function ControlPage() {
                   key={c.id}
                   onClick={() => handleToggleChallenge(c.id)}
                   aria-pressed={openIds.has(c.id)}
-                  className={`flex items-center gap-2 px-4 py-2 border-2 font-semibold text-left ${
+                  className={`btn flex items-center gap-2 px-4 py-2 border-2 font-semibold text-left ${
                     openIds.has(c.id)
-                      ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
-                      : "bg-white border-[#2D5A3D] text-[#2D5A3D]"
+                      ? "bg-brand border-brand text-white"
+                      : "bg-white border-brand text-brand"
                   }`}
                 >
-                  <span aria-hidden>{openIds.has(c.id) ? "☑" : "☐"}</span>
+                  <Icon name={openIds.has(c.id) ? "check-square" : "square"} />
                   <span>{c.title}</span>
                 </button>
               ))}
@@ -418,17 +419,17 @@ export default function ControlPage() {
           {/* Cas d'usage métier */}
           <div className="min-w-0">
             <div className="flex items-center justify-between mb-2 gap-2">
-              <h3 className="font-bold text-black">Cas d&apos;usage métier</h3>
+              <h3 className="font-bold text-ink">Cas d&apos;usage métier</h3>
               <div className="flex gap-2">
                 <button
                   onClick={() => handleOpenMany(USECASE_CHALLENGES.map((c) => c.id))}
-                  className="text-sm text-[#2D5A3D] underline"
+                  className="text-sm text-brand underline"
                 >
                   Tout ouvrir
                 </button>
                 <button
                   onClick={() => handleCloseMany(USECASE_CHALLENGES.map((c) => c.id))}
-                  className="text-sm text-[#8B3A3A] underline"
+                  className="text-sm text-danger underline"
                 >
                   Fermer
                 </button>
@@ -440,13 +441,13 @@ export default function ControlPage() {
                   key={c.id}
                   onClick={() => handleToggleChallenge(c.id)}
                   aria-pressed={openIds.has(c.id)}
-                  className={`flex items-center gap-2 px-4 py-2 border-2 font-semibold text-left ${
+                  className={`btn flex items-center gap-2 px-4 py-2 border-2 font-semibold text-left ${
                     openIds.has(c.id)
-                      ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
-                      : "bg-white border-black text-black"
+                      ? "bg-brand border-brand text-white"
+                      : "bg-white border-control text-ink"
                   }`}
                 >
-                  <span aria-hidden>{openIds.has(c.id) ? "☑" : "☐"}</span>
+                  <Icon name={openIds.has(c.id) ? "check-square" : "square"} />
                   <span>{c.title}</span>
                 </button>
               ))}
@@ -454,10 +455,10 @@ export default function ControlPage() {
           </div>
         </div>
 
-        <p className="text-sm text-[#4A4A4A] mt-4">
+        <p className="text-sm text-ink-2 mt-4">
           Ouverts :{" "}
           {openIds.size > 0 ? (
-            <span className="font-semibold text-black">
+            <span className="font-semibold text-ink">
               {[...openIds]
                 .sort((a, b) => a - b)
                 .map(
@@ -472,15 +473,15 @@ export default function ControlPage() {
       </section>
 
       {/* Équipes */}
-      <section className="border-2 border-black p-4 sm:p-6 mb-6 sm:mb-8">
-        <h2 className="text-2xl font-bold text-black mb-4">Équipes</h2>
+      <section className="border p-4 sm:p-6 mb-6 sm:mb-8 border-line">
+        <h2 className="text-2xl font-bold text-ink mb-4">Équipes</h2>
 
         {/* Créer une équipe */}
         <form
           onSubmit={handleCreateTeam}
-          className="flex flex-col sm:flex-row sm:items-end gap-3 mb-6 border-2 border-[#B8B8B8] p-3"
+          className="flex flex-col sm:flex-row sm:items-end gap-3 mb-6 border-2 border-line p-3"
         >
-          <label className="flex flex-col text-sm font-semibold text-black">
+          <label className="flex flex-col text-sm font-semibold text-ink">
             Code (4 chiffres)
             <input
               type="text"
@@ -489,23 +490,23 @@ export default function ControlPage() {
               value={newCode}
               onChange={(e) => setNewCode(e.target.value)}
               placeholder="ex : 7421"
-              className="mt-1 border-2 border-black px-3 py-2 text-black focus:border-[#2D5A3D] focus:outline-none w-full sm:w-32"
+              className="field mt-1 px-3 py-2 w-full sm:w-32"
             />
           </label>
-          <label className="flex flex-col text-sm font-semibold text-black flex-1">
+          <label className="flex flex-col text-sm font-semibold text-ink flex-1">
             Animateur (optionnel)
             <input
               type="text"
               value={newAnimator}
               onChange={(e) => setNewAnimator(e.target.value)}
               placeholder="ex : Réjane"
-              className="mt-1 border-2 border-black px-3 py-2 text-black focus:border-[#2D5A3D] focus:outline-none"
+              className="field mt-1 px-3 py-2 "
             />
           </label>
           <button
             type="submit"
             disabled={!/^\d{4}$/.test(newCode.trim())}
-            className="px-5 py-2 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] disabled:opacity-50 shrink-0"
+            className="btn btn-primary px-5 py-2 disabled:opacity-50 shrink-0"
           >
             + Ajouter
           </button>
@@ -514,7 +515,7 @@ export default function ControlPage() {
         <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] border-collapse">
           <thead>
-            <tr className="border-b-2 border-black text-left">
+            <tr className="border-b border-line text-left">
               <th scope="col" className="p-3">Code</th>
               <th scope="col" className="p-3">Animateur</th>
               <th scope="col" className="p-3">Mot de passe</th>
@@ -524,17 +525,17 @@ export default function ControlPage() {
           </thead>
           <tbody>
             {teams.map((team) => (
-              <tr key={team.id} className="border-b border-[#B8B8B8]">
+              <tr key={team.id} className="border-b border-line">
                 <td className="p-3 font-bold text-xl">{team.code}</td>
-                <td className="p-3 text-[#4A4A4A] capitalize">{team.animator}</td>
-                <td className="p-3 text-[#2D5A3D] font-semibold">
+                <td className="p-3 text-ink-2 capitalize">{team.animator}</td>
+                <td className="p-3 text-brand font-semibold">
                   {team.password ?? "—"}
                 </td>
                 <td className="p-3">
                   {team.porte_passed_at ? (
-                    <span className="text-[#2D5A3D] font-semibold">Passé</span>
+                    <span className="text-brand font-semibold">Passé</span>
                   ) : (
-                    <span className="text-[#8B3A3A]">En attente</span>
+                    <span className="text-danger">En attente</span>
                   )}
                 </td>
                 <td className="p-3">
@@ -543,7 +544,7 @@ export default function ControlPage() {
                       <button
                         onClick={() => handleUnlock(team.id)}
                         disabled={unlocking === team.id}
-                        className="px-3 py-2 bg-[#8B3A3A] text-white text-sm font-semibold border-2 border-[#8B3A3A] disabled:opacity-50"
+                        className="px-3 py-2 bg-danger text-white text-sm font-semibold border-2 border-danger disabled:opacity-50"
                       >
                         {unlocking === team.id ? <Spinner size="sm" /> : "Débloquer"}
                       </button>
@@ -551,14 +552,14 @@ export default function ControlPage() {
                     <button
                       onClick={() => handleResetTeam(team)}
                       disabled={busyTeam === team.id}
-                      className="px-3 py-2 bg-white text-[#8B3A3A] text-sm font-semibold border-2 border-[#8B3A3A] disabled:opacity-50"
+                      className="px-3 py-2 bg-white text-danger text-sm font-semibold border-2 border-danger disabled:opacity-50"
                     >
                       Reset
                     </button>
                     <button
                       onClick={() => handleArchiveTeam(team)}
                       disabled={busyTeam === team.id}
-                      className="px-3 py-2 bg-white text-[#4A4A4A] text-sm font-semibold border-2 border-[#B8B8B8] disabled:opacity-50"
+                      className="px-3 py-2 bg-white text-ink-2 text-sm font-semibold border-2 border-line disabled:opacity-50"
                     >
                       Archiver
                     </button>
@@ -573,24 +574,24 @@ export default function ControlPage() {
         {/* Équipes archivées */}
         {archivedTeams.length > 0 && (
           <details className="mt-6">
-            <summary className="cursor-pointer font-semibold text-[#4A4A4A]">
+            <summary className="cursor-pointer font-semibold text-ink-2">
               Équipes archivées ({archivedTeams.length})
             </summary>
             <div className="flex flex-wrap gap-2 mt-3">
               {archivedTeams.map((t) => (
                 <div
                   key={t.id}
-                  className="flex items-center gap-2 border-2 border-[#B8B8B8] px-3 py-2"
+                  className="flex items-center gap-2 border-2 border-line px-3 py-2"
                 >
-                  <span className="font-bold text-black">{t.code}</span>
+                  <span className="font-bold text-ink">{t.code}</span>
                   {t.animator && (
-                    <span className="text-sm text-[#4A4A4A] capitalize">
+                    <span className="text-sm text-ink-2 capitalize">
                       {t.animator}
                     </span>
                   )}
                   <button
                     onClick={() => handleRestoreTeam(t)}
-                    className="text-sm text-[#2D5A3D] underline"
+                    className="text-sm text-brand underline"
                   >
                     Restaurer
                   </button>
@@ -602,17 +603,17 @@ export default function ControlPage() {
       </section>
 
       {/* Bonus activation */}
-      <section className="border-2 border-black p-4 sm:p-6">
-        <h2 className="text-2xl font-bold text-black mb-4">Activer un bonus</h2>
+      <section className="border p-4 sm:p-6 border-line">
+        <h2 className="text-2xl font-bold text-ink mb-4">Activer un bonus</h2>
         <div className="flex flex-wrap gap-2 mb-4">
           {BONUS_CHALLENGES.map((b) => (
             <button
               key={b.id}
               onClick={() => setBonusChallenge(b.id)}
-              className={`px-3 py-1 border-2 text-sm font-semibold ${
+              className={`btn px-3 py-1 border-2 text-sm font-semibold ${
                 bonusChallenge === b.id
-                  ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
-                  : "bg-white border-[#B8B8B8] text-[#4A4A4A]"
+                  ? "bg-brand border-brand text-white"
+                  : "bg-white border-control text-ink-2"
               }`}
             >
               {b.title}
@@ -622,10 +623,10 @@ export default function ControlPage() {
 
         <div className="mb-4">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-sm font-bold text-black">Équipes cibles :</span>
+            <span className="text-sm font-bold text-ink">Équipes cibles :</span>
             <button
               onClick={selectAllBonusTargets}
-              className="text-sm text-[#2D5A3D] underline"
+              className="text-sm text-brand underline"
             >
               Toutes
             </button>
@@ -635,10 +636,10 @@ export default function ControlPage() {
               <button
                 key={t.id}
                 onClick={() => toggleBonusTarget(t.id)}
-                className={`px-3 py-1 border-2 text-sm font-semibold ${
+                className={`btn px-3 py-1 border-2 text-sm font-semibold ${
                   bonusTargets.has(t.id)
-                    ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
-                    : "bg-white border-[#B8B8B8] text-[#4A4A4A]"
+                    ? "bg-brand border-brand text-white"
+                    : "bg-white border-control text-ink-2"
                 }`}
               >
                 {t.code}
@@ -650,7 +651,7 @@ export default function ControlPage() {
         <button
           onClick={handleActivateBonus}
           disabled={bonusTargets.size === 0}
-          className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] disabled:opacity-50"
+          className="btn btn-primary px-6 py-3 disabled:opacity-50"
         >
           Activer pour {bonusTargets.size} équipe{bonusTargets.size > 1 ? "s" : ""}
         </button>

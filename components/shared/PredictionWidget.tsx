@@ -45,7 +45,7 @@ function SliderMode({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-4">
-        <span className="text-[#4A4A4A] w-8 text-right">{schema.min}</span>
+        <span className="text-ink-2 w-8 text-right">{schema.min}</span>
         <input
           type="range"
           min={schema.min}
@@ -53,19 +53,19 @@ function SliderMode({
           value={value}
           onChange={(e) => setValue(Number(e.target.value))}
           disabled={locked}
-          className="flex-1 accent-[#2D5A3D]"
+          className="flex-1 accent-brand"
           aria-label="Prediction"
           aria-valuemin={schema.min}
           aria-valuemax={schema.max}
           aria-valuenow={value}
         />
-        <span className="text-[#4A4A4A] w-8">{schema.max}</span>
+        <span className="text-ink-2 w-8">{schema.max}</span>
       </div>
-      <div className="text-center text-2xl font-bold text-black">{value}</div>
+      <div className="text-center text-2xl font-bold text-ink">{value}</div>
       {!locked && (
         <button
           onClick={() => onSubmit(value)}
-          className="px-6 py-3 min-h-[44px] bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] self-center"
+          className="btn btn-primary px-6 py-3 min-h-[44px] self-center"
         >
           Verrouiller le pari
         </button>
@@ -102,10 +102,10 @@ function MultiselectMode({
             key={opt}
             onClick={() => !locked && toggle(opt)}
             disabled={locked}
-            className={`px-4 py-2 min-h-[44px] min-w-[80px] border-2 font-semibold ${
+            className={`btn px-4 py-2 min-h-[44px] min-w-[80px] border-2 font-semibold ${
               selected.has(opt)
-                ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
-                : "bg-white border-black text-black"
+                ? "bg-brand border-brand text-white"
+                : "bg-white border-control text-ink"
             } disabled:opacity-70`}
           >
             {opt.replace(/_/g, " ")}
@@ -116,7 +116,7 @@ function MultiselectMode({
         <button
           onClick={() => onSubmit([...selected])}
           disabled={selected.size === 0}
-          className="px-6 py-3 min-h-[44px] bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] self-center disabled:opacity-50"
+          className="btn btn-primary px-6 py-3 min-h-[44px] self-center disabled:opacity-50"
         >
           Verrouiller le pari
         </button>
@@ -152,7 +152,7 @@ function TfListMode({
     <div className="flex flex-col gap-3">
       {answers.map((ans, i) => (
         <div key={i} className="flex items-center gap-3">
-          <span className="text-[#4A4A4A] w-6 text-right font-bold">
+          <span className="text-ink-2 w-6 text-right font-bold">
             {i + 1}.
           </span>
           {["vrai", "faux", "nuancé"].map((opt) => (
@@ -162,10 +162,10 @@ function TfListMode({
               disabled={locked}
               aria-label={`Question ${i + 1}: ${opt}`}
               aria-pressed={ans === opt}
-              className={`px-3 py-2 min-h-[44px] min-w-[44px] border-2 text-sm font-semibold ${
+              className={`btn px-3 py-2 min-h-[44px] min-w-[44px] border-2 text-sm font-semibold ${
                 ans === opt
-                  ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
-                  : "bg-white border-[#B8B8B8] text-[#4A4A4A]"
+                  ? "bg-brand border-brand text-white"
+                  : "bg-white border-control text-ink-2"
               } disabled:opacity-70`}
             >
               {opt}
@@ -177,7 +177,7 @@ function TfListMode({
         <button
           onClick={() => onSubmit(answers)}
           disabled={!allAnswered}
-          className="px-6 py-3 min-h-[44px] bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] self-center disabled:opacity-50"
+          className="btn btn-primary px-6 py-3 min-h-[44px] self-center disabled:opacity-50"
         >
           Verrouiller le pari
         </button>
@@ -193,8 +193,8 @@ export default function PredictionWidget({
 }: PredictionWidgetProps) {
   if ("type" in schema && schema.type === "multiselect") {
     return (
-      <div className="border-2 border-black p-6 bg-white">
-        <h3 className="font-bold text-black mb-4">Votre pari</h3>
+      <div className="border p-6 bg-white border-line">
+        <h3 className="font-bold text-ink mb-4">Votre pari</h3>
         <MultiselectMode
           schema={schema}
           onSubmit={onSubmit as (v: string[]) => void}
@@ -206,8 +206,8 @@ export default function PredictionWidget({
 
   if ("type" in schema && schema.type === "tf_list") {
     return (
-      <div className="border-2 border-black p-6 bg-white">
-        <h3 className="font-bold text-black mb-4">Votre pari</h3>
+      <div className="border p-6 bg-white border-line">
+        <h3 className="font-bold text-ink mb-4">Votre pari</h3>
         <TfListMode
           schema={schema}
           onSubmit={onSubmit as (v: string[]) => void}
@@ -218,8 +218,8 @@ export default function PredictionWidget({
   }
 
   return (
-    <div className="border-2 border-black p-6 bg-white">
-      <h3 className="font-bold text-black mb-4">Votre pari</h3>
+    <div className="border p-6 bg-white border-line">
+      <h3 className="font-bold text-ink mb-4">Votre pari</h3>
       <SliderMode
         schema={schema as SliderSchema}
         onSubmit={onSubmit as (v: number) => void}

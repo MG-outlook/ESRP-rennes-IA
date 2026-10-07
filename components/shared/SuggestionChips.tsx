@@ -20,7 +20,7 @@ export default function SuggestionChips({
   if (suggestions.length === 0) return null;
   return (
     <div className="mt-2">
-      <p className="text-sm text-[#4A4A4A] mb-1.5">{label}</p>
+      <p className="text-sm text-ink-2 mb-1.5">{label}</p>
       <div className="flex flex-wrap gap-2">
         {suggestions.map((s, i) => (
           <button
@@ -28,7 +28,7 @@ export default function SuggestionChips({
             type="button"
             onClick={() => onPick(s)}
             disabled={disabled}
-            className="px-3 py-1.5 border-2 border-[#B8B8B8] text-sm text-[#4A4A4A] text-left bg-white hover:border-[#2D5A3D] hover:text-[#2D5A3D] disabled:opacity-50"
+            className="px-3 py-1.5 border-2 border-line text-sm text-ink-2 text-left bg-white hover:border-brand hover:text-brand disabled:opacity-50"
           >
             {s}
           </button>

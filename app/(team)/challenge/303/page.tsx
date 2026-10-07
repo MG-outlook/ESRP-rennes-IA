@@ -184,14 +184,14 @@ export default function Uc3Page() {
     return <ChallengeIntro {...intro} onStart={() => setIntroDone(true)} />;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between gap-3 flex-wrap mb-8">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-black">
+            <h1 className="text-3xl sm:text-4xl font-bold text-ink">
               Cas d&apos;usage 3 — Le débrief vocal
             </h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <p className="text-ink-2 mt-2">
               Chacun dicte sa note. L&apos;IA compile. Vous décidez.
             </p>
           </div>
@@ -212,10 +212,10 @@ export default function Uc3Page() {
 
         {phase === "notes" && (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-2">
+            <h2 className="text-2xl font-bold text-ink mb-2">
               Vos notes de débrief ({notes.length})
             </h2>
-            <p className="text-[#4A4A4A] mb-4">
+            <p className="text-ink-2 mb-4">
               Chaque membre choisit un métier, lit sa fiche de vécu (dossier
               d&apos;appui ci-dessus), puis <strong>dicte sa note avec ses
               mots</strong> — comme un message vocal laissé à l&apos;équipe.
@@ -225,29 +225,29 @@ export default function Uc3Page() {
             {notes.length > 0 && (
               <div className="flex flex-col gap-2 mb-5">
                 {notes.map((n, i) => (
-                  <div key={i} className="border-2 border-black p-3">
-                    <p className="text-sm font-bold text-[#2D5A3D] mb-1">
+                  <div key={i} className="border p-3 border-line">
+                    <p className="text-sm font-bold text-brand mb-1">
                       {n.author} — {n.role}
                     </p>
-                    <p className="text-sm text-[#4A4A4A] whitespace-pre-wrap">{n.text}</p>
+                    <p className="text-sm text-ink-2 whitespace-pre-wrap">{n.text}</p>
                   </div>
                 ))}
               </div>
             )}
 
-            <div className="border-2 border-[#2D5A3D] p-4">
+            <div className="border-2 border-brand p-4">
               <div className="flex flex-col sm:flex-row gap-3 mb-3">
                 <input
                   type="text"
                   value={author}
                   onChange={(e) => setAuthor(e.target.value)}
                   placeholder="Prénom"
-                  className="border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none sm:w-44"
+                  className="field px-4 py-3 sm:w-44"
                 />
                 <select
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                  className="border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none bg-white flex-1"
+                  className="field px-4 py-3 flex-1"
                 >
                   {UC3_VECUS.map((v) => (
                     <option key={v.role} value={v.role}>
@@ -266,7 +266,7 @@ export default function Uc3Page() {
                 <button
                   onClick={handleAddNote}
                   disabled={!author.trim() || !text.trim()}
-                  className="px-5 py-2 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] disabled:opacity-50"
+                  className="btn btn-primary px-5 py-2 disabled:opacity-50"
                 >
                   + Ajouter ma note
                 </button>
@@ -277,7 +277,7 @@ export default function Uc3Page() {
               <button
                 onClick={handleCompile}
                 disabled={notes.length < MIN_NOTES}
-                className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl disabled:opacity-50"
+                className="btn btn-primary px-6 py-3 text-xl disabled:opacity-50"
               >
                 Compiler les {notes.length} notes
               </button>
@@ -288,21 +288,21 @@ export default function Uc3Page() {
         {(phase === "compiled" || phase === "result") && (
           <>
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-black mb-3">
+              <h2 className="text-2xl font-bold text-ink mb-3">
                 L&apos;analyse de l&apos;IA
               </h2>
               {compiling ? (
-                <div className="border-2 border-black p-5">
+                <div className="border p-5 border-line">
                   {streamText ? (
                     <Markdown content={streamText} />
                   ) : (
-                    <span className="text-[#B8B8B8] animate-pulse">
+                    <span className="text-muted animate-pulse">
                       Compilation des notes…
                     </span>
                   )}
                 </div>
               ) : (
-                <div className="border-2 border-black p-5">
+                <div className="border p-5 border-line">
                   <Markdown content={analysis} />
                 </div>
               )}
@@ -310,10 +310,10 @@ export default function Uc3Page() {
 
             {!compiling && actions.length > 0 && (
               <section className="mb-8">
-                <h2 className="text-2xl font-bold text-black mb-2">
+                <h2 className="text-2xl font-bold text-ink mb-2">
                   Le plan d&apos;action proposé — à vous de trancher
                 </h2>
-                <p className="text-[#4A4A4A] mb-4">
+                <p className="text-ink-2 mb-4">
                   L&apos;IA propose, l&apos;équipe dispose : cochez les actions
                   que vous retenez réellement pour lundi. Écarter une action
                   inutile vaut autant que garder une bonne.
@@ -323,7 +323,7 @@ export default function Uc3Page() {
                     <label
                       key={i}
                       className={`flex items-start gap-3 border-2 p-3 cursor-pointer ${
-                        kept[i] ? "border-[#2D5A3D] bg-[#F0F5F1]" : "border-black"
+                        kept[i] ? "border-brand bg-brand-soft" : "border-line"
                       } ${phase === "result" ? "pointer-events-none" : ""}`}
                     >
                       <input
@@ -333,13 +333,13 @@ export default function Uc3Page() {
                           setKept((prev) => ({ ...prev, [i]: e.target.checked }))
                         }
                         disabled={phase === "result"}
-                        className="w-5 h-5 mt-0.5 accent-[#2D5A3D] shrink-0"
+                        className="w-5 h-5 mt-0.5 accent-brand shrink-0"
                       />
                       <span>
-                        <span className="block font-semibold text-black">
+                        <span className="block font-semibold text-ink">
                           {a.action}
                         </span>
-                        <span className="block text-sm text-[#4A4A4A]">
+                        <span className="block text-sm text-ink-2">
                           {a.responsable} · {a.echeance}
                         </span>
                       </span>
@@ -351,7 +351,7 @@ export default function Uc3Page() {
                     <button
                       onClick={handleEvaluate}
                       disabled={keptActions.length === 0}
-                      className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl disabled:opacity-50"
+                      className="btn btn-primary px-6 py-3 text-xl disabled:opacity-50"
                     >
                       Valider notre plan ({keptActions.length} action
                       {keptActions.length > 1 ? "s" : ""})
@@ -362,12 +362,12 @@ export default function Uc3Page() {
             )}
 
             {!compiling && actions.length === 0 && phase === "compiled" && (
-              <p className="text-[#8B3A3A] mb-6">
+              <p className="text-danger mb-6">
                 L&apos;IA n&apos;a pas renvoyé d&apos;actions exploitables —
                 relancez la compilation.
                 <button
                   onClick={handleCompile}
-                  className="ml-3 underline text-[#2D5A3D] font-semibold"
+                  className="ml-3 underline text-brand font-semibold"
                 >
                   Relancer
                 </button>
@@ -377,7 +377,7 @@ export default function Uc3Page() {
             {phase === "result" && (
               <section className="mb-8">
                 {evaluating && !verdict ? (
-                  <p className="text-center text-[#4A4A4A]">Évaluation en cours…</p>
+                  <p className="text-center text-ink-2">Évaluation en cours…</p>
                 ) : verdict ? (
                   <Verdict verdict={verdict} />
                 ) : null}

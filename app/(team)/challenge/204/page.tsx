@@ -21,6 +21,7 @@ import {
   finishChallenge,
   parseJsonObject,
 } from "@/lib/challenges/general-helpers";
+import Icon from "@/components/shared/Icon";
 
 const CHALLENGE_ID = 204;
 const MAX_ATTEMPTS = 3;
@@ -120,14 +121,14 @@ export default function GenDPage() {
   const attemptsLeft = MAX_ATTEMPTS - attempts.length;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between gap-3 flex-wrap mb-8">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-black">
+            <h1 className="text-3xl sm:text-4xl font-bold text-ink">
               Défi D — Le caméléon
             </h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <p className="text-ink-2 mt-2">
               Un même message, trois publics — sans trahir le sens.
             </p>
           </div>
@@ -138,11 +139,11 @@ export default function GenDPage() {
         </div>
 
         <section className="mb-6">
-          <h2 className="text-2xl font-bold text-black mb-3">La note d&apos;origine</h2>
-          <div className="border-2 border-black p-5 bg-[#F5F5F5] whitespace-pre-line text-black leading-relaxed">
+          <h2 className="text-2xl font-bold text-ink mb-3">La note d&apos;origine</h2>
+          <div className="border p-5 bg-surface whitespace-pre-line text-ink leading-relaxed border-line">
             {GEN_D_ORIGINAL}
           </div>
-          <p className="text-sm text-[#4A4A4A] mt-3">
+          <p className="text-sm text-ink-2 mt-3">
             Objectif : obtenir <strong>trois versions</strong> de cette note — une
             pour l&apos;équipe (registre pro), une pour une personne accompagnée
             (FALC), une pour un partenaire extérieur — <strong>sans rien trahir</strong>.
@@ -153,7 +154,7 @@ export default function GenDPage() {
         {/* Phase 1 : l'équipe rédige et teste son prompt (jusqu'à 3 essais) */}
         {phase === "write" && (
           <section className="mb-8">
-            <label className="block font-bold text-black mb-2">
+            <label className="block font-bold text-ink mb-2">
               Votre prompt
             </label>
             <textarea
@@ -162,11 +163,11 @@ export default function GenDPage() {
               rows={5}
               disabled={running || attempts.length >= MAX_ATTEMPTS}
               placeholder="Écrivez ici la consigne que l'IA devra suivre pour produire les trois versions…"
-              className="w-full border-2 border-black p-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-60"
+              className="field w-full p-3 disabled:opacity-60"
             />
 
             <div className="flex flex-wrap items-center justify-between gap-3 mt-3">
-              <span className="text-sm text-[#4A4A4A]">
+              <span className="text-sm text-ink-2">
                 {attemptsLeft > 0
                   ? `Essais restants : ${attemptsLeft} / ${MAX_ATTEMPTS}`
                   : "Vous avez utilisé vos 3 essais."}
@@ -175,7 +176,7 @@ export default function GenDPage() {
                 <button
                   onClick={handleRun}
                   disabled={running || !prompt.trim() || attempts.length >= MAX_ATTEMPTS}
-                  className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-lg disabled:opacity-50"
+                  className="btn btn-primary px-6 py-3 text-lg disabled:opacity-50"
                 >
                   {running
                     ? "Génération…"
@@ -188,7 +189,7 @@ export default function GenDPage() {
                       setPhase("choose");
                     }}
                     disabled={running}
-                    className="px-6 py-3 bg-white text-[#2D5A3D] font-semibold border-2 border-[#2D5A3D] text-lg disabled:opacity-50"
+                    className="btn btn-secondary px-6 py-3 text-lg disabled:opacity-50"
                   >
                     Comparer et choisir →
                   </button>
@@ -198,14 +199,14 @@ export default function GenDPage() {
 
             {running && (
               <div className="mt-6">
-                <h3 className="font-bold text-black mb-1">
+                <h3 className="font-bold text-ink mb-1">
                   Essai {attempts.length + 1} — en cours
                 </h3>
-                <div className="border-2 border-[#2D5A3D] p-4 min-h-[100px]">
+                <div className="border-2 border-brand p-4 min-h-[100px]">
                   {streamingText ? (
                     <Markdown content={streamingText} />
                   ) : (
-                    <div className="flex items-center gap-2 text-[#4A4A4A]">
+                    <div className="flex items-center gap-2 text-ink-2">
                       <Spinner size="sm" />
                       <span>L&apos;IA applique votre prompt…</span>
                     </div>
@@ -216,15 +217,15 @@ export default function GenDPage() {
 
             {!running && attempts.length > 0 && (
               <div className="mt-6 flex flex-col gap-4">
-                <h3 className="font-bold text-black">
+                <h3 className="font-bold text-ink">
                   Vos essais ({attempts.length}/{MAX_ATTEMPTS})
                 </h3>
                 {attempts.map((a, i) => (
-                  <div key={i} className="border-2 border-black p-4">
-                    <p className="text-sm font-bold text-[#2D5A3D] mb-2">
+                  <div key={i} className="border p-4 border-line">
+                    <p className="text-sm font-bold text-brand mb-2">
                       Essai {i + 1}
                     </p>
-                    <p className="text-xs text-[#4A4A4A] mb-3 italic whitespace-pre-line">
+                    <p className="text-xs text-ink-2 mb-3 italic whitespace-pre-line">
                       Prompt : {a.prompt}
                     </p>
                     <Markdown content={a.output} />
@@ -238,10 +239,10 @@ export default function GenDPage() {
         {/* Phase 2 : comparer les essais et choisir le meilleur */}
         {phase === "choose" && (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-2">
+            <h2 className="text-2xl font-bold text-ink mb-2">
               Comparez et choisissez
             </h2>
-            <p className="text-[#4A4A4A] mb-5">
+            <p className="text-ink-2 mb-5">
               Sélectionnez l&apos;essai qui adapte le mieux la note aux trois
               publics. C&apos;est lui qui sera évalué.
             </p>
@@ -256,23 +257,23 @@ export default function GenDPage() {
                     aria-pressed={isSelected}
                     className={`text-left border-2 p-4 transition-colors ${
                       isSelected
-                        ? "border-[#2D5A3D] bg-[#F0F5F1]"
-                        : "border-black bg-white hover:border-[#2D5A3D]"
+                        ? "border-brand bg-brand-soft"
+                        : "border-line bg-white hover:border-brand"
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-bold text-[#2D5A3D]">
+                      <span className="text-sm font-bold text-brand">
                         Essai {i + 1}
                       </span>
                       <span
                         className={`text-sm font-semibold ${
-                          isSelected ? "text-[#2D5A3D]" : "text-[#B8B8B8]"
+                          isSelected ? "text-brand" : "text-muted"
                         }`}
                       >
-                        {isSelected ? "✓ Choisi" : "Choisir cet essai"}
+                        {isSelected ? <><Icon name="check" size={16} strokeWidth={3} /> Choisi</> : "Choisir cet essai"}
                       </span>
                     </div>
-                    <p className="text-xs text-[#4A4A4A] mb-3 italic whitespace-pre-line">
+                    <p className="text-xs text-ink-2 mb-3 italic whitespace-pre-line">
                       Prompt : {a.prompt}
                     </p>
                     <Markdown content={a.output} />
@@ -285,7 +286,7 @@ export default function GenDPage() {
               {attempts.length < MAX_ATTEMPTS && (
                 <button
                   onClick={() => setPhase("write")}
-                  className="px-5 py-3 bg-white text-black font-semibold border-2 border-black"
+                  className="btn btn-secondary px-5 py-3 "
                 >
                   ← Refaire un essai
                 </button>
@@ -293,7 +294,7 @@ export default function GenDPage() {
               <button
                 onClick={handleEvaluate}
                 disabled={selected === null}
-                className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-lg disabled:opacity-50 ml-auto"
+                className="btn btn-primary px-6 py-3 text-lg disabled:opacity-50 ml-auto"
               >
                 Valider mon choix et faire évaluer
               </button>
@@ -305,9 +306,9 @@ export default function GenDPage() {
         {phase === "result" && (
           <section className="mb-8">
             {selected !== null && attempts[selected] && (
-              <div className="border-2 border-black p-4 mb-6">
-                <h3 className="font-bold text-black mb-2">Votre version retenue</h3>
-                <p className="text-xs text-[#4A4A4A] mb-3 italic whitespace-pre-line">
+              <div className="border p-4 mb-6 border-line">
+                <h3 className="font-bold text-ink mb-2">Votre version retenue</h3>
+                <p className="text-xs text-ink-2 mb-3 italic whitespace-pre-line">
                   Prompt : {attempts[selected].prompt}
                 </p>
                 <Markdown content={attempts[selected].output} />
@@ -315,11 +316,11 @@ export default function GenDPage() {
             )}
 
             {evaluating && !verdict ? (
-              <p className="text-center text-[#4A4A4A]">Évaluation en cours…</p>
+              <p className="text-center text-ink-2">Évaluation en cours…</p>
             ) : verdict ? (
               <Verdict verdict={verdict} />
             ) : (
-              <p className="text-[#8B3A3A]">Évaluation indisponible.</p>
+              <p className="text-danger">Évaluation indisponible.</p>
             )}
 
             <div className="flex justify-center mt-6">

@@ -5,7 +5,7 @@ interface SkeletonProps {
 export default function Skeleton({ className = "h-4 w-full" }: SkeletonProps) {
   return (
     <div
-      className={`animate-pulse bg-[#F5F5F5] ${className}`}
+      className={`animate-pulse bg-surface ${className}`}
       role="presentation"
       aria-hidden="true"
     />

@@ -15,6 +15,7 @@ import {
   BONUS_F_FEEDBACK_PROMPT,
 } from "@/lib/ai/prompts";
 import { useChallengeInit, finishChallenge } from "@/lib/challenges/general-helpers";
+import Icon from "@/components/shared/Icon";
 
 const CHALLENGE_ID = 106;
 const MAX_ATTEMPTS = 3;
@@ -111,14 +112,14 @@ export default function BonusFPage() {
   const attemptsLeft = MAX_ATTEMPTS - attempts.length;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between gap-3 flex-wrap mb-8">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-black">
+            <h1 className="text-3xl sm:text-4xl font-bold text-ink">
               Bonus F — Le journal de Camille
             </h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <p className="text-ink-2 mt-2">
               Dirigez l&apos;IA pour écrire, à la première personne, un fragment
               juste et digne — puis choisissez le meilleur.
             </p>
@@ -132,17 +133,17 @@ export default function BonusFPage() {
         {/* Phase 1 : moment + prompt + essais */}
         {phase === "write" && (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-3">Choisissez un moment</h2>
+            <h2 className="text-2xl font-bold text-ink mb-3">Choisissez un moment</h2>
             <div className="flex flex-wrap gap-2 mb-3">
               {BONUS_F_MOMENTS.map((m) => (
                 <button
                   key={m}
                   onClick={() => setMoment(m)}
                   disabled={running}
-                  className={`px-3 py-2 border-2 text-sm font-semibold ${
+                  className={`btn px-3 py-2 border-2 text-sm font-semibold ${
                     moment === m
-                      ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
-                      : "bg-white border-black text-black"
+                      ? "bg-brand border-brand text-white"
+                      : "bg-white border-control text-ink"
                   } disabled:opacity-50`}
                 >
                   {m}
@@ -155,13 +156,13 @@ export default function BonusFPage() {
               onChange={(e) => setMoment(e.target.value)}
               disabled={running}
               placeholder="…ou décrivez votre propre moment"
-              className="w-full border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-50 mb-5"
+              className="field w-full px-4 py-3 disabled:opacity-50 mb-5"
             />
 
-            <label className="block font-bold text-black mb-2">
+            <label className="block font-bold text-ink mb-2">
               Votre consigne à l&apos;IA
             </label>
-            <p className="text-sm text-[#4A4A4A] mb-2">
+            <p className="text-sm text-ink-2 mb-2">
               Dites comment Camille doit se raconter : l&apos;émotion dominante, ce
               qu&apos;elle réalise, le ton à éviter. C&apos;est votre prompt qui fait
               la justesse du texte.
@@ -172,11 +173,11 @@ export default function BonusFPage() {
               rows={4}
               disabled={running || attempts.length >= MAX_ATTEMPTS}
               placeholder="Ex : un mélange de fatigue et de fierté discrète, sans pathos ; elle réalise qu'elle a osé prendre la parole…"
-              className="w-full border-2 border-black p-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-60"
+              className="field w-full p-3 disabled:opacity-60"
             />
 
             <div className="flex flex-wrap items-center justify-between gap-3 mt-3">
-              <span className="text-sm text-[#4A4A4A]">
+              <span className="text-sm text-ink-2">
                 {attemptsLeft > 0
                   ? `Essais restants : ${attemptsLeft} / ${MAX_ATTEMPTS}`
                   : "Vous avez utilisé vos 3 essais."}
@@ -190,7 +191,7 @@ export default function BonusFPage() {
                     !prompt.trim() ||
                     attempts.length >= MAX_ATTEMPTS
                   }
-                  className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-lg disabled:opacity-50"
+                  className="btn btn-primary px-6 py-3 text-lg disabled:opacity-50"
                 >
                   {running
                     ? "Écriture…"
@@ -203,7 +204,7 @@ export default function BonusFPage() {
                       setPhase("choose");
                     }}
                     disabled={running}
-                    className="px-6 py-3 bg-white text-[#2D5A3D] font-semibold border-2 border-[#2D5A3D] text-lg disabled:opacity-50"
+                    className="btn btn-secondary px-6 py-3 text-lg disabled:opacity-50"
                   >
                     Comparer et choisir →
                   </button>
@@ -213,14 +214,14 @@ export default function BonusFPage() {
 
             {running && (
               <div className="mt-6">
-                <h3 className="font-bold text-black mb-1">
+                <h3 className="font-bold text-ink mb-1">
                   Essai {attempts.length + 1} — en cours
                 </h3>
-                <div className="border-2 border-[#2D5A3D] p-4 min-h-[100px] italic">
+                <div className="border-2 border-brand p-4 min-h-[100px] italic">
                   {streamingText ? (
                     <Markdown content={streamingText} />
                   ) : (
-                    <div className="flex items-center gap-2 text-[#4A4A4A]">
+                    <div className="flex items-center gap-2 text-ink-2">
                       <Spinner size="sm" />
                       <span>Camille prend la plume…</span>
                     </div>
@@ -231,12 +232,12 @@ export default function BonusFPage() {
 
             {!running && attempts.length > 0 && (
               <div className="mt-6 flex flex-col gap-4">
-                <h3 className="font-bold text-black">
+                <h3 className="font-bold text-ink">
                   Vos essais ({attempts.length}/{MAX_ATTEMPTS})
                 </h3>
                 {attempts.map((a, i) => (
-                  <div key={i} className="border-2 border-black p-4 italic">
-                    <p className="text-sm font-bold text-[#2D5A3D] mb-2 not-italic">
+                  <div key={i} className="border p-4 italic border-line">
+                    <p className="text-sm font-bold text-brand mb-2 not-italic">
                       Essai {i + 1}
                     </p>
                     <Markdown content={a.output} />
@@ -250,10 +251,10 @@ export default function BonusFPage() {
         {/* Phase 2 : choisir le fragment le plus juste */}
         {phase === "choose" && (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-2">
+            <h2 className="text-2xl font-bold text-ink mb-2">
               Choisissez le fragment le plus juste
             </h2>
-            <p className="text-[#4A4A4A] mb-5">
+            <p className="text-ink-2 mb-5">
               Lequel donne à Camille la voix la plus digne et la plus nuancée,
               sans caricature ni pathos ?
             </p>
@@ -268,20 +269,20 @@ export default function BonusFPage() {
                     aria-pressed={isSelected}
                     className={`text-left border-2 p-4 italic transition-colors ${
                       isSelected
-                        ? "border-[#2D5A3D] bg-[#F0F5F1]"
-                        : "border-black bg-white hover:border-[#2D5A3D]"
+                        ? "border-brand bg-brand-soft"
+                        : "border-line bg-white hover:border-brand"
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2 not-italic">
-                      <span className="text-sm font-bold text-[#2D5A3D]">
+                      <span className="text-sm font-bold text-brand">
                         Essai {i + 1}
                       </span>
                       <span
                         className={`text-sm font-semibold ${
-                          isSelected ? "text-[#2D5A3D]" : "text-[#B8B8B8]"
+                          isSelected ? "text-brand" : "text-muted"
                         }`}
                       >
-                        {isSelected ? "✓ Choisi" : "Choisir ce fragment"}
+                        {isSelected ? <><Icon name="check" size={16} strokeWidth={3} /> Choisi</> : "Choisir ce fragment"}
                       </span>
                     </div>
                     <Markdown content={a.output} />
@@ -294,7 +295,7 @@ export default function BonusFPage() {
               {attempts.length < MAX_ATTEMPTS && (
                 <button
                   onClick={() => setPhase("write")}
-                  className="px-5 py-3 bg-white text-black font-semibold border-2 border-black"
+                  className="btn btn-secondary px-5 py-3 "
                 >
                   ← Refaire un essai
                 </button>
@@ -302,7 +303,7 @@ export default function BonusFPage() {
               <button
                 onClick={handleChoose}
                 disabled={selected === null}
-                className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-lg disabled:opacity-50 ml-auto"
+                className="btn btn-primary px-6 py-3 text-lg disabled:opacity-50 ml-auto"
               >
                 Valider mon choix
               </button>
@@ -314,27 +315,27 @@ export default function BonusFPage() {
         {phase === "result" && (
           <section className="mb-8">
             {selected !== null && attempts[selected] && (
-              <div className="border-2 border-black p-4 mb-6 italic">
-                <h3 className="font-bold text-black mb-2 not-italic">
+              <div className="border p-4 mb-6 italic border-line">
+                <h3 className="font-bold text-ink mb-2 not-italic">
                   Le fragment retenu
                 </h3>
                 <Markdown content={attempts[selected].output} />
               </div>
             )}
 
-            <div className="border-l-4 border-[#2D5A3D] bg-[#F0F5F1] p-4 mb-6">
-              <h3 className="font-bold text-[#2D5A3D] mb-1">Le regard de l&apos;IA</h3>
+            <div className="rounded-lg bg-brand-soft p-4 mb-6">
+              <h3 className="font-bold text-brand mb-1">Le regard de l&apos;IA</h3>
               {feedback ? (
                 <Markdown content={feedback} />
               ) : (
-                <div className="flex items-center gap-2 text-[#4A4A4A]">
+                <div className="flex items-center gap-2 text-ink-2">
                   <Spinner size="sm" />
                   <span>Lecture du fragment…</span>
                 </div>
               )}
             </div>
 
-            <label className="block font-bold text-black mb-2">
+            <label className="block font-bold text-ink mb-2">
               Et vous : qu&apos;est-ce que ce changement de point de vue vous fait
               comprendre ?
             </label>
@@ -343,7 +344,7 @@ export default function BonusFPage() {
               onChange={(e) => setReflection(e.target.value)}
               rows={3}
               placeholder="En écrivant « je » à la place de Camille, nous avons réalisé que…"
-              className="w-full border-2 border-black p-3 text-black focus:border-[#2D5A3D] focus:outline-none"
+              className="field w-full p-3 "
             />
 
             <div className="flex justify-center mt-6">

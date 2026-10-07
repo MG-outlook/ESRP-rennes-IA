@@ -111,14 +111,14 @@ export default function BonusHPage() {
     );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-black">
+            <h1 className="text-4xl font-bold text-ink">
               Bonus H — Le scénario de crise
             </h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <p className="text-ink-2 mt-2">
               Un protocole en 4 étapes + un SMS d&apos;alerte
             </p>
           </div>
@@ -130,7 +130,7 @@ export default function BonusHPage() {
 
         {/* Scenario selection */}
         <section className="mb-8">
-          <h2 className="text-2xl font-bold text-black mb-4">
+          <h2 className="text-2xl font-bold text-ink mb-4">
             Choisissez un scénario
           </h2>
           <div className="flex flex-col gap-3">
@@ -141,12 +141,12 @@ export default function BonusHPage() {
                 disabled={generating || !!protocolOutput}
                 className={`border-2 p-4 text-left ${
                   selectedScenario === s.id
-                    ? "border-[#2D5A3D] bg-[#F5F5F5]"
-                    : "border-black bg-white"
+                    ? "border-brand bg-surface"
+                    : "border-line bg-white"
                 } disabled:cursor-default`}
               >
-                <p className="font-bold text-black">{s.label}</p>
-                <p className="text-sm text-[#4A4A4A]">{s.context}</p>
+                <p className="font-bold text-ink">{s.label}</p>
+                <p className="text-sm text-ink-2">{s.context}</p>
               </button>
             ))}
           </div>
@@ -155,10 +155,10 @@ export default function BonusHPage() {
         {/* À vous d'abord : le SMS de l'équipe, avant celui de l'IA */}
         {selectedScenario && (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-2">
+            <h2 className="text-2xl font-bold text-ink mb-2">
               À vous d&apos;abord : votre SMS de premier contact
             </h2>
-            <p className="text-[#4A4A4A] mb-3">
+            <p className="text-ink-2 mb-3">
               Avant de voir la proposition de l&apos;IA, rédigez en équipe le SMS
               que <strong>vous</strong> enverriez à Camille. L&apos;IA proposera
               ensuite le sien — et donnera son regard sur le vôtre.
@@ -170,9 +170,9 @@ export default function BonusHPage() {
               rows={3}
               maxLength={320}
               placeholder="Bonjour Camille, …"
-              className="w-full border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-50 resize-none"
+              className="field w-full px-4 py-3 disabled:opacity-50 resize-none"
             />
-            <p className="text-xs text-[#4A4A4A] mt-1">
+            <p className="text-xs text-ink-2 mt-1">
               {teamSms.length}/320 caractères — un SMS, pas une lettre.
             </p>
           </section>
@@ -184,7 +184,7 @@ export default function BonusHPage() {
             <button
               onClick={handleGenerate}
               disabled={!teamSms.trim()}
-              className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl disabled:opacity-50"
+              className="btn btn-primary px-6 py-3 text-xl disabled:opacity-50"
             >
               Comparer avec l&apos;IA
             </button>
@@ -194,7 +194,7 @@ export default function BonusHPage() {
         {/* Output */}
         {(protocolOutput || generating) && (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-4">
+            <h2 className="text-2xl font-bold text-ink mb-4">
               La proposition de l&apos;IA — et son regard sur votre SMS
             </h2>
             <StreamedOutput content={protocolOutput} loading={generating} />

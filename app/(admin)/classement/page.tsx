@@ -2,6 +2,9 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { adminFetch } from "@/lib/admin/client";
+import { BrandLogo, BrandStripe } from "@/components/shared/Brand";
+import Icon from "@/components/shared/Icon";
+import Spinner from "@/components/shared/Spinner";
 
 interface TeamRow {
   id: string;
@@ -34,7 +37,12 @@ function formatMs(ms: number): string {
   return `${m}min ${s.toString().padStart(2, "0")}s`;
 }
 
-const MEDAL = ["🥇", "🥈", "🥉"];
+const PLACE = ["1re place", "2e place", "3e place"];
+const PODIUM_STYLE = [
+  { card: "bg-brand text-white", sub: "text-white/85" },
+  { card: "bg-brand-soft text-ink", sub: "text-ink-2" },
+  { card: "bg-success-soft text-ink", sub: "text-ink-2" },
+];
 
 export default function ClassementPage() {
   const [ranked, setRanked] = useState<Ranked[]>([]);
@@ -88,71 +96,68 @@ export default function ClassementPage() {
   const rest = ranked.slice(3);
 
   return (
-    <main className="min-h-screen bg-white p-6 sm:p-10">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl sm:text-6xl font-bold text-black text-center mb-2">
-          Classement final
-        </h1>
-        <p className="text-center text-[#4A4A4A] mb-10">
-          CAMPUS EPNAK IA · à points égaux, l&apos;équipe la plus rapide l&apos;emporte
-        </p>
+    <div className="flex-1 flex flex-col bg-white">
+      <BrandStripe />
+      <main className="flex-1 w-full max-w-[1180px] mx-auto px-6 sm:px-8 py-10 sm:py-12 flex flex-col gap-10">
+        <div className="flex justify-between items-end gap-6 flex-wrap">
+          <div className="flex flex-col gap-3">
+            <BrandLogo height={48} priority />
+            <h1 className="text-5xl sm:text-6xl leading-[1.05]">Classement final</h1>
+          </div>
+          <p className="text-ink-2 text-lg max-w-[22em]">
+            À points égaux, l&apos;équipe la plus rapide l&apos;emporte.
+          </p>
+        </div>
 
         {loading ? (
-          <p className="text-center text-[#4A4A4A]">Chargement…</p>
+          <p className="text-ink-2 inline-flex items-center gap-3">
+            <Spinner size="sm" /> Chargement…
+          </p>
         ) : ranked.length === 0 ? (
-          <p className="text-center text-[#4A4A4A]">Aucune équipe pour le moment.</p>
+          <p className="text-ink-2">Aucune équipe pour le moment.</p>
         ) : (
           <>
-            {/* Podium */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10 items-end">
+            <ol aria-label="Podium" className="grid gap-5 sm:grid-cols-3">
               {podium.map((t, i) => (
-                <div
+                <li
                   key={t.id}
-                  className={`border-2 border-[#2D5A3D] p-5 text-center ${
-                    i === 0 ? "sm:order-2 bg-[#2D5A3D] text-white sm:scale-110" : ""
-                  } ${i === 1 ? "sm:order-1 bg-[#F0F5F1]" : ""} ${
-                    i === 2 ? "sm:order-3 bg-[#F0F5F1]" : ""
-                  }`}
+                  className={`flex flex-col gap-3.5 p-8 rounded-2xl ${PODIUM_STYLE[i].card}`}
                 >
-                  <div className="text-5xl mb-2">{MEDAL[i]}</div>
-                  <div className="text-3xl font-bold">{t.code}</div>
-                  <div className="text-4xl font-bold mt-3">{t.score} pts</div>
-                  <div
-                    className={`text-sm mt-1 ${
-                      i === 0 ? "text-white/80" : "text-[#4A4A4A]"
-                    }`}
-                  >
-                    ⏱ {formatMs(t.timeMs)}
-                  </div>
-                </div>
+                  <span className="flex justify-between items-baseline gap-3">
+                    <span className={`text-xl font-bold ${PODIUM_STYLE[i].sub}`}>{PLACE[i]}</span>
+                    <span className={`inline-flex items-center gap-1.5 ${PODIUM_STYLE[i].sub}`}>
+                      <Icon name="clock" size={16} />
+                      {formatMs(t.timeMs)}
+                    </span>
+                  </span>
+                  <span className="font-mono text-5xl sm:text-6xl leading-none font-bold">{t.code}</span>
+                  <span className="mt-auto text-5xl sm:text-6xl leading-none font-extrabold">
+                    {t.score} <span className="text-2xl font-bold">pts</span>
+                  </span>
+                </li>
               ))}
-            </div>
+            </ol>
 
-            {/* Reste du classement */}
             {rest.length > 0 && (
-              <div className="flex flex-col gap-2">
+              <ol start={4} aria-label="Suite du classement" className="flex flex-col border-t-2 border-ink">
                 {rest.map((t, i) => (
-                  <div
+                  <li
                     key={t.id}
-                    className="flex items-center justify-between border-2 border-black px-5 py-3"
+                    className="grid grid-cols-[3.5rem_minmax(0,1fr)_auto_auto] items-baseline gap-4 sm:gap-6 px-2 py-4 border-b border-line"
                   >
-                    <div className="flex items-center gap-4">
-                      <span className="text-2xl font-bold text-[#4A4A4A] w-8 text-right">
-                        {i + 4}
-                      </span>
-                      <span className="text-2xl font-bold text-black">{t.code}</span>
-                    </div>
-                    <div className="flex items-baseline gap-4">
-                      <span className="text-sm text-[#4A4A4A]">⏱ {formatMs(t.timeMs)}</span>
-                      <span className="text-2xl font-bold text-black">{t.score} pts</span>
-                    </div>
-                  </div>
+                    <span className="text-2xl font-extrabold text-ink-2 text-right">{i + 4}</span>
+                    <span className="font-mono text-2xl sm:text-3xl font-bold">{t.code}</span>
+                    <span className="text-ink-2 whitespace-nowrap">{formatMs(t.timeMs)}</span>
+                    <span className="text-2xl sm:text-3xl font-extrabold whitespace-nowrap">
+                      {t.score} <span className="text-base font-bold text-ink-2">pts</span>
+                    </span>
+                  </li>
                 ))}
-              </div>
+              </ol>
             )}
           </>
         )}
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }

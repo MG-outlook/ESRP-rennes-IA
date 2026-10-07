@@ -150,14 +150,14 @@ export default function BonusBPage() {
   }, [teamId, submitState, messages, round]);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-black">
+            <h1 className="text-4xl font-bold text-ink">
               Bonus B — Le coach d&apos;entretien
             </h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <p className="text-ink-2 mt-2">
               3 questions, 3 réponses. Préparez Camille à son entretien.
             </p>
           </div>
@@ -173,15 +173,15 @@ export default function BonusBPage() {
         />
 
         {/* Chat */}
-        <div className="border-2 border-black p-6 mb-6 min-h-[300px] max-h-[500px] overflow-y-auto flex flex-col gap-4">
+        <div className="border p-6 mb-6 min-h-[300px] max-h-[500px] overflow-y-auto flex flex-col gap-4 border-line">
           {messages.map((msg, i) => (
             <div
               key={i}
               className={`${
-                msg.role === "assistant" ? "text-black" : "text-[#2D5A3D] font-semibold"
+                msg.role === "assistant" ? "text-ink" : "text-brand font-semibold"
               }`}
             >
-              <span className="text-sm text-[#B8B8B8]">
+              <span className="text-sm text-muted">
                 {msg.role === "assistant" ? "Coach" : "Vous"}
               </span>
               {msg.role === "assistant" ? (
@@ -192,7 +192,7 @@ export default function BonusBPage() {
             </div>
           ))}
           {streaming && messages.length > 0 && !messages[messages.length - 1].content && (
-            <span className="text-[#B8B8B8] animate-pulse">Le coach réfléchit...</span>
+            <span className="text-muted animate-pulse">Le coach réfléchit...</span>
           )}
         </div>
 
@@ -215,12 +215,12 @@ export default function BonusBPage() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
               placeholder={`Réponse ${round + 1}/${MAX_ROUNDS}...`}
-              className="flex-1 border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none"
+              className="field flex-1 px-4 py-3 "
             />
             <button
               onClick={handleSend}
               disabled={!input.trim()}
-              className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] disabled:opacity-50"
+              className="btn btn-primary px-6 py-3 disabled:opacity-50"
             >
               Envoyer
             </button>

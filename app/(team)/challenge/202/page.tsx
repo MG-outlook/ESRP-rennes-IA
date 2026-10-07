@@ -28,6 +28,7 @@ import {
   stripGauge,
   stripGaugeStreaming,
 } from "@/lib/challenges/general-pure";
+import Icon from "@/components/shared/Icon";
 
 const CHALLENGE_ID = 202;
 
@@ -168,14 +169,14 @@ export default function GenBPage() {
     return <ChallengeIntro {...intro} onStart={() => setIntroDone(true)} />;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between gap-3 flex-wrap mb-8">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-black">
+            <h1 className="text-3xl sm:text-4xl font-bold text-ink">
               Défi B — Le client mystère
             </h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <p className="text-ink-2 mt-2">
               Faites évoluer la position de votre interlocuteur.
             </p>
           </div>
@@ -187,7 +188,7 @@ export default function GenBPage() {
 
         {phase === "select" && (
           <section className="flex flex-col gap-4">
-            <h2 className="text-2xl font-bold text-black">Choisissez votre interlocuteur</h2>
+            <h2 className="text-2xl font-bold text-ink">Choisissez votre interlocuteur</h2>
             {GEN_B_PERSONAS.map((p) => (
               <button
                 key={p.id}
@@ -195,10 +196,10 @@ export default function GenBPage() {
                   setPersona(p);
                   setPhase("chat");
                 }}
-                className="text-left border-2 border-black p-4 hover:border-[#2D5A3D]"
+                className="text-left border p-4 hover:border-brand border-line"
               >
-                <span className="font-bold text-black text-lg">{p.label}</span>
-                <span className="block text-[#4A4A4A] mt-1">{p.brief}</span>
+                <span className="font-bold text-ink text-lg">{p.label}</span>
+                <span className="block text-ink-2 mt-1">{p.brief}</span>
               </button>
             ))}
           </section>
@@ -209,43 +210,43 @@ export default function GenBPage() {
             {/* Gauge */}
             <div className="mb-4">
               <div className="flex justify-between text-sm font-semibold mb-1">
-                <span className="text-black">{persona.label}</span>
-                <span className="text-[#2D5A3D]">
+                <span className="text-ink">{persona.label}</span>
+                <span className="text-brand">
                   Jauge {gauge}/100 · objectif {GEN_B_THRESHOLD}
                 </span>
               </div>
-              <div className="h-4 border-2 border-black bg-white">
+              <div className="h-4 border bg-white border-line">
                 <div
-                  className="h-full bg-[#2D5A3D] transition-all"
+                  className="h-full bg-brand transition-all"
                   style={{ width: `${gauge}%` }}
                 />
               </div>
-              <p className="text-xs text-[#4A4A4A] mt-1">
+              <p className="text-xs text-ink-2 mt-1">
                 Échange {Math.min(turns, GEN_B_MAX_TURNS)}/{GEN_B_MAX_TURNS}
               </p>
             </div>
 
             {/* Chat */}
-            <div className="border-2 border-black p-4 mb-4 min-h-[280px] max-h-[460px] overflow-y-auto flex flex-col gap-4">
+            <div className="border p-4 mb-4 min-h-[280px] max-h-[460px] overflow-y-auto flex flex-col gap-4 border-line">
               {messages.length === 0 && (
-                <p className="text-[#B8B8B8]">{persona.brief}</p>
+                <p className="text-muted">{persona.brief}</p>
               )}
               {messages.map((m, i) => (
                 <div key={i}>
-                  <span className="text-xs text-[#B8B8B8]">
+                  <span className="text-xs text-muted">
                     {m.role === "user" ? "Vous" : persona.label}
                   </span>
                   {m.role === "assistant" ? (
                     <Markdown content={m.content} />
                   ) : (
-                    <p className="text-[#2D5A3D] font-semibold whitespace-pre-wrap">
+                    <p className="text-brand font-semibold whitespace-pre-wrap">
                       {m.content}
                     </p>
                   )}
                 </div>
               ))}
               {streaming && messages[messages.length - 1]?.content === "" && (
-                <span className="text-[#B8B8B8] animate-pulse">
+                <span className="text-muted animate-pulse">
                   {persona.label} réfléchit…
                 </span>
               )}
@@ -260,12 +261,12 @@ export default function GenBPage() {
                   onKeyDown={(e) => e.key === "Enter" && handleSend()}
                   disabled={streaming}
                   placeholder="Votre argument…"
-                  className="flex-1 border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-50"
+                  className="field flex-1 px-4 py-3 disabled:opacity-50"
                 />
                 <button
                   onClick={handleSend}
                   disabled={streaming || !input.trim()}
-                  className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] disabled:opacity-50"
+                  className="btn btn-primary px-6 py-3 disabled:opacity-50"
                 >
                   Envoyer
                 </button>
@@ -274,13 +275,13 @@ export default function GenBPage() {
 
             {phase === "result" && (
               <section className="mt-4">
-                <p className="text-center text-xl font-bold mb-4 text-black">
+                <p className="text-center text-xl font-bold mb-4 text-ink">
                   {gauge >= GEN_B_THRESHOLD
-                    ? "Objectif atteint ! 🎉"
+                    ? "Objectif atteint !"
                     : "Conversation terminée."}
                 </p>
                 {evaluating && !verdict ? (
-                  <p className="text-center text-[#4A4A4A]">Évaluation en cours…</p>
+                  <p className="text-center text-ink-2">Évaluation en cours…</p>
                 ) : verdict ? (
                   <Verdict verdict={verdict} />
                 ) : null}

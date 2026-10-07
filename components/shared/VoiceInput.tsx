@@ -6,6 +6,7 @@
 // tape sa note — le défi fonctionne de bout en bout sans voix.
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Icon from "@/components/shared/Icon";
 
 interface SpeechResultLike {
   isFinal: boolean;
@@ -119,7 +120,7 @@ export default function VoiceInput({
         placeholder={placeholder}
         rows={rows}
         disabled={disabled}
-        className="w-full border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-50"
+        className="field w-full px-4 py-3 disabled:opacity-50"
       />
       <div className="flex items-center gap-3 mt-1.5 flex-wrap">
         {supported ? (
@@ -127,24 +128,25 @@ export default function VoiceInput({
             type="button"
             onClick={listening ? stop : start}
             disabled={disabled}
-            className={`px-4 py-2 border-2 font-semibold text-sm disabled:opacity-50 ${
+            className={`btn px-4 py-2 border-2 font-semibold text-sm disabled:opacity-50 ${
               listening
-                ? "bg-[#8B3A3A] border-[#8B3A3A] text-white"
-                : "bg-white border-[#2D5A3D] text-[#2D5A3D]"
+                ? "bg-danger border-danger text-white"
+                : "bg-white border-brand text-brand"
             }`}
           >
-            {listening ? "⏹ Arrêter la dictée" : "🎤 Dicter au micro"}
+            <Icon name={listening ? "stop" : "mic"} size={18} />
+            {listening ? "Arrêter la dictée" : "Dicter au micro"}
           </button>
         ) : (
-          <span className="text-sm text-[#4A4A4A]">
+          <span className="text-sm text-ink-2">
             Dictée vocale non disponible sur ce navigateur — tapez votre note
             (Chrome ou Edge pour le micro).
           </span>
         )}
         {listening && (
-          <span className="text-sm text-[#2D5A3D] animate-pulse">
-            🔴 Écoute en cours… parlez naturellement.
-            {interim && <em className="text-[#4A4A4A]"> {interim}</em>}
+          <span className="text-sm text-ink-2 inline-flex items-center flex-wrap">
+            <span className="inline-block w-2.5 h-2.5 rounded-full bg-danger animate-pulse mr-2" aria-hidden />Écoute en cours… parlez naturellement.
+            {interim && <em className="text-ink-2"> {interim}</em>}
           </span>
         )}
       </div>

@@ -12,6 +12,7 @@ import SuggestionChips from "@/components/shared/SuggestionChips";
 import { streamFromProxy } from "@/lib/ai/proxy";
 import { BONUS_G_PITCH_PROMPT, BONUS_G_SUGGESTIONS } from "@/lib/ai/prompts";
 import { useChallengeInit, finishChallenge } from "@/lib/challenges/general-helpers";
+import Icon from "@/components/shared/Icon";
 
 const CHALLENGE_ID = 107;
 const MAX_ATTEMPTS = 2;
@@ -118,14 +119,14 @@ export default function BonusGPage() {
   const attemptsLeft = MAX_ATTEMPTS - attempts.length;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between gap-3 flex-wrap mb-8">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-black">
+            <h1 className="text-3xl sm:text-4xl font-bold text-ink">
               Bonus G — Le pitch en 30 secondes
             </h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <p className="text-ink-2 mt-2">
               Faites générer deux pitchs, écoutez-les, et choisissez le meilleur.
             </p>
           </div>
@@ -144,14 +145,14 @@ export default function BonusGPage() {
             />
             <div className="flex flex-col gap-4 mb-4">
               <label className="flex flex-col gap-1">
-                <span className="font-bold text-black">Une compétence forte</span>
+                <span className="font-bold text-ink">Une compétence forte</span>
                 <input
                   type="text"
                   value={competence}
                   onChange={(e) => setCompetence(e.target.value)}
                   disabled={running || attempts.length >= MAX_ATTEMPTS}
                   placeholder="Ex : sens de l'organisation, relationnel…"
-                  className="border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-50"
+                  className="field px-4 py-3 disabled:opacity-50"
                 />
                 <SuggestionChips
                   suggestions={BONUS_G_SUGGESTIONS.competence}
@@ -161,14 +162,14 @@ export default function BonusGPage() {
                 />
               </label>
               <label className="flex flex-col gap-1">
-                <span className="font-bold text-black">Une motivation</span>
+                <span className="font-bold text-ink">Une motivation</span>
                 <input
                   type="text"
                   value={motivation}
                   onChange={(e) => setMotivation(e.target.value)}
                   disabled={running || attempts.length >= MAX_ATTEMPTS}
                   placeholder="Ex : envie d'un métier de bureau avec du lien humain"
-                  className="border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-50"
+                  className="field px-4 py-3 disabled:opacity-50"
                 />
                 <SuggestionChips
                   suggestions={BONUS_G_SUGGESTIONS.motivation}
@@ -178,14 +179,14 @@ export default function BonusGPage() {
                 />
               </label>
               <label className="flex flex-col gap-1">
-                <span className="font-bold text-black">Un projet</span>
+                <span className="font-bold text-ink">Un projet</span>
                 <input
                   type="text"
                   value={projet}
                   onChange={(e) => setProjet(e.target.value)}
                   disabled={running || attempts.length >= MAX_ATTEMPTS}
                   placeholder="Ex : un poste d'accueil-secrétariat"
-                  className="border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-50"
+                  className="field px-4 py-3 disabled:opacity-50"
                 />
                 <SuggestionChips
                   suggestions={BONUS_G_SUGGESTIONS.projet}
@@ -195,13 +196,13 @@ export default function BonusGPage() {
                 />
               </label>
             </div>
-            <p className="text-sm text-[#4A4A4A] mb-3">
+            <p className="text-sm text-ink-2 mb-3">
               Ajustez les éléments entre les deux essais pour comparer ce que ça
               change dans le pitch.
             </p>
 
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="text-sm text-[#4A4A4A]">
+              <span className="text-sm text-ink-2">
                 {attemptsLeft > 0
                   ? `Essais restants : ${attemptsLeft} / ${MAX_ATTEMPTS}`
                   : "Vous avez généré vos 2 pitchs."}
@@ -210,7 +211,7 @@ export default function BonusGPage() {
                 <button
                   onClick={handleRun}
                   disabled={running || !ready || attempts.length >= MAX_ATTEMPTS}
-                  className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-lg disabled:opacity-50"
+                  className="btn btn-primary px-6 py-3 text-lg disabled:opacity-50"
                 >
                   {running
                     ? "Génération…"
@@ -223,7 +224,7 @@ export default function BonusGPage() {
                       setPhase("choose");
                     }}
                     disabled={running}
-                    className="px-6 py-3 bg-white text-[#2D5A3D] font-semibold border-2 border-[#2D5A3D] text-lg disabled:opacity-50"
+                    className="btn btn-secondary px-6 py-3 text-lg disabled:opacity-50"
                   >
                     Comparer et choisir →
                   </button>
@@ -233,12 +234,12 @@ export default function BonusGPage() {
 
             {running && (
               <div className="mt-6">
-                <h3 className="font-bold text-black mb-1">
+                <h3 className="font-bold text-ink mb-1">
                   Pitch {attempts.length + 1} — en cours
                 </h3>
-                <div className="border-2 border-[#2D5A3D] p-4 min-h-[80px] text-lg">
+                <div className="border-2 border-brand p-4 min-h-[80px] text-lg">
                   {streamingText || (
-                    <span className="inline-flex items-center gap-2 text-[#4A4A4A]">
+                    <span className="inline-flex items-center gap-2 text-ink-2">
                       <Spinner size="sm" />
                       <span>L&apos;IA rédige le pitch…</span>
                     </span>
@@ -249,15 +250,15 @@ export default function BonusGPage() {
 
             {!running && attempts.length > 0 && (
               <div className="mt-6 flex flex-col gap-4">
-                <h3 className="font-bold text-black">
+                <h3 className="font-bold text-ink">
                   Vos pitchs ({attempts.length}/{MAX_ATTEMPTS})
                 </h3>
                 {attempts.map((a, i) => (
-                  <div key={i} className="border-2 border-black p-4">
-                    <p className="text-sm font-bold text-[#2D5A3D] mb-2">
+                  <div key={i} className="border p-4 border-line">
+                    <p className="text-sm font-bold text-brand mb-2">
                       Pitch {i + 1}
                     </p>
-                    <p className="text-black text-lg whitespace-pre-line">{a.pitch}</p>
+                    <p className="text-ink text-lg whitespace-pre-line">{a.pitch}</p>
                   </div>
                 ))}
               </div>
@@ -268,10 +269,10 @@ export default function BonusGPage() {
         {/* Phase 2 : écouter, choisir, justifier */}
         {phase === "choose" && (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-2">
+            <h2 className="text-2xl font-bold text-ink mb-2">
               Écoutez, comparez, choisissez
             </h2>
-            <p className="text-[#4A4A4A] mb-5">
+            <p className="text-ink-2 mb-5">
               Lequel présente Camille de la façon la plus juste et la plus
               valorisante ?
             </p>
@@ -283,11 +284,11 @@ export default function BonusGPage() {
                   <div
                     key={i}
                     className={`border-2 p-4 ${
-                      isSelected ? "border-[#2D5A3D] bg-[#F0F5F1]" : "border-black"
+                      isSelected ? "border-brand bg-brand-soft" : "border-line"
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2 gap-2">
-                      <span className="text-sm font-bold text-[#2D5A3D]">
+                      <span className="text-sm font-bold text-brand">
                         Pitch {i + 1}
                       </span>
                       <div className="flex gap-2">
@@ -295,31 +296,32 @@ export default function BonusGPage() {
                           <button
                             onClick={() => handleSpeak(i, a.pitch)}
                             disabled={speakingIdx !== null}
-                            className="px-3 py-1 border-2 border-[#2D5A3D] text-[#2D5A3D] text-sm font-semibold disabled:opacity-50"
+                            className="btn btn-secondary px-3 py-1 text-sm disabled:opacity-50"
                           >
-                            {speakingIdx === i ? "🔊 Lecture…" : "▶ Écouter"}
+                            <Icon name="volume" size={18} />
+                    {speakingIdx === i ? "Lecture…" : "Écouter"}
                           </button>
                         )}
                         <button
                           onClick={() => setSelected(i)}
                           aria-pressed={isSelected}
-                          className={`px-3 py-1 border-2 text-sm font-semibold ${
+                          className={`btn px-3 py-1 border-2 text-sm font-semibold ${
                             isSelected
-                              ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
-                              : "border-black text-black"
+                              ? "bg-brand border-brand text-white"
+                              : "border-line text-ink"
                           }`}
                         >
-                          {isSelected ? "✓ Choisi" : "Choisir"}
+                          {isSelected ? <><Icon name="check" size={16} strokeWidth={3} /> Choisi</> : "Choisir"}
                         </button>
                       </div>
                     </div>
-                    <p className="text-black text-lg whitespace-pre-line">{a.pitch}</p>
+                    <p className="text-ink text-lg whitespace-pre-line">{a.pitch}</p>
                   </div>
                 );
               })}
             </div>
 
-            <label className="block font-bold text-black mt-6 mb-2">
+            <label className="block font-bold text-ink mt-6 mb-2">
               Pourquoi ce choix ? (une ligne)
             </label>
             <input
@@ -327,14 +329,14 @@ export default function BonusGPage() {
               value={justification}
               onChange={(e) => setJustification(e.target.value)}
               placeholder="Ex : il met mieux en avant le lien humain sans en faire trop."
-              className="w-full border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none"
+              className="field w-full px-4 py-3 "
             />
 
             <div className="flex flex-wrap justify-between gap-3 mt-6">
               {attempts.length < MAX_ATTEMPTS && (
                 <button
                   onClick={() => setPhase("write")}
-                  className="px-5 py-3 bg-white text-black font-semibold border-2 border-black"
+                  className="btn btn-secondary px-5 py-3 "
                 >
                   ← Générer un autre pitch
                 </button>

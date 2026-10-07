@@ -109,9 +109,9 @@ export function getDocumentTitle(kind: DocumentKind): string {
 export default function DocumentCamille({ kind }: { kind: DocumentKind }) {
   const document = DOCUMENTS[kind];
   return (
-    <article className="border-2 border-black p-4 bg-white">
+    <article className="border p-4 bg-white border-line">
       <h3 className="mb-2 font-bold">{document.title}</h3>
-      <p className="text-[#4A4A4A] whitespace-pre-line text-sm">
+      <p className="text-ink-2 whitespace-pre-line text-sm">
         {document.content}
       </p>
     </article>

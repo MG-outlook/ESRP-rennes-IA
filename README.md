@@ -42,6 +42,16 @@ Les participants rejoignent via `/join?code=XXXX` (code à 4 chiffres). Le flux 
 - `scripts/warmup-functions.ts` — préchauffe les fonctions.
 - `scripts/load-test.ts` — test de charge.
 
+## Charte graphique
+
+Les tokens de design sont définis dans `app/globals.css` (bloc `@theme`) et s'utilisent comme classes Tailwind (`bg-brand`, `text-ink-2`, `border-line`…). La palette est volontairement restreinte à ces tokens : la palette Tailwind par défaut est désactivée.
+
+- **Couleurs** reprises du logo Campus EPNAK (`public/logo-campus-epnak.png`) : `brand` (bleu, actions, liens, focus), `success` (vert, réussite, terminé), `sky` et `leaf` (décor uniquement, contraste insuffisant pour du texte). Textes : `ink`, `ink-2`, `muted` ; surfaces : `surface`, `line`, `control`. Tous les textes respectent au moins le niveau AA.
+- **Typographie** : Atkinson Hyperlegible Next (texte) et Atkinson Hyperlegible Mono (codes, mots de passe, chronos), chargées via `next/font`.
+- **Composants CSS** : `.btn` + `.btn-primary` / `.btn-secondary` / `.btn-danger`, `.field` (champs), `.badge` (statuts), `.brand-stripe`.
+- **Icônes** : `components/shared/Icon.tsx` (icônes au trait), pas d'emoji dans l'interface.
+- **En-têtes** : `TeamHeader` et `BrandLogo` (`components/shared/Brand.tsx`), `AdminHeader` pour les écrans d'animation.
+
 ## Documentation
 
 Voir le dossier [`docs/`](./docs) (plan général, plan B jour J, specs).

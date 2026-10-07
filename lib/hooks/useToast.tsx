@@ -24,9 +24,9 @@ export function useToast(): ToastContextValue {
 }
 
 const TYPE_STYLES: Record<ToastType, string> = {
-  success: "bg-[#2D5A3D] text-white",
-  error: "bg-[#8B3A3A] text-white",
-  info: "bg-[#4A4A4A] text-white",
+  success: "bg-success-soft text-success-strong border border-success",
+  error: "bg-danger-soft text-danger-strong border border-danger",
+  info: "bg-brand-soft text-brand-strong border border-brand",
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -50,7 +50,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       {state.visible && (
         <div
-          className={`fixed top-4 left-1/2 -translate-x-1/2 z-[60] px-6 py-3 font-semibold text-lg ${TYPE_STYLES[state.type]}`}
+          className={`fixed top-4 left-1/2 -translate-x-1/2 z-[60] px-6 py-3 rounded-xl shadow-lg font-bold text-lg max-w-[calc(100vw-2rem)] ${TYPE_STYLES[state.type]}`}
           role="status"
           aria-live="assertive"
         >

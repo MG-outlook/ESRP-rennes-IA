@@ -33,14 +33,14 @@ export default function TurnByTurnPanel({
   const canSubmit = activeRoles.every((role) => contributions[role].trim().length > 0);
 
   return (
-    <section className="border-2 border-black p-4 bg-white">
+    <section className="border p-4 bg-white border-line">
       <h2 className="mb-3">Contributions par métier</h2>
       <div className="space-y-4">
         {activeRoles.map((role) => (
           <label key={role} className="block">
-            <span className="font-bold text-black">{ROLE_LABELS[role]}</span>
+            <span className="font-bold text-ink">{ROLE_LABELS[role]}</span>
             {roleHints?.[role]?.hint && (
-              <span className="block text-sm text-[#4A4A4A] mb-2">
+              <span className="block text-sm text-ink-2 mb-2">
                 {roleHints[role].hint}
               </span>
             )}
@@ -52,7 +52,7 @@ export default function TurnByTurnPanel({
                   [role]: event.target.value,
                 }))
               }
-              className="w-full min-h-24 border-2 border-black p-3 bg-white text-black"
+              className="w-full min-h-24 border p-3 bg-white text-ink border-line"
               placeholder="Notez la contribution de ce métier..."
             />
           </label>
@@ -62,7 +62,7 @@ export default function TurnByTurnPanel({
         type="button"
         disabled={!canSubmit}
         onClick={() => onAllContributed?.(contributions)}
-        className="mt-4 px-4 py-2 border-2 border-[#2D5A3D] bg-[#2D5A3D] text-white font-semibold disabled:opacity-50"
+        className="btn btn-primary mt-4 px-4 py-2 disabled:opacity-50"
       >
         Valider les contributions
       </button>

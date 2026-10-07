@@ -102,14 +102,14 @@ export default function GenCPage() {
     return <ChallengeIntro {...intro} onStart={() => setIntroDone(true)} />;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between gap-3 flex-wrap mb-8">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-black">
+            <h1 className="text-3xl sm:text-4xl font-bold text-ink">
               Défi C — La chasse à l&apos;hallu
             </h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <p className="text-ink-2 mt-2">
               L&apos;IA a écrit ce document. Débusquez ses pièges.
             </p>
           </div>
@@ -120,27 +120,27 @@ export default function GenCPage() {
         </div>
 
         <section className="mb-6">
-          <h2 className="text-2xl font-bold text-black mb-3">{doc.title}</h2>
-          <div className="border-2 border-black p-5 bg-[#F5F5F5] whitespace-pre-line text-black leading-relaxed">
+          <h2 className="text-2xl font-bold text-ink mb-3">{doc.title}</h2>
+          <div className="border p-5 bg-surface whitespace-pre-line text-ink leading-relaxed border-line">
             {doc.body}
           </div>
         </section>
 
         {phase === "hunt" && (
           <section className="mb-6">
-            <h2 className="text-2xl font-bold text-black mb-3">Vos signalements</h2>
+            <h2 className="text-2xl font-bold text-ink mb-3">Vos signalements</h2>
             <div className="flex flex-col sm:flex-row gap-2 mb-3">
               <input
                 type="text"
                 value={quote}
                 onChange={(e) => setQuote(e.target.value)}
                 placeholder="Copiez le passage suspect…"
-                className="flex-1 border-2 border-black px-3 py-2 text-black focus:border-[#2D5A3D] focus:outline-none"
+                className="field flex-1 px-3 py-2 "
               />
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as GenCCategory)}
-                className="border-2 border-black px-3 py-2 text-black"
+                className="border px-3 py-2 text-ink border-line"
               >
                 {CATEGORIES.map((c) => (
                   <option key={c} value={c}>
@@ -151,7 +151,7 @@ export default function GenCPage() {
               <button
                 onClick={addSignalement}
                 disabled={!quote.trim()}
-                className="px-4 py-2 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] disabled:opacity-50"
+                className="btn btn-primary px-4 py-2 disabled:opacity-50"
               >
                 + Ajouter
               </button>
@@ -162,11 +162,11 @@ export default function GenCPage() {
                 {signalements.map((s, i) => (
                   <li
                     key={i}
-                    className="flex items-start justify-between gap-3 border-2 border-[#B8B8B8] p-3"
+                    className="flex items-start justify-between gap-3 border-2 border-line p-3"
                   >
-                    <span className="text-black text-sm">
+                    <span className="text-ink text-sm">
                       « {s.quote} »
-                      <span className="text-[#2D5A3D] font-semibold">
+                      <span className="text-brand font-semibold">
                         {" "}
                         — {GEN_C_CATEGORY_LABELS[s.category]}
                       </span>
@@ -175,7 +175,7 @@ export default function GenCPage() {
                       onClick={() =>
                         setSignalements((prev) => prev.filter((_, j) => j !== i))
                       }
-                      className="text-[#8B3A3A] text-sm font-semibold shrink-0"
+                      className="text-danger text-sm font-semibold shrink-0"
                     >
                       Retirer
                     </button>
@@ -188,7 +188,7 @@ export default function GenCPage() {
               <button
                 onClick={handleEvaluate}
                 disabled={signalements.length === 0}
-                className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl disabled:opacity-50"
+                className="btn btn-primary px-6 py-3 text-xl disabled:opacity-50"
               >
                 Soumettre la chasse ({signalements.length})
               </button>
@@ -199,24 +199,24 @@ export default function GenCPage() {
         {phase === "result" && (
           <section className="mb-8">
             {evaluating && !verdict ? (
-              <p className="text-center text-[#4A4A4A]">Correction en cours…</p>
+              <p className="text-center text-ink-2">Correction en cours…</p>
             ) : verdict ? (
               <Verdict verdict={verdict} />
             ) : (
-              <p className="text-[#8B3A3A]">Évaluation indisponible.</p>
+              <p className="text-danger">Évaluation indisponible.</p>
             )}
 
             {verdict && (
-              <div className="border-2 border-black p-4 mt-6">
-                <h3 className="font-bold text-black mb-2">Les pièges réels</h3>
+              <div className="border p-4 mt-6 border-line">
+                <h3 className="font-bold text-ink mb-2">Les pièges réels</h3>
                 <ul className="flex flex-col gap-2">
                   {doc.pieges.map((p, i) => (
                     <li key={i} className="text-sm">
-                      <span className="text-black">« {p.quote} » </span>
-                      <span className="text-[#2D5A3D] font-semibold">
+                      <span className="text-ink">« {p.quote} » </span>
+                      <span className="text-brand font-semibold">
                         — {GEN_C_CATEGORY_LABELS[p.category]}
                       </span>
-                      <span className="block text-[#4A4A4A]">{p.why}</span>
+                      <span className="block text-ink-2">{p.why}</span>
                     </li>
                   ))}
                 </ul>
