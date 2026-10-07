@@ -27,7 +27,7 @@ function renderInline(text: string, keyPrefix: string): React.ReactNode[] {
       nodes.push(<strong key={key}>{token.slice(2, -2)}</strong>);
     } else if (token.startsWith("`")) {
       nodes.push(
-        <code key={key} className="px-1 bg-[#EDEDED] text-[#2D5A3D] text-[0.95em]">
+        <code key={key} className="px-1 bg-surface text-brand text-[0.95em]">
           {token.slice(1, -1)}
         </code>
       );

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Spinner from "@/components/shared/Spinner";
 import RichText from "@/components/shared/RichText";
+import Icon from "@/components/shared/Icon";
 import { useAutoSave, useAutoSaveRestore } from "@/lib/hooks/useAutoSave";
 import { useToast } from "@/lib/hooks/useToast";
 
@@ -71,7 +72,7 @@ export default function PortePage() {
   useEffect(() => {
     if (restoredMessages && restoredMessages.length > 0 && messages.length === 0) {
       setMessages(restoredMessages);
-      showToast("Brouillon restaure", "info");
+      showToast("Brouillon restauré", "info");
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -111,7 +112,7 @@ export default function PortePage() {
     });
 
     clearSavedChat();
-    showToast("Mot de passe accepte — bienvenue !", "success");
+    showToast("Mot de passe accepté — bienvenue !", "success");
 
     // Reveal animation. The team then advances at their own pace via the button
     // (no auto-redirect, so they have time to read and note their password).
@@ -230,96 +231,137 @@ export default function PortePage() {
   // Password reveal screen — the team stays here until they choose to continue.
   if (readyPayload && revealed) {
     return (
-      <main className="flex flex-col items-center justify-center min-h-screen p-8 bg-white text-center">
-        <p className="text-[#4A4A4A] mb-2 text-sm uppercase tracking-widest">
-          Votre équipe
-        </p>
-        <p className="text-[#4A4A4A] mb-6 italic max-w-md">
-          {readyPayload.team_essence}
-        </p>
-        <p className="text-[#4A4A4A] mb-2 text-sm uppercase tracking-widest">
-          Mot de passe d&apos;équipe
-        </p>
-        <p className="text-4xl md:text-5xl font-bold text-[#2D5A3D] mb-10 tracking-wider">
-          {readyPayload.password}
-        </p>
-        <button
-          onClick={() => router.push("/lobby")}
-          className="px-8 py-4 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl hover:bg-[#234a31] transition-colors"
-        >
-          Commencer la découverte de l&apos;IA
-        </button>
-        <p className="text-[#B8B8B8] text-sm mt-6">
-          Notez bien votre mot de passe avant de continuer.
-        </p>
+      <main className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-surface text-center">
+        <div className="w-full max-w-xl bg-white border border-line rounded-xl p-8 sm:p-10 flex flex-col items-center gap-5">
+          <p role="status" className="badge bg-success-soft text-success-strong text-base">
+            <Icon name="check" size={16} strokeWidth={3} />
+            Porte franchie
+          </p>
+          <p className="text-ink-2 italic text-lg max-w-md">{readyPayload.team_essence}</p>
+          <div className="w-full rounded-xl bg-success-soft px-6 py-7 flex flex-col items-center gap-2">
+            <p className="font-bold text-success-strong">Votre mot de passe d&apos;équipe</p>
+            <p className="font-mono text-3xl sm:text-4xl font-bold text-ink tracking-wide break-all">
+              {readyPayload.password}
+            </p>
+          </div>
+          <p className="text-ink-2">Notez-le bien avant de continuer.</p>
+          <button
+            onClick={() => router.push("/lobby")}
+            className="btn btn-primary px-8 py-4 text-xl"
+          >
+            Commencer la découverte de l&apos;IA
+            <Icon name="arrow-right" />
+          </button>
+        </div>
       </main>
     );
   }
 
   return (
-    <main className="flex flex-col min-h-screen bg-white">
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-6 max-w-3xl mx-auto w-full">
-        {messages.length === 0 && (
-          <div className="flex items-center justify-center h-full">
-            <span className="text-4xl font-bold text-black animate-pulse">
-              {">"}
-            </span>
+    <main className="flex flex-col flex-1 bg-white">
+      <div className="flex-1 w-full max-w-6xl mx-auto px-6 pt-10 flex flex-wrap gap-10 items-start">
+        <div className="flex-[999_1_560px] min-w-0 flex flex-col gap-7">
+          <div className="flex flex-col gap-2">
+            <p className="font-bold text-success">Étape d&apos;entrée</p>
+            <h1 className="text-4xl">La Porte</h1>
+            <p className="text-ink-2 text-lg">
+              Répondez au Gardien. Il vous pose trois questions, puis vous confie
+              votre mot de passe d&apos;équipe.
+            </p>
           </div>
-        )}
 
-        {messages.map((msg, i) => (
-          <div key={i} className="mb-4">
-            {msg.role === "user" ? (
-              <div className="flex gap-2">
-                <span className="text-[#2D5A3D] font-bold shrink-0">{">"}</span>
-                <p className="text-black">{msg.content}</p>
-              </div>
-            ) : (
-              <RichText text={msg.content} className="block text-[#4A4A4A] pl-5" />
+          <ol aria-label="Conversation avec le Gardien" aria-live="polite" className="flex flex-col gap-5">
+            {messages.length === 0 && !streaming && (
+              <li className="text-ink-2">
+                Le Gardien vous attend. Écrivez un premier message pour le saluer.
+              </li>
             )}
-          </div>
-        ))}
 
-        {streaming && messages[messages.length - 1]?.content === "" && (
-          <span className="text-[#4A4A4A] pl-5 inline-flex items-center gap-2">
-            <Spinner size="sm" />
-            <span>Le Gardien reflechit...</span>
-          </span>
-        )}
+            {messages.map((msg, i) =>
+              msg.role === "user" ? (
+                <li key={i} className="self-end max-w-[560px] flex flex-col items-end gap-1.5">
+                  <span className="text-[0.85rem] font-bold text-ink-2">Votre équipe</span>
+                  <p className="px-4 py-3 rounded-2xl rounded-br-sm bg-brand-soft text-lg">
+                    {msg.content}
+                  </p>
+                </li>
+              ) : msg.content ? (
+                <li key={i} className="max-w-[640px] flex flex-col gap-1.5">
+                  <span className="text-[0.85rem] font-bold text-brand">Le Gardien</span>
+                  <RichText text={msg.content} className="block text-lg" />
+                </li>
+              ) : null
+            )}
 
-        <div ref={messagesEndRef} />
+            {streaming && messages[messages.length - 1]?.content === "" && (
+              <li className="inline-flex items-center gap-2 text-ink-2">
+                <Spinner size="sm" />
+                <span>Le Gardien réfléchit…</span>
+              </li>
+            )}
+          </ol>
+
+          <div ref={messagesEndRef} />
+        </div>
+
+        <aside className="flex-[1_1_280px] flex flex-col gap-4 p-6 border border-line rounded-xl bg-surface">
+          <h2 className="text-lg">Le Gardien veut savoir</h2>
+          <ol className="flex flex-col gap-3.5 leading-snug">
+            {[
+              ["Qui vous êtes", "les métiers présents, combien"],
+              ["Ce que vous cherchez", "votre intention pour l'atelier"],
+              ["Ce qui vous distingue", "la singularité de l'équipe"],
+            ].map(([title, hint], i) => (
+              <li key={i} className="flex gap-3">
+                <span className="shrink-0 w-7 h-7 rounded-full border-2 border-brand text-brand text-sm font-extrabold inline-flex items-center justify-center">
+                  {i + 1}
+                </span>
+                <span>
+                  <strong>{title}</strong>
+                  <br />
+                  <span className="text-ink-2">{hint}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+          <p className="pt-3.5 border-t border-line text-ink-2 text-[0.9rem]">
+            Notez bien le mot de passe qu&apos;il vous donnera : il vous servira
+            pendant l&apos;atelier.
+          </p>
+        </aside>
       </div>
 
-      {/* Input */}
       {!readyPayload && (
-        <div className="sticky bottom-0 bg-white border-t-2 border-black">
+        <div className="sticky bottom-0 mt-10 bg-white border-t border-line">
           <form
             onSubmit={sendMessage}
-            className="max-w-3xl mx-auto w-full p-4"
+            className="max-w-6xl mx-auto w-full px-6 pt-4 pb-5 flex flex-col gap-2"
           >
-            <div className="flex gap-3 items-center border-2 border-black px-4 py-3 focus-within:border-[#2D5A3D] transition-colors">
-              <span className="text-[#2D5A3D] font-bold text-xl select-none">{">"}</span>
+            <label htmlFor="porte-input" className="font-bold">
+              Votre réponse au Gardien
+            </label>
+            <div className="field flex gap-3 items-center pl-4 pr-2 py-2 focus-within:border-brand focus-within:outline-3 focus-within:outline-brand focus-within:outline-offset-2">
               <input
+                id="porte-input"
                 ref={inputRef}
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={streaming ? "Le Gardien répond…" : "Votre réponse…"}
                 disabled={streaming}
-                aria-label="Votre message au Gardien"
-                className="flex-1 text-black bg-white outline-none border-none text-lg placeholder:text-[#B8B8B8]"
+                className="flex-1 min-w-0 h-11 bg-transparent outline-none border-none text-lg"
                 autoFocus
               />
               <button
                 type="submit"
                 disabled={streaming || !input.trim()}
-                className="px-4 py-1 bg-[#2D5A3D] text-white font-semibold text-sm disabled:opacity-40"
+                className="btn btn-primary px-5"
               >
                 Envoyer
+                <Icon name="arrow-right" size={18} />
               </button>
             </div>
-            <p className="text-xs text-[#B8B8B8] mt-2 pl-1">Appuyez sur Entrée ou cliquez Envoyer</p>
+            <p className="text-[0.85rem] text-muted">Appuyez sur Entrée ou sur Envoyer.</p>
           </form>
         </div>
       )}

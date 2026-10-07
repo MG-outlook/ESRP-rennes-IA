@@ -10,6 +10,7 @@ import {
   getDocumentContent,
   getDocumentTitle,
 } from "./DocumentCamille";
+import Icon from "@/components/shared/Icon";
 
 interface ExtraDoc {
   title: string;
@@ -45,13 +46,13 @@ export default function DossierAppui({
   if (!intro && tabs.length === 0) return null;
 
   return (
-    <details className="mb-8 border-2 border-black" open={defaultOpen}>
-      <summary className="cursor-pointer font-bold text-black px-4 py-3 bg-[#F5F5F5]">
-        📁 Dossier d&apos;appui — les faits sont là, inutile d&apos;inventer
+    <details className="mb-8 border border-line " open={defaultOpen}>
+      <summary className="cursor-pointer font-bold text-ink px-4 py-3 bg-surface">
+        Dossier d&apos;appui — les faits sont là, inutile d&apos;inventer
       </summary>
-      <div className="border-t-2 border-black p-4">
+      <div className="border-t border-line p-4">
         {intro && (
-          <p className="text-[#4A4A4A] mb-4 leading-relaxed">{intro}</p>
+          <p className="text-ink-2 mb-4 leading-relaxed">{intro}</p>
         )}
         {tabs.length > 0 && (
           <>
@@ -60,19 +61,19 @@ export default function DossierAppui({
                 <button
                   key={i}
                   onClick={() => setActive(i)}
-                  className={`px-3 py-1.5 border-2 text-sm font-semibold ${
+                  className={`btn px-3 py-1.5 border-2 text-sm font-semibold ${
                     active === i
-                      ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
-                      : "bg-white border-black text-black hover:border-[#2D5A3D]"
+                      ? "bg-brand border-brand text-white"
+                      : "bg-white border-control text-ink hover:border-brand"
                   }`}
                 >
                   {t.title}
                 </button>
               ))}
             </div>
-            <article className="border-2 border-black p-4 bg-white max-h-[320px] overflow-y-auto">
+            <article className="border p-4 bg-white max-h-[320px] overflow-y-auto border-line">
               <h3 className="mb-2 font-bold">{tabs[active].title}</h3>
-              <p className="text-[#4A4A4A] whitespace-pre-line text-sm">
+              <p className="text-ink-2 whitespace-pre-line text-sm">
                 {tabs[active].content}
               </p>
             </article>

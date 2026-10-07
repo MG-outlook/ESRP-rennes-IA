@@ -15,6 +15,7 @@ import { DEFI5_CADRAGE_PROMPT, DEFI5_QUESTIONS, DEFI5_IDEES } from "@/lib/ai/pro
 import { challengeTitle, computeChallengeScore, formatDuration } from "@/lib/scoring";
 import { useAutoSave, useAutoSaveRestore } from "@/lib/hooks/useAutoSave";
 import { useToast } from "@/lib/hooks/useToast";
+import Icon from "@/components/shared/Icon";
 
 function downloadMarkdown(filename: string, content: string) {
   const blob = new Blob([content], { type: "text/markdown;charset=utf-8" });
@@ -69,7 +70,7 @@ export default function Defi5Page() {
   useEffect(() => {
     if (restoredAnswers) {
       setAnswers(restoredAnswers);
-      showToast("Brouillon restaure", "info");
+      showToast("Brouillon restauré", "info");
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -296,14 +297,14 @@ export default function Defi5Page() {
     );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-5xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-black">
+            <h1 className="text-4xl font-bold text-ink">
               Défi 5 — Notre projet
             </h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <p className="text-ink-2 mt-2">
               Construisez votre Pacte IA collectif
             </p>
           </div>
@@ -317,27 +318,27 @@ export default function Defi5Page() {
         {/* Phase A — Inspiration */}
         {phase === "inspiration" && (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-4">
+            <h2 className="text-2xl font-bold text-ink mb-4">
               Vos défis précédents
             </h2>
             {previousDefis.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 {previousDefis.map((d) => (
-                  <div key={d.challengeId} className="border-2 border-black p-4">
+                  <div key={d.challengeId} className="border p-4 border-line">
                     <div className="flex justify-between items-start gap-2 mb-2">
-                      <h3 className="font-bold text-black">
+                      <h3 className="font-bold text-ink">
                         Défi {d.challengeId} — {d.title}
                       </h3>
                       {d.points != null && (
-                        <span className="shrink-0 text-sm font-bold text-white bg-[#2D5A3D] px-2 py-0.5">
+                        <span className="badge bg-brand text-white shrink-0">
                           {d.points}/20
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-[#4A4A4A] mb-2">
-                      {d.duration ? `⏱ Temps : ${d.duration}` : "⏱ Temps non mesuré"}
+                    <p className="text-xs text-ink-2 mb-2">
+                      {d.duration ? `Temps : ${d.duration}` : "Temps non mesuré"}
                     </p>
-                    <p className="text-sm text-[#4A4A4A] line-clamp-3">
+                    <p className="text-sm text-ink-2 line-clamp-3">
                       {d.summary.slice(0, 180)}
                       {d.summary.length > 180 ? "…" : ""}
                     </p>
@@ -345,14 +346,14 @@ export default function Defi5Page() {
                 ))}
               </div>
             ) : (
-              <p className="text-[#4A4A4A] mb-6">
+              <p className="text-ink-2 mb-6">
                 Aucun défi précédent trouvé. Pas d&apos;inquiétude, passez directement au cadrage.
               </p>
             )}
             <div className="flex justify-center">
               <button
                 onClick={() => setPhase("cadrage")}
-                className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl"
+                className="btn btn-primary px-6 py-3 text-xl"
               >
                 Passer au cadrage
               </button>
@@ -363,24 +364,24 @@ export default function Defi5Page() {
         {/* Phase B — Cadrage */}
         {phase === "cadrage" && (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-4">
+            <h2 className="text-2xl font-bold text-ink mb-4">
               5 questions de cadrage
             </h2>
 
             {/* Banque d'idées : amorce la réponse « Pour quoi faire ? » */}
-            <details className="mb-6 border-2 border-black">
-              <summary className="cursor-pointer font-bold text-black px-4 py-3 bg-[#F5F5F5]">
-                💡 Banque d&apos;idées — des usages IA vus aujourd&apos;hui, à
+            <details className="mb-6 border border-line ">
+              <summary className="cursor-pointer font-bold text-ink px-4 py-3 bg-surface">
+                Banque d&apos;idées — des usages IA vus aujourd&apos;hui, à
                 adapter à votre service
               </summary>
-              <div className="border-t-2 border-black p-4 flex flex-col gap-4">
-                <p className="text-sm text-[#4A4A4A]">
+              <div className="border-t border-line p-4 flex flex-col gap-4">
+                <p className="text-sm text-ink-2">
                   Cliquez sur une idée pour amorcer la question 2 (« Pour quoi
                   faire ? ») — puis adaptez-la à votre réalité de service.
                 </p>
                 {DEFI5_IDEES.map((group) => (
                   <div key={group.theme}>
-                    <p className="font-bold text-black text-sm mb-2">
+                    <p className="font-bold text-ink text-sm mb-2">
                       {group.theme}
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -397,7 +398,7 @@ export default function Defi5Page() {
                               return next;
                             })
                           }
-                          className="px-3 py-1.5 border-2 border-[#B8B8B8] text-sm text-[#4A4A4A] text-left bg-white hover:border-[#2D5A3D] hover:text-[#2D5A3D]"
+                          className="px-3 py-1.5 border-2 border-line text-sm text-ink-2 text-left bg-white hover:border-brand hover:text-brand"
                         >
                           {idea}
                         </button>
@@ -410,8 +411,8 @@ export default function Defi5Page() {
 
             <div className="flex flex-col gap-6">
               {DEFI5_QUESTIONS.map((q, i) => (
-                <div key={i} className="border-2 border-black p-4">
-                  <label className="font-bold text-black block mb-2">
+                <div key={i} className="border p-4 border-line">
+                  <label className="font-bold text-ink block mb-2">
                     {i + 1}. {q}
                   </label>
                   <textarea
@@ -424,7 +425,7 @@ export default function Defi5Page() {
                       })
                     }
                     rows={3}
-                    className="w-full border-2 border-black p-3 text-black bg-white focus:border-[#2D5A3D] focus:outline-none"
+                    className="field w-full p-3 "
                     placeholder="Votre réponse..."
                   />
                 </div>
@@ -434,7 +435,7 @@ export default function Defi5Page() {
               <button
                 onClick={handleGenerate}
                 disabled={!allAnswered || generating}
-                className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl disabled:opacity-50"
+                className="btn btn-primary px-6 py-3 text-xl disabled:opacity-50"
               >
                 {generating ? "Génération du Pacte..." : "Générer notre Pacte IA"}
               </button>
@@ -446,7 +447,7 @@ export default function Defi5Page() {
         {(phase === "generation" || phase === "vote" || phase === "finalized") &&
           pactOutput && (
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-black mb-4">
+              <h2 className="text-2xl font-bold text-ink mb-4">
                 Votre Pacte IA
               </h2>
 
@@ -458,19 +459,19 @@ export default function Defi5Page() {
               {/* Editable once generated */}
               {phase === "generation" && !generating && (
                 <>
-                  <p className="text-sm text-[#4A4A4A] mb-2">
+                  <p className="text-sm text-ink-2 mb-2">
                     Relisez et <strong>modifiez librement</strong> votre Pacte avant de le valider.
                   </p>
                   <textarea
                     value={pactOutput}
                     onChange={(e) => setPactOutput(e.target.value)}
                     rows={16}
-                    className="w-full border-2 border-black p-4 text-black bg-white focus:border-[#2D5A3D] focus:outline-none font-mono text-sm"
+                    className="field w-full p-4 font-mono text-sm"
                   />
                   <div className="flex justify-center mt-4">
                     <button
                       onClick={handleSavePact}
-                      className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl"
+                      className="btn btn-primary px-6 py-3 text-xl"
                     >
                       Valider le Pacte et voter
                     </button>
@@ -480,7 +481,7 @@ export default function Defi5Page() {
 
               {/* Read-only after validation */}
               {(phase === "vote" || phase === "finalized") && (
-                <div className="border-2 border-black p-6">
+                <div className="border p-6 border-line">
                   <Markdown content={pactOutput} />
                 </div>
               )}
@@ -490,12 +491,12 @@ export default function Defi5Page() {
         {/* Phase C — Vote */}
         {phase === "vote" && (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-4">
+            <h2 className="text-2xl font-bold text-ink mb-4">
               Votez pour les projets des autres équipes
             </h2>
             {otherProjects.length === 0 ? (
-              <div className="border-2 border-[#B8B8B8] p-6 text-center">
-                <p className="text-[#4A4A4A]">
+              <div className="border-2 border-line p-6 text-center">
+                <p className="text-ink-2">
                   Aucune autre équipe n&apos;a encore finalisé son projet.
                   Vous pouvez valider directement.
                 </p>
@@ -503,8 +504,8 @@ export default function Defi5Page() {
             ) : (
               <div className="flex flex-col gap-6">
                 {otherProjects.map((proj) => (
-                  <div key={proj.teamId} className="border-2 border-black p-4">
-                    <h3 className="font-bold text-black mb-2">
+                  <div key={proj.teamId} className="border p-4 border-line">
+                    <h3 className="font-bold text-ink mb-2">
                       Équipe {proj.teamCode}
                     </h3>
                     <div className="text-sm mb-4 max-h-[200px] overflow-y-auto">
@@ -513,7 +514,7 @@ export default function Defi5Page() {
                     <div className="flex gap-4">
                       {VOTE_CATEGORIES.map((cat) => (
                         <div key={cat} className="flex flex-col items-center gap-1">
-                          <span className="text-sm text-[#4A4A4A] capitalize">
+                          <span className="text-sm text-ink-2 capitalize">
                             {cat}
                           </span>
                           <div className="flex gap-1">
@@ -523,11 +524,11 @@ export default function Defi5Page() {
                                 onClick={() => handleVote(proj.teamId, cat, s)}
                                 className={`w-8 h-8 border-2 text-sm font-bold ${
                                   (votes[proj.teamId]?.[cat] ?? 0) >= s
-                                    ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
-                                    : "bg-white border-[#B8B8B8] text-[#B8B8B8]"
+                                    ? "bg-brand border-brand text-white"
+                                    : "bg-white border-line text-muted"
                                 }`}
                               >
-                                ★
+                                <Icon name="star" size={16} />
                               </button>
                             ))}
                           </div>
@@ -552,14 +553,14 @@ export default function Defi5Page() {
         {/* Finalized */}
         {phase === "finalized" && (
           <section className="mb-8">
-            <div className="border-2 border-[#2D5A3D] p-8 text-center mb-6">
-              <p className="text-3xl font-bold text-[#2D5A3D] mb-3">Bravo !</p>
-              <p className="text-xl text-[#4A4A4A]">
+            <div className="border-2 border-brand p-8 text-center mb-6">
+              <p className="text-3xl font-bold text-brand mb-3">Bravo !</p>
+              <p className="text-xl text-ink-2">
                 Votre Pacte IA est finalisé et enregistré.
               </p>
               {teamCode && (
-                <p className="text-[#4A4A4A] mt-3">
-                  Code équipe : <strong className="text-black text-lg">{teamCode}</strong>{" "}
+                <p className="text-ink-2 mt-3">
+                  Code équipe : <strong className="text-ink text-lg">{teamCode}</strong>{" "}
                   — conservez-le pour récupérer votre document.
                 </p>
               )}
@@ -568,7 +569,7 @@ export default function Defi5Page() {
             <div className="flex flex-wrap justify-center gap-4 mb-6">
               <button
                 onClick={() => window.print()}
-                className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D]"
+                className="btn btn-primary px-6 py-3 "
               >
                 Exporter en PDF
               </button>
@@ -576,15 +577,15 @@ export default function Defi5Page() {
                 onClick={() =>
                   downloadMarkdown(`${teamCode || "equipe"}-pacte.md`, pactOutput)
                 }
-                className="px-6 py-3 bg-white text-[#2D5A3D] font-semibold border-2 border-[#2D5A3D]"
+                className="btn btn-secondary px-6 py-3 "
               >
                 Télécharger en .md
               </button>
             </div>
 
             {/* Printable document (isolated by print CSS) */}
-            <div id="printable-pact" className="border-2 border-black p-8">
-              <h1 className="text-2xl font-bold text-black mb-4">
+            <div id="printable-pact" className="border p-8 border-line">
+              <h1 className="text-2xl font-bold text-ink mb-4">
                 Pacte IA{teamCode ? ` — Équipe ${teamCode}` : ""}
               </h1>
               <Markdown content={pactOutput} />

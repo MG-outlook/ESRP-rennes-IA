@@ -105,14 +105,14 @@ export default function GenEPage() {
     return <ChallengeIntro {...intro} onStart={() => setIntroDone(true)} />;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between gap-3 flex-wrap mb-8">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-black">
+            <h1 className="text-3xl sm:text-4xl font-bold text-ink">
               Défi E — La fabrique à idées
             </h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <p className="text-ink-2 mt-2">
               Deux cartes tirées au sort. À vous de faire jaillir l&apos;idée.
             </p>
           </div>
@@ -123,17 +123,17 @@ export default function GenEPage() {
         </div>
 
         <section className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-          <div className="border-2 border-black p-4">
-            <p className="text-xs uppercase tracking-wide text-[#4A4A4A] font-semibold">
+          <div className="border p-4 border-line">
+            <p className="text-xs uppercase tracking-wide text-ink-2 font-semibold">
               Situation
             </p>
-            <p className="text-xl font-bold text-black mt-1">« {situation} »</p>
+            <p className="text-xl font-bold text-ink mt-1">« {situation} »</p>
           </div>
-          <div className="border-2 border-[#2D5A3D] p-4">
-            <p className="text-xs uppercase tracking-wide text-[#4A4A4A] font-semibold">
+          <div className="border-2 border-brand p-4">
+            <p className="text-xs uppercase tracking-wide text-ink-2 font-semibold">
               Contrainte forte
             </p>
-            <p className="text-xl font-bold text-[#2D5A3D] mt-1">« {contrainte} »</p>
+            <p className="text-xl font-bold text-brand mt-1">« {contrainte} »</p>
           </div>
         </section>
 
@@ -141,7 +141,7 @@ export default function GenEPage() {
           <div className="flex justify-center mb-6">
             <button
               onClick={handleGenerate}
-              className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl"
+              className="btn btn-primary px-6 py-3 text-xl"
             >
               Générer 10 idées
             </button>
@@ -150,17 +150,17 @@ export default function GenEPage() {
 
         {(ideas || generating) && (
           <section className="mb-6">
-            <h2 className="text-2xl font-bold text-black mb-3">Les idées de l&apos;IA</h2>
+            <h2 className="text-2xl font-bold text-ink mb-3">Les idées de l&apos;IA</h2>
             <StreamedOutput content={ideas} loading={generating} />
           </section>
         )}
 
         {ideas && !generating && phase === "ideate" && (
           <section className="mb-6">
-            <h2 className="text-2xl font-bold text-black mb-2">
+            <h2 className="text-2xl font-bold text-ink mb-2">
               Votre idée retenue
             </h2>
-            <p className="text-[#4A4A4A] mb-3">
+            <p className="text-ink-2 mb-3">
               Choisissez UNE idée et défendez-la en 3 lignes : à quoi elle sert,
               pour qui, pourquoi elle est réaliste demain.
             </p>
@@ -169,13 +169,13 @@ export default function GenEPage() {
               onChange={(e) => setChosen(e.target.value)}
               rows={5}
               placeholder="Notre idée : …"
-              className="w-full border-2 border-black p-3 text-black focus:border-[#2D5A3D] focus:outline-none"
+              className="field w-full p-3 "
             />
             <div className="flex justify-center mt-4">
               <button
                 onClick={handleEvaluate}
                 disabled={!chosen.trim()}
-                className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl disabled:opacity-50"
+                className="btn btn-primary px-6 py-3 text-xl disabled:opacity-50"
               >
                 Défendre notre idée
               </button>
@@ -186,11 +186,11 @@ export default function GenEPage() {
         {phase === "result" && (
           <section className="mb-8">
             {evaluating && !verdict ? (
-              <p className="text-center text-[#4A4A4A]">Évaluation en cours…</p>
+              <p className="text-center text-ink-2">Évaluation en cours…</p>
             ) : verdict ? (
               <Verdict verdict={verdict} />
             ) : (
-              <p className="text-[#8B3A3A]">Évaluation indisponible.</p>
+              <p className="text-danger">Évaluation indisponible.</p>
             )}
             <div className="flex justify-center mt-6">
               <SubmitButton state={submitState} onClick={handleSubmit} label="Valider" />

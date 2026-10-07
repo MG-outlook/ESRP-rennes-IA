@@ -1,46 +1,205 @@
 @import "tailwindcss";
 
+/*
+ * Campus EPNAK IA — design tokens.
+ * Couleurs reprises du logo Campus EPNAK (bleu roi, cyan, vert), assombries
+ * quand elles portent du texte pour tenir le contraste AA sur fond blanc.
+ * Règle d'usage : le bleu agit (boutons, liens, focus), le vert confirme
+ * (réussite, terminé). Jamais la couleur seule : toujours un mot ou une icône.
+ */
 @theme {
+  --color-*: initial;
+
   --color-white: #FFFFFF;
-  --color-black: #1A1A1A;
-  --color-green: #2D5A3D;
-  --color-green-light: #5B8C6B;
-  --color-gray-900: #1A1A1A;
-  --color-gray-700: #4A4A4A;
-  --color-gray-400: #B8B8B8;
-  --color-gray-100: #F5F5F5;
-  --color-red: #8B3A3A;
+  --color-transparent: transparent;
+  --color-current: currentColor;
 
-  --font-sans: Inter, system-ui, sans-serif;
+  /* Marque */
+  --color-brand: #234395;         /* bleu logo — 9,1:1 sur blanc */
+  --color-brand-strong: #1A3275;  /* survol, texte sur fond bleu clair */
+  --color-brand-soft: #EBF0FA;    /* sélection, information */
+  --color-sky: #00A8E1;           /* cyan logo — décor uniquement */
+  --color-leaf: #3BA847;          /* vert logo — décor uniquement */
 
-  --text-base: 1.125rem;   /* 18px */
+  /* Réussite */
+  --color-success: #24803A;       /* 5,0:1 sur blanc */
+  --color-success-strong: #185C2A;
+  --color-success-soft: #EAF6EC;
+
+  /* Texte et surfaces */
+  --color-ink: #12233B;           /* 15,8:1 */
+  --color-ink-2: #44546A;         /* 7,7:1 — texte secondaire */
+  --color-muted: #5E6B7D;         /* 5,4:1 — aides, légendes */
+  --color-control: #808C9C;       /* 3,4:1 — contours de champs */
+  --color-line: #D5DCE5;          /* filets, bordures de cartes */
+  --color-surface: #F4F7FA;       /* fond de page, blocs */
+
+  /* États */
+  --color-danger: #B42318;
+  --color-danger-strong: #8F1C13;
+  --color-danger-soft: #FDECEA;
+  --color-warning: #8A5300;
+  --color-warning-soft: #FFF4D6;
+  --color-warning-line: #E8C873;
+
+  --font-sans: var(--font-atkinson), "Atkinson Hyperlegible Next", system-ui, sans-serif;
+  --font-mono: var(--font-atkinson-mono), "Atkinson Hyperlegible Mono", ui-monospace, monospace;
+
+  --text-base: 1.125rem;
   --text-xl: 1.25rem;
   --text-2xl: 1.5rem;
-  --text-3xl: 1.875rem;   /* ~30px */
-  --text-4xl: 2.25rem;    /* ~36px — H1 */
-
-  --border-radius: 0;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
 }
 
-*, *::before, *::after {
-  border-radius: 0 !important;
+@layer base {
+  html {
+    font-size: 18px;
+  }
+
+  body {
+    background-color: var(--color-white);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 {
+    line-height: 1.2;
+    font-weight: 800;
+    color: var(--color-ink);
+  }
+  h1 { font-size: 2rem; letter-spacing: -0.01em; }
+  h2 { font-size: 1.556rem; }
+  h3 { font-size: 1.222rem; }
+
+  a {
+    color: var(--color-brand);
+  }
+
+  /* Coins doux par défaut sur les contrôles et les blocs bordés. */
+  button, input, textarea, select {
+    border-radius: 0.5rem;
+  }
+  [class~="border"], [class~="border-2"] {
+    border-radius: 0.75rem;
+  }
+  table[class~="border"], table[class~="border-2"],
+  td[class~="border"], th[class~="border"] {
+    border-radius: 0;
+  }
+
+  ::placeholder {
+    color: var(--color-muted);
+    opacity: 1;
+  }
+
+  :where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+    outline: 3px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
-html {
-  font-size: 18px;
-}
+@layer components {
+  /* Boutons : la classe .btn donne la forme, la variante donne la couleur. */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    border-radius: 0.5rem;
+    border: 2px solid transparent;
+    font-weight: 700;
+    line-height: 1.2;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+  }
+  .btn:disabled, .btn[aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+  .btn-primary {
+    background-color: var(--color-brand);
+    border-color: var(--color-brand);
+    color: var(--color-white);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--color-brand-strong);
+    border-color: var(--color-brand-strong);
+    color: var(--color-white);
+  }
+  .btn-secondary {
+    background-color: var(--color-white);
+    border-color: var(--color-brand);
+    color: var(--color-brand);
+  }
+  .btn-secondary:hover:not(:disabled) {
+    background-color: var(--color-brand-soft);
+    color: var(--color-brand-strong);
+  }
+  .btn-danger {
+    background-color: var(--color-white);
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+  }
+  .btn-danger:hover:not(:disabled) {
+    background-color: var(--color-danger-soft);
+  }
 
-body {
-  background-color: #FFFFFF;
-  color: #1A1A1A;
-  font-family: Inter, system-ui, sans-serif;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-}
+  /* Champs de saisie. */
+  .field {
+    display: block;
+    border: 2px solid var(--color-control);
+    border-radius: 0.5rem;
+    background-color: var(--color-white);
+    color: var(--color-ink);
+    transition: border-color 0.15s;
+  }
+  .field:focus {
+    border-color: var(--color-brand);
+  }
+  .field:disabled {
+    background-color: var(--color-surface);
+    cursor: not-allowed;
+  }
+  .field[aria-invalid="true"] {
+    border-color: var(--color-danger);
+  }
 
-h1 { font-size: 2rem; font-weight: 700; }
-h2 { font-size: 1.556rem; font-weight: 700; }
-h3 { font-size: 1.222rem; font-weight: 700; }
+  /* Pastilles de statut. */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.2rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+
+  /* Bandeau de marque : bleu, cyan, vert du logo. */
+  .brand-stripe {
+    display: flex;
+    height: 4px;
+  }
+  .brand-stripe > span:nth-child(1) { flex: 3; background: var(--color-brand); }
+  .brand-stripe > span:nth-child(2) { flex: 1; background: var(--color-sky); }
+  .brand-stripe > span:nth-child(3) { flex: 1; background: var(--color-leaf); }
+}
 
 @keyframes spin {
   to { transform: rotate(360deg); }
@@ -48,9 +207,9 @@ h3 { font-size: 1.222rem; font-weight: 700; }
 
 .spinner {
   display: inline-block;
-  border: 2px solid #B8B8B8;
-  border-top-color: #2D5A3D;
-  border-radius: 50% !important;
+  border: 2px solid var(--color-line);
+  border-top-color: var(--color-brand);
+  border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
 
@@ -87,13 +246,4 @@ h3 { font-size: 1.222rem; font-weight: 700; }
     border: none !important;
     padding: 0 !important;
   }
-}
-
-a:focus-visible,
-button:focus-visible,
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible {
-  outline: 2px solid #2D5A3D;
-  outline-offset: 2px;
 }

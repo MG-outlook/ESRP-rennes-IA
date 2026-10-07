@@ -22,6 +22,7 @@ import {
 } from "@/lib/ai/prompts";
 import { useAutoSave, useAutoSaveRestore } from "@/lib/hooks/useAutoSave";
 import { useToast } from "@/lib/hooks/useToast";
+import Icon from "@/components/shared/Icon";
 
 const CHALLENGE_ID = 4;
 
@@ -241,14 +242,14 @@ Courriers produits par l'IA :
     );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-black">
+            <h1 className="text-4xl font-bold text-ink">
               Défi 4 — Trois courriers, un seul prompt
             </h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <p className="text-ink-2 mt-2">
               Obtenez les 3 courriers d&apos;un coup. Le bon prompt, les bons documents.
             </p>
           </div>
@@ -263,13 +264,13 @@ Courriers produits par l'IA :
         {/* BRIEF — the hierarchical request */}
         {phase === "brief" && (
           <section className="mb-8">
-            <div className="border-2 border-black p-6 bg-[#F5F5F5] whitespace-pre-line text-black leading-relaxed">
+            <div className="border p-6 bg-surface whitespace-pre-line text-ink leading-relaxed border-line">
               {DEFI4_BRIEF}
             </div>
             <div className="flex justify-center mt-6">
               <button
                 onClick={() => setPhase("compose")}
-                className="px-8 py-4 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl hover:bg-[#234a31] transition-colors"
+                className="btn btn-primary px-8 py-4 text-xl transition-colors"
               >
                 Préparer les courriers
               </button>
@@ -281,10 +282,10 @@ Courriers produits par l'IA :
         {phase === "compose" && (
           <>
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-black mb-2">
+              <h2 className="text-2xl font-bold text-ink mb-2">
                 1. Quels documents donner à l&apos;IA ?
               </h2>
-              <p className="text-[#4A4A4A] mb-4">
+              <p className="text-ink-2 mb-4">
                 L&apos;IA ne verra QUE les documents cochés. Choisissez ceux
                 réellement utiles à ces 3 courriers.
               </p>
@@ -295,23 +296,23 @@ Courriers produits par l'IA :
                     onClick={() => toggleDoc(d.kind)}
                     className={`text-left border-2 p-4 ${
                       selectedDocs[d.kind]
-                        ? "border-[#2D5A3D] bg-[#F0F5F1]"
-                        : "border-black bg-white"
+                        ? "border-brand bg-brand-soft"
+                        : "border-line bg-white"
                     }`}
                   >
-                    <span className="font-bold text-black flex items-center gap-2">
+                    <span className="font-bold text-ink flex items-center gap-2">
                       <span
                         className={`inline-flex items-center justify-center w-5 h-5 border-2 text-xs ${
                           selectedDocs[d.kind]
-                            ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
-                            : "border-black text-transparent"
+                            ? "bg-brand border-brand text-white"
+                            : "border-line text-transparent"
                         }`}
                       >
-                        ✓
+                        <Icon name="check" size={14} strokeWidth={3} />
                       </span>
                       {d.label}
                     </span>
-                    <span className="block text-sm text-[#4A4A4A] mt-1 ml-7">
+                    <span className="block text-sm text-ink-2 mt-1 ml-7">
                       {d.hint}
                     </span>
                   </button>
@@ -320,10 +321,10 @@ Courriers produits par l'IA :
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-black mb-2">
+              <h2 className="text-2xl font-bold text-ink mb-2">
                 2. Votre prompt unique
               </h2>
-              <p className="text-[#4A4A4A] mb-4">
+              <p className="text-ink-2 mb-4">
                 Écrivez UN seul prompt pour obtenir les 3 courriers en même temps
                 (à Camille en langage simple, à la MDPH, à l&apos;entreprise).
                 Soyez précis sur chaque destinataire et le ton attendu.
@@ -334,19 +335,19 @@ Courriers produits par l'IA :
                 disabled={generating}
                 rows={6}
                 placeholder="Ex : À partir des documents fournis, rédige trois courriers distincts pour officialiser le stage de Camille…"
-                className="w-full border-2 border-black p-4 text-black bg-white focus:border-[#2D5A3D] focus:outline-none disabled:opacity-60"
+                className="field w-full p-4 disabled:opacity-60"
               />
               <div className="flex flex-wrap items-center gap-4 mt-4">
                 <button
                   onClick={handleGenerate}
                   disabled={generating || !prompt.trim() || attempts >= DEFI4_MAX_ATTEMPTS}
-                  className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] disabled:opacity-50"
+                  className="btn btn-primary px-6 py-3 disabled:opacity-50"
                 >
                   {attempts === 0
                     ? "Générer les 3 courriers"
                     : `Régénérer (essai ${attempts + 1}/${DEFI4_MAX_ATTEMPTS})`}
                 </button>
-                <span className="text-sm text-[#4A4A4A]">
+                <span className="text-sm text-ink-2">
                   {attemptsLeft > 0
                     ? `${attemptsLeft} essai(s) restant(s)`
                     : "Plus d'essai — validez votre résultat"}
@@ -356,7 +357,7 @@ Courriers produits par l'IA :
 
             {(output || generating) && (
               <section className="mb-8">
-                <h2 className="text-2xl font-bold text-black mb-4">Les 3 courriers</h2>
+                <h2 className="text-2xl font-bold text-ink mb-4">Les 3 courriers</h2>
                 <StreamedOutput content={output} loading={generating} />
                 {output && !generating && (
                   <div className="flex justify-center mt-6">
@@ -375,10 +376,10 @@ Courriers produits par l'IA :
         {/* VERDICT — the AI judge */}
         {phase === "verdict" && (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-4">Le verdict de l&apos;IA</h2>
+            <h2 className="text-2xl font-bold text-ink mb-4">Le verdict de l&apos;IA</h2>
 
             {judging && !verdict && (
-              <div className="flex flex-col items-center gap-3 py-10 text-[#4A4A4A]">
+              <div className="flex flex-col items-center gap-3 py-10 text-ink-2">
                 <span className="spinner spinner-lg" aria-label="Évaluation" />
                 <p className="text-lg font-semibold">L&apos;IA évalue votre travail…</p>
               </div>
@@ -386,30 +387,30 @@ Courriers produits par l'IA :
 
             {verdict && (
               <>
-                <div className="border-2 border-[#2D5A3D] p-6 mb-6 bg-[#F5F5F5] text-center">
-                  <p className="text-5xl font-bold text-[#2D5A3D]">{finalScore}/20</p>
-                  <p className="text-[#4A4A4A] mt-2">{verdict.commentaire}</p>
+                <div className="border-2 border-brand p-6 mb-6 bg-surface text-center">
+                  <p className="text-5xl font-bold text-brand">{finalScore}/20</p>
+                  <p className="text-ink-2 mt-2">{verdict.commentaire}</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-                  <div className="border-2 border-black p-4 text-center">
-                    <div className="text-sm text-[#4A4A4A]">Qualité du prompt</div>
-                    <div className="text-2xl font-bold text-black">{verdict.prompt_quality}/10</div>
+                  <div className="border p-4 text-center border-line">
+                    <div className="text-sm text-ink-2">Qualité du prompt</div>
+                    <div className="text-2xl font-bold text-ink">{verdict.prompt_quality}/10</div>
                   </div>
-                  <div className="border-2 border-black p-4 text-center">
-                    <div className="text-sm text-[#4A4A4A]">Qualité des courriers</div>
-                    <div className="text-2xl font-bold text-black">{verdict.documents_quality}/10</div>
+                  <div className="border p-4 text-center border-line">
+                    <div className="text-sm text-ink-2">Qualité des courriers</div>
+                    <div className="text-2xl font-bold text-ink">{verdict.documents_quality}/10</div>
                   </div>
-                  <div className="border-2 border-[#8B3A3A] p-4 text-center">
-                    <div className="text-sm text-[#4A4A4A]">Malus essais ({attempts})</div>
-                    <div className="text-2xl font-bold text-[#8B3A3A]">−{malus}</div>
+                  <div className="border-2 border-danger p-4 text-center">
+                    <div className="text-sm text-ink-2">Malus essais ({attempts})</div>
+                    <div className="text-2xl font-bold text-danger">−{malus}</div>
                   </div>
                 </div>
 
                 {verdict.conseils?.length > 0 && (
-                  <div className="border-2 border-black p-5 mb-6">
-                    <h3 className="font-bold text-black mb-2">Pour aller plus loin</h3>
-                    <ul className="list-disc pl-6 space-y-1 text-black">
+                  <div className="border p-5 mb-6 border-line">
+                    <h3 className="font-bold text-ink mb-2">Pour aller plus loin</h3>
+                    <ul className="list-disc pl-6 space-y-1 text-ink">
                       {verdict.conseils.map((c, i) => (
                         <li key={i}>{c}</li>
                       ))}

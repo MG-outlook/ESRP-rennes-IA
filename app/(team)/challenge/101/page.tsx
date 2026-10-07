@@ -132,14 +132,14 @@ export default function BonusAPage() {
     );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-black">
+            <h1 className="text-4xl font-bold text-ink">
               Bonus A — Le détective des doublons
             </h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <p className="text-ink-2 mt-2">
               4 rapports sur Camille. Combien d&apos;informations sont répétées ?
             </p>
           </div>
@@ -151,16 +151,16 @@ export default function BonusAPage() {
 
         <section className="mb-8 grid md:grid-cols-2 gap-4">
           {BONUS_A_REPORTS.map((r) => (
-            <article key={r.role} className="border-2 border-black p-4">
-              <h3 className="font-bold text-black mb-2">{r.role}</h3>
-              <p className="text-sm text-[#4A4A4A]">{r.content}</p>
+            <article key={r.role} className="border p-4 border-line">
+              <h3 className="font-bold text-ink mb-2">{r.role}</h3>
+              <p className="text-sm text-ink-2">{r.content}</p>
             </article>
           ))}
         </section>
 
         {!predictionLocked && (
-          <section className="border-2 border-black p-6 mb-8">
-            <h2 className="text-2xl font-bold text-black mb-4">
+          <section className="border p-6 mb-8 border-line">
+            <h2 className="text-2xl font-bold text-ink mb-4">
               Votre pari : combien de doublons ?
             </h2>
             <PredictionWidget
@@ -174,7 +174,7 @@ export default function BonusAPage() {
           <div className="flex justify-center mb-8">
             <button
               onClick={handleAnalyze}
-              className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl"
+              className="btn btn-primary px-6 py-3 text-xl"
             >
               Lancer l&apos;analyse de l&apos;IA
             </button>
@@ -183,7 +183,7 @@ export default function BonusAPage() {
 
         {(generating || analysis) && (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-4">
+            <h2 className="text-2xl font-bold text-ink mb-4">
               Analyse des redondances
             </h2>
             <StreamedOutput content={analysis} loading={generating} />
@@ -191,8 +191,8 @@ export default function BonusAPage() {
         )}
 
         {revealed && (
-          <section className="border-2 border-[#2D5A3D] p-6 mb-8 bg-[#F5F5F5]">
-            <p className="text-black">
+          <section className="border-2 border-brand p-6 mb-8 bg-surface">
+            <p className="text-ink">
               Doublons réels : <strong>{BONUS_A_DOUBLON_COUNT}</strong> — votre
               pari : <strong>{prediction}</strong> (écart {ecart}).
             </p>

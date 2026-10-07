@@ -203,14 +203,14 @@ export default function Uc2Page() {
     return <ChallengeIntro {...intro} onStart={() => setIntroDone(true)} />;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between gap-3 flex-wrap mb-8">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-black">
+            <h1 className="text-3xl sm:text-4xl font-bold text-ink">
               Cas d&apos;usage 2 — Le simulateur d&apos;entretien
             </h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <p className="text-ink-2 mt-2">
               Mettez-vous à la place de la personne accompagnée : testez l&apos;outil.
             </p>
           </div>
@@ -222,8 +222,8 @@ export default function Uc2Page() {
 
         {phase === "select" && (
           <section className="flex flex-col gap-4">
-            <h2 className="text-2xl font-bold text-black">Choisissez la situation</h2>
-            <p className="text-[#4A4A4A]">
+            <h2 className="text-2xl font-bold text-ink">Choisissez la situation</h2>
+            <p className="text-ink-2">
               L&apos;IA joue l&apos;interlocuteur (jury, employeur, RH) — jamais la
               personne accompagnée. C&apos;est vous qui jouez le candidat,
               comme le ferait une personne que vous accompagnez.
@@ -232,10 +232,10 @@ export default function Uc2Page() {
               <button
                 key={s.id}
                 onClick={() => startScenario(s)}
-                className="text-left border-2 border-black p-4 hover:border-[#2D5A3D]"
+                className="text-left border p-4 hover:border-brand border-line"
               >
-                <span className="font-bold text-black text-lg">{s.label}</span>
-                <span className="block text-[#4A4A4A] mt-1">{s.brief}</span>
+                <span className="font-bold text-ink text-lg">{s.label}</span>
+                <span className="block text-ink-2 mt-1">{s.brief}</span>
               </button>
             ))}
           </section>
@@ -243,29 +243,29 @@ export default function Uc2Page() {
 
         {(phase === "chat" || phase === "result") && scenario && (
           <>
-            <p className="text-sm text-[#4A4A4A] mb-2">
-              <strong className="text-black">{scenario.label}</strong> — échange{" "}
+            <p className="text-sm text-ink-2 mb-2">
+              <strong className="text-ink">{scenario.label}</strong> — échange{" "}
               {Math.min(turns, UC2_MAX_TURNS)}/{UC2_MAX_TURNS}
             </p>
 
             {/* Chat */}
-            <div className="border-2 border-black p-4 mb-4 min-h-[280px] max-h-[460px] overflow-y-auto flex flex-col gap-4">
+            <div className="border p-4 mb-4 min-h-[280px] max-h-[460px] overflow-y-auto flex flex-col gap-4 border-line">
               {messages.map((m, i) => (
                 <div key={i}>
-                  <span className="text-xs text-[#B8B8B8]">
+                  <span className="text-xs text-muted">
                     {m.role === "user" ? "Vous (candidat)" : "Interlocuteur"}
                   </span>
                   {m.role === "assistant" ? (
                     <Markdown content={m.content} />
                   ) : (
-                    <p className="text-[#2D5A3D] font-semibold whitespace-pre-wrap">
+                    <p className="text-brand font-semibold whitespace-pre-wrap">
                       {m.content}
                     </p>
                   )}
                 </div>
               ))}
               {streaming && messages[messages.length - 1]?.content === "" && (
-                <span className="text-[#B8B8B8] animate-pulse">
+                <span className="text-muted animate-pulse">
                   L&apos;interlocuteur réfléchit…
                 </span>
               )}
@@ -286,12 +286,12 @@ export default function Uc2Page() {
                     disabled={streaming}
                     placeholder="Votre réponse de candidat… (Entrée pour envoyer, Maj+Entrée pour revenir à la ligne)"
                     rows={3}
-                    className="flex-1 border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-50 resize-none"
+                    className="field flex-1 px-4 py-3 disabled:opacity-50 resize-none"
                   />
                   <button
                     onClick={handleSend}
                     disabled={streaming || !input.trim()}
-                    className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] disabled:opacity-50"
+                    className="btn btn-primary px-6 py-3 disabled:opacity-50"
                   >
                     Envoyer
                   </button>
@@ -300,7 +300,7 @@ export default function Uc2Page() {
                   <div className="flex justify-center mt-4">
                     <button
                       onClick={() => runDebrief(messages)}
-                      className="px-5 py-2 bg-white text-[#2D5A3D] font-semibold border-2 border-[#2D5A3D]"
+                      className="btn btn-secondary px-5 py-2 "
                     >
                       Terminer l&apos;entretien et recevoir le débrief
                     </button>
@@ -311,15 +311,15 @@ export default function Uc2Page() {
 
             {phase === "result" && (
               <section className="mt-4">
-                <h2 className="text-2xl font-bold text-black mb-3">
+                <h2 className="text-2xl font-bold text-ink mb-3">
                   Le débrief du coach
                 </h2>
                 {feedback ? (
-                  <div className="border-2 border-black p-5 mb-5">
+                  <div className="border p-5 mb-5 border-line">
                     <Markdown content={feedback} />
                   </div>
                 ) : (
-                  <p className="text-center text-[#4A4A4A] mb-5">
+                  <p className="text-center text-ink-2 mb-5">
                     Débrief en cours…
                   </p>
                 )}
@@ -327,7 +327,7 @@ export default function Uc2Page() {
 
                 {!evaluating && (
                   <>
-                    <label className="block font-bold text-black mt-6 mb-2">
+                    <label className="block font-bold text-ink mt-6 mb-2">
                       Et maintenant, le regard pro : confieriez-vous cet
                       entraînement à une personne que vous accompagnez ?
                       Quelles précautions ?
@@ -337,7 +337,7 @@ export default function Uc2Page() {
                       onChange={(e) => setAppropriation(e.target.value)}
                       rows={3}
                       placeholder="Ex : oui pour dédramatiser, mais accompagné·e la première fois, et jamais comme seul entraînement…"
-                      className="w-full border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none"
+                      className="field w-full px-4 py-3 "
                     />
                     <div className="flex justify-center mt-6">
                       <SubmitButton

@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
+import Icon from "@/components/shared/Icon";
 
 interface ChallengeIntroProps {
   title: string;
@@ -39,60 +40,102 @@ export default function ChallengeIntro({
   startLabel = "C'est parti",
   onStart,
 }: ChallengeIntroProps) {
-  return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-3xl mx-auto px-6 py-12">
-        <h1 className="text-4xl font-bold text-black">{title}</h1>
-        {subtitle && (
-          <p className="text-[#4A4A4A] mt-3 text-lg italic">{subtitle}</p>
-        )}
-        {objective && (
-          <p className="mt-4 border-l-4 border-[#2D5A3D] bg-[#F0F5F1] px-4 py-3 text-black">
-            <span className="font-bold text-[#2D5A3D]">🎯 Objectif — </span>
-            {objective}
-          </p>
-        )}
-        {pourquoi && (
-          <p className="mt-3 border-l-4 border-black bg-[#F5F5F5] px-4 py-3 text-black">
-            <span className="font-bold text-black">💡 Pourquoi ce défi ? </span>
-            {pourquoi}
-          </p>
-        )}
+  const [kicker, ...rest] = title.split(" — ");
+  const name = rest.join(" — ") || kicker;
 
-        <section className="border-2 border-black p-8 mt-8 bg-[#F5F5F5]">
-          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-            <h2 className="text-2xl font-bold text-black">Comment ça marche</h2>
+  return (
+    <div className="flex-1 bg-white">
+      <div className="max-w-[820px] mx-auto px-6 pt-10 pb-16 flex flex-col gap-9">
+        <div className="flex flex-col gap-3.5">
+          <div className="flex items-center gap-3 flex-wrap text-base">
+            {rest.length > 0 && <span className="font-bold text-brand">{kicker}</span>}
             {duration && (
-              <span className="text-sm font-semibold text-[#2D5A3D] border-2 border-[#2D5A3D] px-3 py-1">
-                ⏱ {duration}
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface text-ink-2">
+                <Icon name="clock" size={16} />
+                {duration}
               </span>
             )}
           </div>
-          <ol className="list-decimal pl-6 space-y-3 text-black text-lg">
+          <h1 className="text-4xl sm:text-5xl leading-[1.1]">{name}</h1>
+          {subtitle && <p className="text-ink-2 text-xl">{subtitle}</p>}
+        </div>
+
+        {(objective || pourquoi) && <IntroBlocks objective={objective} pourquoi={pourquoi} />}
+
+        <section className="flex flex-col gap-5">
+          <h2 className="text-[1.556rem]">Comment ça marche</h2>
+          <ol className="flex flex-col">
             {steps.map((step, i) => (
-              <li key={i}>{step}</li>
+              <li
+                key={i}
+                className="flex gap-5 py-4 border-t border-line last:border-b"
+              >
+                <span className="shrink-0 w-10 h-10 rounded-full bg-brand text-white font-extrabold inline-flex items-center justify-center">
+                  {i + 1}
+                </span>
+                <div className="pt-1.5 text-lg">{step}</div>
+              </li>
             ))}
           </ol>
           {note && (
-            <p className="text-[#4A4A4A] mt-5 italic border-t-2 border-[#E0E0E0] pt-4">
+            <p className="text-ink-2">
+              <strong className="text-ink">À retenir : </strong>
               {note}
             </p>
           )}
-          <div className="flex justify-center mt-6">
-            <button
-              onClick={() => {
-                // Repart en haut de la page du défi : on doit voir le titre et
-                // les instructions, pas atterrir au milieu si l'intro a scrollé.
-                if (typeof window !== "undefined") window.scrollTo(0, 0);
-                onStart();
-              }}
-              className="px-8 py-4 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl hover:bg-[#234a31] transition-colors"
-            >
-              {startLabel}
-            </button>
-          </div>
         </section>
+
+        <div>
+          <button
+            onClick={() => {
+              // Repart en haut de la page du défi : on doit voir le titre et
+              // les instructions, pas atterrir au milieu si l'intro a scrollé.
+              if (typeof window !== "undefined") window.scrollTo(0, 0);
+              onStart();
+            }}
+            className="btn btn-primary min-h-[60px] px-8 text-xl"
+          >
+            {startLabel}
+            <Icon name="arrow-right" />
+          </button>
+        </div>
       </div>
+    </div>
+  );
+}
+
+/** Blocs « Objectif » et « Pourquoi ce défi ? », partagés avec le rappel des consignes. */
+export function IntroBlocks({
+  objective,
+  pourquoi,
+  compact = false,
+}: {
+  objective?: string;
+  pourquoi?: string;
+  compact?: boolean;
+}) {
+  const pad = compact ? "p-4" : "p-6";
+  const text = compact ? "" : "text-lg";
+  return (
+    <div className="grid gap-4 sm:grid-cols-[repeat(auto-fit,minmax(min(100%,280px),1fr))]">
+      {objective && (
+        <section className={`flex flex-col gap-2 ${pad} rounded-xl bg-success-soft`}>
+          <h2 className="flex items-center gap-2.5 text-lg text-success-strong">
+            <Icon name="target" size={22} />
+            Objectif
+          </h2>
+          <p className={text}>{objective}</p>
+        </section>
+      )}
+      {pourquoi && (
+        <section className={`flex flex-col gap-2 ${pad} rounded-xl bg-brand-soft`}>
+          <h2 className="flex items-center gap-2.5 text-lg text-brand-strong">
+            <Icon name="help" size={22} />
+            Pourquoi ce défi ?
+          </h2>
+          <p className={text}>{pourquoi}</p>
+        </section>
+      )}
     </div>
   );
 }

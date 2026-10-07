@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import PauseOverlay from "@/components/PauseOverlay";
 import DegradedBanner from "@/components/shared/DegradedBanner";
 import ChallengeNavigator from "@/components/ChallengeNavigator";
+import { TeamHeader } from "@/components/shared/Brand";
 
 export const metadata: Metadata = {
   title: "Défis",
@@ -35,12 +36,20 @@ export default async function TeamLayout({
     redirect("/");
   }
 
+  // Code affiché dans l'en-tête. Si la lecture est refusée (RLS), on s'en passe.
+  const { data: team } = await supabase
+    .from("teams")
+    .select("code")
+    .eq("id", session.team_id)
+    .maybeSingle();
+
   return (
     <>
       <ChallengeNavigator />
+      <TeamHeader teamCode={team?.code ?? null} />
       <DegradedBanner />
       <PauseOverlay />
-      {children}
+      <div className="flex-1 flex flex-col">{children}</div>
     </>
   );
 }

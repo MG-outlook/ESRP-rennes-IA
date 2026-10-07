@@ -194,13 +194,13 @@ export default function Defi1Page() {
   );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-5xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-black">Défi 1 — La Pré-admission</h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <h1 className="text-4xl font-bold text-ink">Défi 1 — La Pré-admission</h1>
+            <p className="text-ink-2 mt-2">
               Le dossier de Camille vient d&apos;arriver. Que voit chaque métier dans le même dossier ?
             </p>
           </div>
@@ -214,9 +214,9 @@ export default function Defi1Page() {
 
         {/* INTRO — explain the game */}
         {phase === "intro" && (
-          <section className="border-2 border-black p-8 mb-8 bg-[#F5F5F5]">
-            <h2 className="text-2xl font-bold text-black mb-4">Comment ça marche</h2>
-            <ol className="list-decimal pl-6 space-y-3 text-black text-lg">
+          <section className="border p-8 mb-8 bg-surface border-line">
+            <h2 className="text-2xl font-bold text-ink mb-4">Comment ça marche</h2>
+            <ol className="list-decimal pl-6 space-y-3 text-ink text-lg">
               <li>
                 <strong>Lisez le dossier de Camille</strong> — trois documents :
                 un courrier MDPH, une lettre de motivation et une fiche médicale.
@@ -236,7 +236,7 @@ export default function Defi1Page() {
                 votre estimation est proche, mieux c&apos;est&nbsp;!
               </li>
             </ol>
-            <p className="text-[#4A4A4A] mt-5 italic">
+            <p className="text-ink-2 mt-5 italic">
               L&apos;idée du jeu : découvrir que chaque métier voit des choses
               différentes dans le même dossier — et ce que l&apos;on rate quand on
               le lit seul·e.
@@ -244,7 +244,7 @@ export default function Defi1Page() {
             <div className="flex justify-center mt-6">
               <button
                 onClick={() => setPhase("documents")}
-                className="px-8 py-4 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl hover:bg-[#234a31] transition-colors"
+                className="btn btn-primary px-8 py-4 text-xl transition-colors"
               >
                 C&apos;est parti
               </button>
@@ -255,7 +255,7 @@ export default function Defi1Page() {
         {/* DOCUMENTS */}
         {phase !== "intro" && (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-4">Le dossier de Camille</h2>
+            <h2 className="text-2xl font-bold text-ink mb-4">Le dossier de Camille</h2>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               <DocumentCamille kind="mdph_letter" />
               <DocumentCamille kind="motivation_letter" />
@@ -268,7 +268,7 @@ export default function Defi1Page() {
           <div className="flex justify-center mb-8">
             <button
               onClick={() => setPhase("prediction")}
-              className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl"
+              className="btn btn-primary px-6 py-3 text-xl"
             >
               Nous avons lu — Faire nos paris
             </button>
@@ -278,19 +278,19 @@ export default function Defi1Page() {
         {/* PREDICTION */}
         {(phase === "prediction" || phase === "generation" || phase === "results") && (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-2">
+            <h2 className="text-2xl font-bold text-ink mb-2">
               Votre pari : combien d&apos;infos utiles par métier ?
             </h2>
-            <p className="text-[#4A4A4A] mb-5">
+            <p className="text-ink-2 mb-5">
               Pour chaque métier représenté, estimez le nombre d&apos;informations
               du dossier réellement utiles à ce regard (de 0 à 10).
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {betRoles.map((role) => (
-                <div key={role} className="border-2 border-black p-4">
-                  <h3 className="font-bold text-black mb-3">{ROLE_LABELS[role]}</h3>
+                <div key={role} className="border p-4 border-line">
+                  <h3 className="font-bold text-ink mb-3">{ROLE_LABELS[role]}</h3>
                   <div className="flex items-center gap-4">
-                    <span className="text-[#4A4A4A] w-6 text-right">0</span>
+                    <span className="text-ink-2 w-6 text-right">0</span>
                     <input
                       type="range"
                       min={0}
@@ -303,11 +303,11 @@ export default function Defi1Page() {
                           [role]: Number(e.target.value),
                         }))
                       }
-                      className="flex-1 accent-[#2D5A3D]"
+                      className="flex-1 accent-brand"
                       aria-label={`Pari pour ${ROLE_LABELS[role]}`}
                     />
-                    <span className="text-[#4A4A4A] w-6">10</span>
-                    <span className="text-2xl font-bold text-[#2D5A3D] w-8 text-center">
+                    <span className="text-ink-2 w-6">10</span>
+                    <span className="text-2xl font-bold text-brand w-8 text-center">
                       {predictions[role]}
                     </span>
                   </div>
@@ -318,7 +318,7 @@ export default function Defi1Page() {
               <div className="flex justify-center mt-6">
                 <button
                   onClick={handleLockPrediction}
-                  className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl"
+                  className="btn btn-primary px-6 py-3 text-xl"
                 >
                   Verrouiller nos paris et lancer l&apos;IA
                 </button>
@@ -330,7 +330,7 @@ export default function Defi1Page() {
         {/* AI OUTPUT */}
         {(phase === "generation" || phase === "results") && (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-4">La fiche de synthèse de l&apos;IA</h2>
+            <h2 className="text-2xl font-bold text-ink mb-4">La fiche de synthèse de l&apos;IA</h2>
             <StreamedOutput content={aiOutput} loading={generating} />
           </section>
         )}
@@ -338,8 +338,8 @@ export default function Defi1Page() {
         {/* RESULTS — la Vérité */}
         {phase === "results" && (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-2">La Vérité</h2>
-            <p className="text-[#4A4A4A] mb-5">
+            <h2 className="text-2xl font-bold text-ink mb-2">La Vérité</h2>
+            <p className="text-ink-2 mb-5">
               Voici les informations réellement présentes dans le dossier, métier
               par métier. Comparez avec vos paris.
             </p>
@@ -349,16 +349,16 @@ export default function Defi1Page() {
                 const actual = t.facts.length;
                 const gap = Math.abs(bet - actual);
                 return (
-                  <div key={t.role} className="border-2 border-black p-5">
+                  <div key={t.role} className="border p-5 border-line">
                     <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-                      <h3 className="font-bold text-black text-lg">{t.label}</h3>
-                      <p className="text-sm text-[#4A4A4A]">
-                        Votre pari : <strong className="text-black">{bet}</strong> —
-                        Réel : <strong className="text-[#2D5A3D]">{actual}</strong> —
-                        Écart : <strong className={gap <= 1 ? "text-[#2D5A3D]" : "text-[#8B3A3A]"}>{gap}</strong>
+                      <h3 className="font-bold text-ink text-lg">{t.label}</h3>
+                      <p className="text-sm text-ink-2">
+                        Votre pari : <strong className="text-ink">{bet}</strong> —
+                        Réel : <strong className="text-brand">{actual}</strong> —
+                        Écart : <strong className={gap <= 1 ? "text-success" : "text-danger"}>{gap}</strong>
                       </p>
                     </div>
-                    <ul className="list-disc pl-6 space-y-1 text-black">
+                    <ul className="list-disc pl-6 space-y-1 text-ink">
                       {t.facts.map((f, i) => (
                         <li key={i}>{f}</li>
                       ))}
@@ -367,11 +367,11 @@ export default function Defi1Page() {
                 );
               })}
             </div>
-            <div className="border-2 border-[#2D5A3D] bg-[#F5F5F5] p-5 mt-5 text-center">
-              <p className="text-black text-lg">
-                Écart total : <strong className="text-2xl text-[#2D5A3D]">{totalGap}</strong>
+            <div className="border-2 border-brand bg-surface p-5 mt-5 text-center">
+              <p className="text-ink text-lg">
+                Écart total : <strong className="text-2xl text-brand">{totalGap}</strong>
               </p>
-              <p className="text-[#4A4A4A] mt-1">
+              <p className="text-ink-2 mt-1">
                 {totalGap <= 3
                   ? "Excellente lecture du dossier — votre équipe a l'œil !"
                   : totalGap <= 7

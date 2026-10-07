@@ -129,14 +129,14 @@ export default function BonusCPage() {
     );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-black">
+            <h1 className="text-4xl font-bold text-ink">
               Bonus C — La pièce manquante
             </h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <p className="text-ink-2 mt-2">
               Un RAPO pour Camille, en version officielle et en FALC
             </p>
           </div>
@@ -154,10 +154,10 @@ export default function BonusCPage() {
 
         {/* Situation input */}
         <section className="mb-8">
-          <h2 className="text-2xl font-bold text-black mb-4">
+          <h2 className="text-2xl font-bold text-ink mb-4">
             Décrivez la situation
           </h2>
-          <p className="text-[#4A4A4A] mb-3">
+          <p className="text-ink-2 mb-3">
             Choisissez une situation réelle comme point de départ — puis{" "}
             <strong>adaptez-la</strong> : précisez, ajoutez des références du
             dossier, reformulez avec vos mots.
@@ -171,12 +171,12 @@ export default function BonusCPage() {
                 disabled={!!rapoOutput || generating}
                 className={`border-2 p-3 text-left disabled:opacity-50 ${
                   situation === s.text
-                    ? "border-[#2D5A3D] bg-[#F0F5F1]"
-                    : "border-black bg-white hover:border-[#2D5A3D]"
+                    ? "border-brand bg-brand-soft"
+                    : "border-line bg-white hover:border-brand"
                 }`}
               >
-                <p className="font-bold text-black text-sm mb-1">{s.label}</p>
-                <p className="text-xs text-[#4A4A4A] line-clamp-3">{s.text}</p>
+                <p className="font-bold text-ink text-sm mb-1">{s.label}</p>
+                <p className="text-xs text-ink-2 line-clamp-3">{s.text}</p>
               </button>
             ))}
           </div>
@@ -186,7 +186,7 @@ export default function BonusCPage() {
             disabled={!!rapoOutput || generating}
             placeholder="Exemple : Camille a reçu un refus de renouvellement RQTH malgré un avis favorable du médecin..."
             rows={4}
-            className="w-full border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-50 resize-none"
+            className="field w-full px-4 py-3 disabled:opacity-50 resize-none"
           />
         </section>
 
@@ -196,7 +196,7 @@ export default function BonusCPage() {
             <button
               onClick={handleGenerate}
               disabled={!situation.trim()}
-              className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl disabled:opacity-50"
+              className="btn btn-primary px-6 py-3 text-xl disabled:opacity-50"
             >
               Générer le RAPO
             </button>
@@ -207,13 +207,13 @@ export default function BonusCPage() {
         {(rapoOutput || falcOutput || generating) && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <section>
-              <h2 className="text-2xl font-bold text-black mb-4">
+              <h2 className="text-2xl font-bold text-ink mb-4">
                 RAPO officiel
               </h2>
               <StreamedOutput content={rapoOutput} loading={generating && !rapoOutput} />
             </section>
             <section>
-              <h2 className="text-2xl font-bold text-black mb-4">
+              <h2 className="text-2xl font-bold text-ink mb-4">
                 Version FALC
               </h2>
               <StreamedOutput content={falcOutput} loading={generating && !falcOutput} />

@@ -21,6 +21,7 @@ import {
 } from "@/lib/ai/prompts";
 import { useAutoSave, useAutoSaveRestore } from "@/lib/hooks/useAutoSave";
 import { useToast } from "@/lib/hooks/useToast";
+import Icon from "@/components/shared/Icon";
 
 const CHALLENGE_ID = 3;
 
@@ -73,7 +74,7 @@ export default function Defi3Page() {
       setCurrentCase(restoredProgress.currentCase);
       setSelectedBiases(restoredProgress.selectedBiases);
       setRewrittenPrompt(restoredProgress.rewrittenPrompt);
-      showToast("Brouillon restaure", "info");
+      showToast("Brouillon restauré", "info");
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -252,14 +253,14 @@ export default function Defi3Page() {
     );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-5xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-black">
+            <h1 className="text-4xl font-bold text-ink">
               Défi 3 — La Chasse aux mauvais prompts
             </h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <p className="text-ink-2 mt-2">
               Identifiez les biais dans les réponses IA, puis réécrivez le prompt
             </p>
           </div>
@@ -278,10 +279,10 @@ export default function Defi3Page() {
                 key={i}
                 className={`h-2 flex-1 ${
                   i < currentCase
-                    ? "bg-[#2D5A3D]"
+                    ? "bg-brand"
                     : i === currentCase
-                      ? "bg-[#5B8C6B]"
-                      : "bg-[#B8B8B8]"
+                      ? "bg-success"
+                      : "bg-control"
                 }`}
               />
             ))}
@@ -292,19 +293,19 @@ export default function Defi3Page() {
         {phase !== "results" && currentCaseData && (
           <>
             <section className="mb-6">
-              <h2 className="text-2xl font-bold text-black mb-2">
+              <h2 className="text-2xl font-bold text-ink mb-2">
                 {currentCaseData.title}
               </h2>
-              <div className="border-2 border-[#8B3A3A] p-4 mb-4 bg-[#F5F5F5]">
-                <p className="text-sm text-[#8B3A3A] font-bold mb-1">
+              <div className="border-2 border-danger p-4 mb-4 bg-surface">
+                <p className="text-sm text-danger font-bold mb-1">
                   Le mauvais prompt :
                 </p>
-                <p className="text-black italic">
+                <p className="text-ink italic">
                   &quot;{currentCaseData.bad_prompt}&quot;
                 </p>
               </div>
-              <div className="border-2 border-black p-6">
-                <h3 className="font-bold text-black mb-2">
+              <div className="border p-6 border-line">
+                <h3 className="font-bold text-ink mb-2">
                   Réponse de l&apos;IA :
                 </h3>
                 {cachedResponse ? (
@@ -323,12 +324,12 @@ export default function Defi3Page() {
             {/* Bias identification */}
             {phase === "case" && (
               <section className="mb-6">
-                <h2 className="text-2xl font-bold text-black mb-2">
+                <h2 className="text-2xl font-bold text-ink mb-2">
                   Quels biais repérez-vous ?
                 </h2>
                 <div className="mb-2">
                   {DEFI3_BIAS_CATEGORIES.map((b) => (
-                    <span key={b.id} className="text-sm text-[#4A4A4A] mr-4">
+                    <span key={b.id} className="text-sm text-ink-2 mr-4">
                       <strong>{b.label}</strong> : {b.desc}
                     </span>
                   ))}
@@ -348,32 +349,32 @@ export default function Defi3Page() {
             {/* Reveal — the answer + explanation on the bias */}
             {phase === "reveal" && (
               <section className="mb-6">
-                <h2 className="text-2xl font-bold text-black mb-4">
+                <h2 className="text-2xl font-bold text-ink mb-4">
                   La réponse : les biais de ce prompt
                 </h2>
-                <div className="border-2 border-[#2D5A3D] p-5 mb-4 bg-[#F5F5F5]">
-                  <p className="text-sm text-[#4A4A4A] mb-2 font-semibold uppercase tracking-wide">
+                <div className="border-2 border-brand p-5 mb-4 bg-surface">
+                  <p className="text-sm text-ink-2 mb-2 font-semibold uppercase tracking-wide">
                     Biais réellement présents
                   </p>
                   <div className="flex flex-wrap gap-2 mb-4">
                     {currentCaseData.expected_biases.map((b) => (
                       <span
                         key={b}
-                        className="text-sm px-3 py-1 border-2 border-[#2D5A3D] text-[#2D5A3D] font-semibold"
+                        className="badge bg-brand-soft text-brand-strong "
                       >
                         {BIAS_LABELS[b] ?? b.replace(/_/g, " ")}
-                        {selectedBiases.includes(b) ? " ✓" : ""}
+                        {selectedBiases.includes(b) ? <Icon name="check" size={16} strokeWidth={3} /> : null}
                       </span>
                     ))}
                   </div>
-                  <p className="text-black leading-relaxed">
+                  <p className="text-ink leading-relaxed">
                     {currentCaseData.explanation}
                   </p>
                 </div>
 
                 {/* Feedback on the team's guess */}
                 <div className="mb-4">
-                  <p className="text-sm text-[#4A4A4A]">
+                  <p className="text-sm text-ink-2">
                     Votre pari :{" "}
                     {selectedBiases.length === 0 ? (
                       <em>aucun biais sélectionné</em>
@@ -383,8 +384,8 @@ export default function Defi3Page() {
                           key={b}
                           className={`text-sm px-2 py-0.5 border mr-1 ${
                             currentCaseData.expected_biases.includes(b)
-                              ? "border-[#2D5A3D] text-[#2D5A3D]"
-                              : "border-[#8B3A3A] text-[#8B3A3A]"
+                              ? "border-success text-success"
+                              : "border-danger text-danger"
                           }`}
                         >
                           {BIAS_LABELS[b] ?? b.replace(/_/g, " ")}
@@ -397,7 +398,7 @@ export default function Defi3Page() {
                 <div className="flex justify-center">
                   <button
                     onClick={() => setPhase("rewrite")}
-                    className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D]"
+                    className="btn btn-primary px-6 py-3 "
                   >
                     Réécrire le prompt
                   </button>
@@ -408,10 +409,10 @@ export default function Defi3Page() {
             {/* Rewrite phase */}
             {phase === "rewrite" && (
               <section className="mb-6">
-                <h2 className="text-2xl font-bold text-black mb-2">
+                <h2 className="text-2xl font-bold text-ink mb-2">
                   Réécrivez le prompt
                 </h2>
-                <p className="text-[#4A4A4A] mb-4">
+                <p className="text-ink-2 mb-4">
                   Corrigez le prompt pour éliminer les biais identifiés.
                 </p>
                 <textarea
@@ -419,13 +420,13 @@ export default function Defi3Page() {
                   onChange={(e) => setRewrittenPrompt(e.target.value)}
                   placeholder="Votre prompt amélioré..."
                   rows={4}
-                  className="w-full border-2 border-black p-4 text-black bg-white focus:border-[#2D5A3D] focus:outline-none mb-4"
+                  className="field w-full p-4 mb-4"
                 />
                 <div className="flex gap-4 mb-4">
                   <button
                     onClick={handleRewrite}
                     disabled={rewriting || !rewrittenPrompt.trim()}
-                    className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] disabled:opacity-50"
+                    className="btn btn-primary px-6 py-3 disabled:opacity-50"
                   >
                     {rewriting ? "Génération..." : "Tester le nouveau prompt"}
                   </button>
@@ -439,7 +440,7 @@ export default function Defi3Page() {
                   <div className="flex justify-center mt-4">
                     <button
                       onClick={handleNextCase}
-                      className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D]"
+                      className="btn btn-primary px-6 py-3 "
                     >
                       {currentCase < DEFI3_CASES.length - 1
                         ? "Cas suivant"
@@ -455,28 +456,28 @@ export default function Defi3Page() {
         {/* Results */}
         {phase === "results" && (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-4">Résultats</h2>
-            <div className="border-2 border-black p-6 mb-6">
-              <p className="text-4xl font-bold text-[#2D5A3D] mb-2">
+            <h2 className="text-2xl font-bold text-ink mb-4">Résultats</h2>
+            <div className="border p-6 mb-6 border-line">
+              <p className="text-4xl font-bold text-brand mb-2">
                 Score : {computeScore()} points
               </p>
-              <p className="text-[#4A4A4A]">
+              <p className="text-ink-2">
                 +2 par biais correctement identifié, -1 par biais manqué ou faux positif
               </p>
             </div>
 
             {caseResults.map((result, i) => (
-              <div key={i} className="border-2 border-[#B8B8B8] p-4 mb-3">
-                <h3 className="font-bold text-black">{DEFI3_CASES[i].title}</h3>
+              <div key={i} className="border-2 border-line p-4 mb-3">
+                <h3 className="font-bold text-ink">{DEFI3_CASES[i].title}</h3>
                 <div className="flex gap-2 mt-2">
-                  <span className="text-sm text-[#4A4A4A]">Vos choix :</span>
+                  <span className="text-sm text-ink-2">Vos choix :</span>
                   {result.selectedBiases.map((b) => (
                     <span
                       key={b}
                       className={`text-sm px-2 py-0.5 border ${
                         (DEFI3_CASES[i].expected_biases as readonly string[]).includes(b)
-                          ? "border-[#2D5A3D] text-[#2D5A3D]"
-                          : "border-[#8B3A3A] text-[#8B3A3A]"
+                          ? "border-success text-success"
+                          : "border-danger text-danger"
                       }`}
                     >
                       {b.replace(/_/g, " ")}
@@ -484,11 +485,11 @@ export default function Defi3Page() {
                   ))}
                 </div>
                 <div className="flex gap-2 mt-1">
-                  <span className="text-sm text-[#4A4A4A]">Attendus :</span>
+                  <span className="text-sm text-ink-2">Attendus :</span>
                   {DEFI3_CASES[i].expected_biases.map((b) => (
                     <span
                       key={b}
-                      className="text-sm px-2 py-0.5 border border-[#2D5A3D] text-[#2D5A3D]"
+                      className="text-sm px-2 py-0.5 border border-brand text-brand"
                     >
                       {b.replace(/_/g, " ")}
                     </span>
@@ -498,11 +499,11 @@ export default function Defi3Page() {
             ))}
 
             {/* Bonus question */}
-            <div className="border-2 border-[#2D5A3D] p-6 mt-8 mb-6">
-              <p className="text-xs font-bold text-[#2D5A3D] uppercase tracking-widest mb-2">
+            <div className="border-2 border-brand p-6 mt-8 mb-6">
+              <p className="text-xs font-bold text-brand uppercase tracking-widest mb-2">
                 Question bonus
               </p>
-              <h3 className="text-xl font-bold text-black mb-4">
+              <h3 className="text-xl font-bold text-ink mb-4">
                 {DEFI3_BONUS.question}
               </h3>
               <div className="flex flex-col gap-2">
@@ -514,17 +515,17 @@ export default function Defi3Page() {
                       key={opt.id}
                       onClick={() => !bonusRevealed && setBonusAnswer(opt.id)}
                       disabled={bonusRevealed}
-                      className={`text-left px-4 py-3 border-2 font-medium ${
+                      className={`btn text-left px-4 py-3 border-2 font-medium ${
                         bonusRevealed && isCorrect
-                          ? "border-[#2D5A3D] bg-[#F0F5F1] text-[#2D5A3D]"
+                          ? "border-brand bg-brand-soft text-brand"
                           : bonusRevealed && selected && !isCorrect
-                          ? "border-[#8B3A3A] bg-[#F8F0F0] text-[#8B3A3A]"
+                          ? "border-danger bg-danger-soft text-danger"
                           : selected
-                          ? "border-[#2D5A3D] bg-[#2D5A3D] text-white"
-                          : "border-black bg-white text-black"
+                          ? "border-brand bg-brand text-white"
+                          : "border-line bg-white text-ink"
                       } disabled:cursor-default`}
                     >
-                      {bonusRevealed && isCorrect ? "✓ " : ""}
+                      {bonusRevealed && isCorrect ? <Icon name="check" size={16} strokeWidth={3} /> : null}
                       {opt.label}
                     </button>
                   );
@@ -534,18 +535,18 @@ export default function Defi3Page() {
                 <button
                   onClick={() => setBonusRevealed(true)}
                   disabled={!bonusAnswer}
-                  className="mt-4 px-5 py-2 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] disabled:opacity-50"
+                  className="btn btn-primary mt-4 px-5 py-2 disabled:opacity-50"
                 >
                   Valider ma réponse
                 </button>
               ) : (
-                <div className="mt-4 border-t-2 border-[#E0E0E0] pt-4">
-                  <p className="font-bold text-black mb-1">
+                <div className="mt-4 border-t-2 border-line pt-4">
+                  <p className="font-bold text-ink mb-1">
                     {bonusAnswer === DEFI3_BONUS.correctId
-                      ? "✓ Bien vu !"
+                      ? "Bien vu !"
                       : "La bonne réponse était la première."}
                   </p>
-                  <p className="text-[#4A4A4A] leading-relaxed">
+                  <p className="text-ink-2 leading-relaxed">
                     {DEFI3_BONUS.explanation}
                   </p>
                 </div>

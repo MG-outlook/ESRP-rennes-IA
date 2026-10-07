@@ -21,6 +21,7 @@ import {
   finishChallenge,
 } from "@/lib/challenges/general-helpers";
 import { parseJsonObject } from "@/lib/challenges/general-pure";
+import Icon from "@/components/shared/Icon";
 
 const CHALLENGE_ID = 304;
 
@@ -151,14 +152,14 @@ export default function Uc4Page() {
   const attemptsLeft = UC4_MAX_ATTEMPTS - attempts;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between gap-3 flex-wrap mb-8">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-black">
+            <h1 className="text-3xl sm:text-4xl font-bold text-ink">
               Cas d&apos;usage 4 — La synthèse d&apos;accueil du copil
             </h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <p className="text-ink-2 mt-2">
               3 réunions d&apos;avance à rattraper. Un prompt pour tout transmettre.
             </p>
           </div>
@@ -168,9 +169,9 @@ export default function Uc4Page() {
           </div>
         </div>
 
-        <section className="mb-8 border-2 border-[#2D5A3D] p-5 bg-[#F0F5F1]">
-          <p className="text-sm font-bold text-[#2D5A3D] mb-1">LA SITUATION</p>
-          <p className="text-black leading-relaxed">
+        <section className="mb-8 border-2 border-brand p-5 bg-brand-soft">
+          <p className="text-sm font-bold text-brand mb-1">LA SITUATION</p>
+          <p className="text-ink leading-relaxed">
             Un nouveau membre rejoint le copil « IA à l&apos;ESRP » au copil n°4
             (17 septembre). Il doit arriver à niveau : décisions prises, actions
             en cours, points en suspens. Choisissez les bonnes pièces dans le
@@ -182,10 +183,10 @@ export default function Uc4Page() {
 
         {/* Fond documentaire */}
         <section className="mb-8">
-          <h2 className="text-2xl font-bold text-black mb-2">
+          <h2 className="text-2xl font-bold text-ink mb-2">
             Le fond documentaire ({UC4_DOCS.length} pièces)
           </h2>
-          <p className="text-[#4A4A4A] mb-4">
+          <p className="text-ink-2 mb-4">
             Cliquez sur un titre pour lire la pièce. L&apos;IA ne verra que ce
             que vous cochez.
           </p>
@@ -194,7 +195,7 @@ export default function Uc4Page() {
               <div
                 key={d.id}
                 className={`border-2 ${
-                  selected[d.id] ? "border-[#2D5A3D] bg-[#F0F5F1]" : "border-black"
+                  selected[d.id] ? "border-brand bg-brand-soft" : "border-line"
                 }`}
               >
                 <div className="flex items-center gap-3 p-3">
@@ -205,18 +206,18 @@ export default function Uc4Page() {
                       setSelected((prev) => ({ ...prev, [d.id]: e.target.checked }))
                     }
                     disabled={phase === "result"}
-                    className="w-5 h-5 accent-[#2D5A3D] shrink-0"
+                    className="w-5 h-5 accent-brand shrink-0"
                   />
                   <button
                     type="button"
                     onClick={() => setOpenDoc(openDoc === d.id ? null : d.id)}
-                    className="flex-1 text-left font-semibold text-black hover:text-[#2D5A3D]"
+                    className="flex-1 text-left font-semibold text-ink hover:text-brand"
                   >
                     {d.title}
                   </button>
                 </div>
                 {openDoc === d.id && (
-                  <p className="px-4 pb-4 text-sm text-[#4A4A4A] whitespace-pre-line border-t border-[#E0E0E0] pt-3">
+                  <p className="px-4 pb-4 text-sm text-ink-2 whitespace-pre-line border-t border-line pt-3">
                     {d.content}
                   </p>
                 )}
@@ -227,10 +228,10 @@ export default function Uc4Page() {
 
         {phase === "compose" && (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-2">
+            <h2 className="text-2xl font-bold text-ink mb-2">
               Votre prompt — c&apos;est lui qui fait tout
             </h2>
-            <p className="text-[#4A4A4A] mb-3">
+            <p className="text-ink-2 mb-3">
               Pensez : pour qui ? quel format ? que doit couvrir la note
               (décisions, actions, points en suspens) ? qu&apos;est-il interdit
               d&apos;inventer ? Vous avez {UC4_MAX_ATTEMPTS} essais.
@@ -241,10 +242,10 @@ export default function Uc4Page() {
               rows={4}
               disabled={generating}
               placeholder="Rédige une note d'accueil pour le nouveau membre du copil…"
-              className="w-full border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-50"
+              className="field w-full px-4 py-3 disabled:opacity-50"
             />
             <div className="flex items-center justify-between gap-3 mt-3 flex-wrap">
-              <span className="text-sm text-[#4A4A4A]">
+              <span className="text-sm text-ink-2">
                 {attemptsLeft > 0
                   ? `Essais restants : ${attemptsLeft}/${UC4_MAX_ATTEMPTS}`
                   : "Plus d'essai disponible — faites évaluer votre note."}
@@ -258,7 +259,7 @@ export default function Uc4Page() {
                     !prompt.trim() ||
                     attempts >= UC4_MAX_ATTEMPTS
                   }
-                  className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-lg disabled:opacity-50"
+                  className="btn btn-primary px-6 py-3 text-lg disabled:opacity-50"
                 >
                   {generating
                     ? "Génération…"
@@ -267,7 +268,7 @@ export default function Uc4Page() {
                 {output && !generating && (
                   <button
                     onClick={handleEvaluate}
-                    className="px-6 py-3 bg-white text-[#2D5A3D] font-semibold border-2 border-[#2D5A3D] text-lg"
+                    className="btn btn-secondary px-6 py-3 text-lg"
                   >
                     Faire évaluer cette note →
                   </button>
@@ -277,7 +278,7 @@ export default function Uc4Page() {
 
             {(output || generating) && (
               <div className="mt-6">
-                <h3 className="font-bold text-black mb-2">La note d&apos;accueil produite</h3>
+                <h3 className="font-bold text-ink mb-2">La note d&apos;accueil produite</h3>
                 <StreamedOutput content={output} loading={generating} />
               </div>
             )}
@@ -287,15 +288,15 @@ export default function Uc4Page() {
         {phase === "result" && (
           <>
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-black mb-2">
+              <h2 className="text-2xl font-bold text-ink mb-2">
                 La note d&apos;accueil retenue
               </h2>
               <StreamedOutput content={output} loading={false} />
             </section>
 
             {/* Révélation des pièces */}
-            <section className="mb-8 border-2 border-[#2D5A3D] p-5">
-              <h2 className="text-2xl font-bold text-black mb-3">
+            <section className="mb-8 border-2 border-brand p-5">
+              <h2 className="text-2xl font-bold text-ink mb-3">
                 La révélation : les pièces
               </h2>
               <div className="flex flex-col gap-2">
@@ -306,14 +307,12 @@ export default function Uc4Page() {
                   return (
                     <div
                       key={d.id}
-                      className={`border-l-4 pl-3 py-1 ${
-                        ok ? "border-[#2D5A3D]" : "border-[#8B3A3A]"
-                      }`}
+                      className={`rounded-lg px-3 py-2 ${ok ? "bg-success-soft" : "bg-danger-soft"}`}
                     >
-                      <p className="font-semibold text-black text-sm">
-                        {ok ? "✓" : "✗"} {d.title}
+                      <p className="font-semibold text-ink text-sm">
+                        <Icon name={ok ? "check" : "x"} size={16} strokeWidth={3} className="inline -mt-0.5 mr-1" label={ok ? "Juste" : "À revoir"} />{d.title}
                       </p>
-                      <p className="text-xs text-[#4A4A4A]">{d.debrief}</p>
+                      <p className="text-xs text-ink-2">{d.debrief}</p>
                     </div>
                   );
                 })}
@@ -322,7 +321,7 @@ export default function Uc4Page() {
 
             <section className="mb-8">
               {evaluating && !verdict ? (
-                <p className="text-center text-[#4A4A4A]">Évaluation en cours…</p>
+                <p className="text-center text-ink-2">Évaluation en cours…</p>
               ) : verdict ? (
                 <Verdict verdict={verdict} />
               ) : null}

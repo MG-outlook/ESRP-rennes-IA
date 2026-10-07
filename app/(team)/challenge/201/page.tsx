@@ -131,14 +131,14 @@ export default function GenAPage() {
     return <ChallengeIntro {...intro} onStart={() => setIntroDone(true)} />;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between gap-3 flex-wrap mb-8">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-black">
+            <h1 className="text-3xl sm:text-4xl font-bold text-ink">
               Défi A — Le pictogramme express
             </h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <p className="text-ink-2 mt-2">
               Faites comprendre une consigne sans aucun texte.
             </p>
           </div>
@@ -148,18 +148,18 @@ export default function GenAPage() {
           </div>
         </div>
 
-        <section className="border-2 border-black p-5 mb-6 bg-[#F5F5F5]">
-          <p className="text-sm text-[#4A4A4A] uppercase tracking-wide font-semibold">
+        <section className="border p-5 mb-6 bg-surface border-line">
+          <p className="text-sm text-ink-2 uppercase tracking-wide font-semibold">
             Votre consigne tirée au sort
           </p>
-          <p className="text-2xl font-bold text-black mt-1">« {consigne} »</p>
+          <p className="text-2xl font-bold text-ink mt-1">« {consigne} »</p>
         </section>
 
         {phase === "compose" && (
           <>
             <section className="mb-6">
-              <h2 className="text-2xl font-bold text-black mb-2">Votre prompt</h2>
-              <p className="text-[#4A4A4A] mb-3">
+              <h2 className="text-2xl font-bold text-ink mb-2">Votre prompt</h2>
+              <p className="text-ink-2 mb-3">
                 Décrivez à l&apos;IA le pictogramme à produire. Aides :
               </p>
               <div className="flex flex-wrap gap-2 mb-3">
@@ -168,7 +168,7 @@ export default function GenAPage() {
                     key={h}
                     onClick={() => addHelper(h)}
                     disabled={!!svg}
-                    className="px-3 py-1 border-2 border-[#2D5A3D] text-[#2D5A3D] text-sm font-semibold disabled:opacity-50"
+                    className="btn btn-secondary px-3 py-1 text-sm disabled:opacity-50"
                   >
                     + {h}
                   </button>
@@ -180,16 +180,16 @@ export default function GenAPage() {
                 disabled={!!svg}
                 rows={4}
                 placeholder="Crée un pictogramme simple et universel pour…"
-                className="w-full border-2 border-black p-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-60"
+                className="field w-full p-3 disabled:opacity-60"
               />
-              <label className="block mt-3 font-semibold text-black">
+              <label className="block mt-3 font-semibold text-ink">
                 Légende (5 mots maximum)
                 <input
                   type="text"
                   value={legend}
                   onChange={(e) => setLegend(e.target.value)}
                   disabled={!!svg}
-                  className="w-full border-2 border-black px-3 py-2 mt-1 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-60"
+                  className="field w-full px-3 py-2 mt-1 disabled:opacity-60"
                 />
               </label>
               {!svg && (
@@ -197,7 +197,7 @@ export default function GenAPage() {
                   <button
                     onClick={handleGenerate}
                     disabled={generating || !prompt.trim()}
-                    className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] disabled:opacity-50"
+                    className="btn btn-primary px-6 py-3 disabled:opacity-50"
                   >
                     {generating ? "Génération…" : "Générer le pictogramme"}
                   </button>
@@ -206,7 +206,7 @@ export default function GenAPage() {
             </section>
 
             {generating && (
-              <div className="flex flex-col items-center gap-3 py-8 text-[#4A4A4A]">
+              <div className="flex flex-col items-center gap-3 py-8 text-ink-2">
                 <Spinner size="lg" />
                 <p className="text-lg font-semibold">L&apos;IA dessine…</p>
               </div>
@@ -214,19 +214,19 @@ export default function GenAPage() {
 
             {svg && !generating && (
               <section className="mb-6">
-                <h2 className="text-2xl font-bold text-black mb-3">Votre pictogramme</h2>
+                <h2 className="text-2xl font-bold text-ink mb-3">Votre pictogramme</h2>
                 <div
-                  className="border-2 border-black bg-white w-64 h-64 mx-auto flex items-center justify-center [&_svg]:w-full [&_svg]:h-full"
+                  className="border bg-white w-64 h-64 mx-auto flex items-center justify-center [&_svg]:w-full [&_svg]:h-full border-line"
                   dangerouslySetInnerHTML={{ __html: svg }}
                 />
                 {legend && (
-                  <p className="text-center font-semibold text-black mt-2">{legend}</p>
+                  <p className="text-center font-semibold text-ink mt-2">{legend}</p>
                 )}
                 <div className="flex justify-center mt-5">
                   <button
                     onClick={handleBlindTest}
                     disabled={evaluating}
-                    className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] disabled:opacity-50"
+                    className="btn btn-primary px-6 py-3 disabled:opacity-50"
                   >
                     {evaluating ? "Test en cours…" : "Lancer le test à l'aveugle"}
                   </button>
@@ -238,15 +238,15 @@ export default function GenAPage() {
 
         {phase === "result" && (
           <section className="mb-8">
-            <div className="border-2 border-black bg-white w-48 h-48 mx-auto flex items-center justify-center [&_svg]:w-full [&_svg]:h-full mb-4">
+            <div className="border bg-white w-48 h-48 mx-auto flex items-center justify-center [&_svg]:w-full [&_svg]:h-full mb-4 border-line">
               <span dangerouslySetInnerHTML={{ __html: svg }} />
             </div>
-            <div className="border-2 border-black p-4 mb-6">
-              <p className="text-sm text-[#4A4A4A] font-semibold">
+            <div className="border p-4 mb-6 border-line">
+              <p className="text-sm text-ink-2 font-semibold">
                 Lecture « à l&apos;aveugle » par l&apos;IA :
               </p>
-              <p className="text-black mt-1">« {interpretation} »</p>
-              <p className="text-sm text-[#4A4A4A] mt-2">
+              <p className="text-ink mt-1">« {interpretation} »</p>
+              <p className="text-sm text-ink-2 mt-2">
                 Consigne d&apos;origine : « {consigne} »
               </p>
             </div>
@@ -254,7 +254,7 @@ export default function GenAPage() {
             {verdict ? (
               <Verdict verdict={verdict} />
             ) : (
-              <p className="text-[#8B3A3A]">Évaluation indisponible.</p>
+              <p className="text-danger">Évaluation indisponible.</p>
             )}
 
             <div className="flex justify-center mt-6">

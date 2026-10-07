@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import Icon from "@/components/shared/Icon";
 
 interface TimerProps {
   durationSec: number;
@@ -90,11 +91,15 @@ export default function Timer({
   const seconds = remaining % 60;
   const isLow = remaining <= 60 && !frozen;
 
+  const tone = frozen
+    ? "bg-success-soft border-line text-success-strong"
+    : isLow
+      ? "bg-danger-soft border-danger text-danger"
+      : "bg-white border-line text-ink";
+
   return (
     <div
-      className={`text-4xl font-bold tabular-nums ${
-        frozen ? "text-[#2D5A3D]" : isLow ? "text-[#8B3A3A]" : "text-black"
-      }`}
+      className={`flex flex-col items-end px-4 py-1.5 border-2 rounded-xl ${tone}`}
       role="timer"
       aria-live="polite"
       aria-label={
@@ -102,9 +107,25 @@ export default function Timer({
           ? `Temps figé à ${minutes} minutes ${seconds} secondes`
           : `${minutes} minutes ${seconds} secondes restantes`
       }
-      title={frozen ? "Défi terminé — chrono arrêté" : undefined}
     >
-      {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
+      <span className="inline-flex items-center gap-1.5 text-[0.8rem] font-bold">
+        {frozen ? (
+          <>
+            <Icon name="check" size={14} strokeWidth={3} />
+            Défi terminé
+          </>
+        ) : isLow ? (
+          <>
+            <Icon name="clock" size={14} strokeWidth={2.4} />
+            Moins d&apos;une minute
+          </>
+        ) : (
+          <span className="font-normal text-ink-2">Temps restant</span>
+        )}
+      </span>
+      <span className="font-mono text-[2rem] leading-tight font-bold tabular-nums">
+        {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
+      </span>
     </div>
   );
 }

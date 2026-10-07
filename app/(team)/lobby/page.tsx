@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { challengeTitle } from "@/lib/scoring";
 import { CHALLENGE_INTROS } from "@/lib/challenges/intros";
 import Spinner from "@/components/shared/Spinner";
+import Icon from "@/components/shared/Icon";
 
 export default function LobbyPage() {
   const router = useRouter();
@@ -76,40 +77,50 @@ export default function LobbyPage() {
 
   if (showMenu) {
     return (
-      <main
-        className="min-h-screen bg-white px-6 py-12"
-        aria-label="Choix du défi"
-      >
-        <div className="max-w-3xl mx-auto">
-          <h1 className="font-bold text-black mb-2 text-3xl">Choisissez votre défi</h1>
-          <p className="text-[#4A4A4A] text-lg mb-8">
-            Plusieurs défis sont ouverts. À vous de choisir lequel relever
-            maintenant — vous pourrez faire les autres ensuite.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <main className="flex-1 bg-surface px-6 py-12 sm:py-14" aria-label="Choix du défi">
+        <div className="max-w-6xl mx-auto flex flex-col gap-9">
+          <div className="flex flex-col gap-2.5 max-w-3xl">
+            <h1 className="text-4xl">Choisissez votre défi</h1>
+            <p className="text-ink-2 text-lg">
+              Plusieurs défis sont ouverts. Commencez par celui qui vous parle :
+              vous pourrez faire les autres ensuite.
+            </p>
+          </div>
+          <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,320px),1fr))] gap-5">
             {available.map((id) => {
-              const objective = CHALLENGE_INTROS[id]?.objective;
+              const intro = CHALLENGE_INTROS[id];
+              const [kicker, ...rest] = challengeTitle(id).split(" — ");
+              const name = rest.join(" — ") || kicker;
               return (
-                <button
-                  key={id}
-                  onClick={() => router.push(`/challenge/${id}`)}
-                  className="text-left border-2 border-black p-5 hover:border-[#2D5A3D] hover:bg-[#F0F5F1] transition-colors"
-                >
-                  <span className="block text-xl font-bold text-black">
-                    {challengeTitle(id)}
-                  </span>
-                  {objective && (
-                    <span className="block text-sm text-[#4A4A4A] mt-2">
-                      🎯 {objective}
+                <li key={id}>
+                  <button
+                    onClick={() => router.push(`/challenge/${id}`)}
+                    className="group w-full h-full text-left flex flex-col gap-3.5 p-7 bg-white border border-line rounded-xl transition-[border-color,box-shadow] hover:border-brand hover:shadow-md"
+                  >
+                    <span className="flex justify-between items-center gap-3 text-[0.85rem]">
+                      <span className="font-bold text-brand">
+                        {rest.length ? kicker : id < 100 ? `Défi ${id}` : "Défi"}
+                      </span>
+                      {intro?.duration && (
+                        <span className="inline-flex items-center gap-1.5 text-ink-2">
+                          <Icon name="clock" size={16} />
+                          {intro.duration}
+                        </span>
+                      )}
                     </span>
-                  )}
-                  <span className="inline-block mt-3 text-sm font-semibold text-[#2D5A3D]">
-                    Commencer →
-                  </span>
-                </button>
+                    <span className="text-2xl font-extrabold leading-tight">{name}</span>
+                    {intro?.objective && (
+                      <span className="text-ink-2">{intro.objective}</span>
+                    )}
+                    <span className="mt-auto pt-2 inline-flex items-center gap-2 font-bold text-brand group-hover:underline">
+                      Commencer
+                      <Icon name="arrow-right" size={18} />
+                    </span>
+                  </button>
+                </li>
               );
             })}
-          </div>
+          </ul>
         </div>
       </main>
     );
@@ -117,23 +128,26 @@ export default function LobbyPage() {
 
   return (
     <main
-      className="flex flex-col items-center justify-center min-h-screen p-8 bg-white text-center"
+      className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-surface text-center"
       aria-label="Salle d'attente"
     >
-      <h1 className="font-bold text-black mb-4 text-3xl">En attente du prochain défi</h1>
-      <p className="text-[#4A4A4A] text-lg max-w-md" aria-live="polite">
-        Demandez aux animateurs d&apos;ouvrir le prochain défi si besoin.
-      </p>
-      <div className="mt-8 flex gap-2" aria-hidden>
-        {loading ? (
-          <Spinner size="sm" />
-        ) : (
-          <>
-            <span className="w-3 h-3 bg-[#2D5A3D] animate-pulse" />
-            <span className="w-3 h-3 bg-[#2D5A3D] animate-pulse [animation-delay:150ms]" />
-            <span className="w-3 h-3 bg-[#2D5A3D] animate-pulse [animation-delay:300ms]" />
-          </>
-        )}
+      <div className="w-full max-w-lg bg-white border border-line rounded-xl px-8 py-10 flex flex-col items-center gap-4">
+        <h1 className="text-3xl">En attente du prochain défi</h1>
+        <p className="text-ink-2 text-lg" aria-live="polite">
+          L&apos;animation va ouvrir le prochain défi. Cette page se met à jour
+          toute seule.
+        </p>
+        <div className="mt-2 flex gap-2" aria-hidden>
+          {loading ? (
+            <Spinner size="sm" />
+          ) : (
+            <>
+              <span className="w-2.5 h-2.5 rounded-full bg-brand animate-pulse" />
+              <span className="w-2.5 h-2.5 rounded-full bg-sky animate-pulse [animation-delay:150ms]" />
+              <span className="w-2.5 h-2.5 rounded-full bg-leaf animate-pulse [animation-delay:300ms]" />
+            </>
+          )}
+        </div>
       </div>
     </main>
   );

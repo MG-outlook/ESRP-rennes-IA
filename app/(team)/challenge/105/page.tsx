@@ -109,12 +109,12 @@ export default function BonusEPage() {
     );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-black">Bonus E — Vrai ou Faux IA</h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <h1 className="text-4xl font-bold text-ink">Bonus E — Vrai ou Faux IA</h1>
+            <p className="text-ink-2 mt-2">
               10 affirmations sur l&apos;IA. Vrai, Faux, ou Nuancé ?
             </p>
           </div>
@@ -134,12 +134,12 @@ export default function BonusEPage() {
                 className={`border-2 p-4 ${
                   revealed
                     ? correct
-                      ? "border-[#2D5A3D]"
-                      : "border-[#8B3A3A]"
-                    : "border-black"
+                      ? "border-success"
+                      : "border-danger"
+                    : "border-line"
                 }`}
               >
-                <p className="text-black mb-3">
+                <p className="text-ink mb-3">
                   {s.id}. « {s.text} »
                 </p>
                 <div className="flex gap-2 flex-wrap">
@@ -148,10 +148,10 @@ export default function BonusEPage() {
                       key={v}
                       onClick={() => setVote(s.id, v)}
                       disabled={revealed}
-                      className={`px-4 py-2 border-2 font-semibold text-sm ${
+                      className={`btn px-4 py-2 border-2 font-semibold text-sm ${
                         vote === v
-                          ? "bg-[#2D5A3D] border-[#2D5A3D] text-white"
-                          : "bg-white border-black text-black"
+                          ? "bg-brand border-brand text-white"
+                          : "bg-white border-control text-ink"
                       } disabled:opacity-60`}
                     >
                       {VERDICT_LABEL[v]}
@@ -159,11 +159,11 @@ export default function BonusEPage() {
                   ))}
                 </div>
                 {revealed && (
-                  <div className="mt-3 border-t border-[#B8B8B8] pt-3">
-                    <p className="text-sm font-bold text-[#2D5A3D]">
+                  <div className="mt-3 border-t border-line pt-3">
+                    <p className="text-sm font-bold text-brand">
                       Réponse : {VERDICT_LABEL[s.verdict]}
                     </p>
-                    <p className="text-sm text-[#4A4A4A] mt-1">{s.explanation}</p>
+                    <p className="text-sm text-ink-2 mt-1">{s.explanation}</p>
                   </div>
                 )}
               </div>
@@ -176,14 +176,14 @@ export default function BonusEPage() {
             <button
               onClick={handleReveal}
               disabled={!allVoted}
-              className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl disabled:opacity-50"
+              className="btn btn-primary px-6 py-3 text-xl disabled:opacity-50"
             >
               Révéler les réponses
             </button>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-4">
-            <p className="text-2xl font-bold text-black">
+            <p className="text-2xl font-bold text-ink">
               Score : {score} / {BONUS_E_STATEMENTS.length}
             </p>
             <SubmitButton state={submitState} onClick={handleSubmit} label="Valider" />

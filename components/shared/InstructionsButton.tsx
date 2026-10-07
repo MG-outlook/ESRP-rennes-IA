@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ChallengeIntroContent } from "@/lib/challenges/intros";
+import Icon from "@/components/shared/Icon";
+import { IntroBlocks } from "@/components/shared/ChallengeIntro";
 
 /**
  * "Rappel des instructions" — a small header button that reopens the challenge's
@@ -14,85 +16,87 @@ export default function InstructionsButton({
   content?: ChallengeIntroContent;
 }) {
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
   if (!content) return null;
 
   return (
     <>
       <button
         onClick={() => setOpen(true)}
-        title="Revoir les instructions du défi"
-        className="shrink-0 px-3 py-2 border-2 border-[#2D5A3D] text-[#2D5A3D] font-semibold text-sm hover:bg-[#2D5A3D] hover:text-white transition-colors"
+        className="btn btn-secondary shrink-0 px-4"
       >
-        Instructions
+        <Icon name="list" size={18} />
+        Consignes
       </button>
 
       {/* Bouton flottant bas-droite */}
       <button
         onClick={() => setOpen(true)}
-        title="Revoir les instructions du défi"
-        aria-label="Revoir les instructions du défi"
-        className="fixed bottom-6 right-6 z-40 w-12 h-12 flex items-center justify-center border-2 border-[#2D5A3D] bg-white text-[#2D5A3D] font-bold text-xl hover:bg-[#2D5A3D] hover:text-white transition-colors"
+        aria-label="Revoir les consignes du défi"
+        className="btn btn-secondary fixed bottom-6 right-6 z-40 w-12 h-12 p-0 rounded-full shadow-md"
       >
-        ?
+        <Icon name="help" size={24} />
       </button>
 
       {open && (
         <div
-          className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-ink/50 flex items-center justify-center p-4"
           onClick={() => setOpen(false)}
-          role="dialog"
-          aria-modal="true"
         >
           <div
-            className="bg-white border-2 border-black max-w-2xl w-full max-h-[85vh] overflow-y-auto p-8"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="instructions-title"
+            className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6 sm:p-8 flex flex-col gap-5"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex justify-between items-start mb-4">
-              <h2 className="text-2xl font-bold text-black">Comment ça marche</h2>
+            <div className="flex justify-between items-start gap-4">
+              <div>
+                <p className="font-bold text-brand">{content.title}</p>
+                <h2 id="instructions-title" className="text-2xl mt-1">Comment ça marche</h2>
+              </div>
               <button
                 onClick={() => setOpen(false)}
                 aria-label="Fermer"
-                className="text-2xl leading-none text-[#4A4A4A] hover:text-black px-2"
+                className="btn w-11 h-11 p-0 text-ink-2 hover:bg-surface hover:text-ink"
+                autoFocus
               >
-                ✕
+                <Icon name="x" size={22} />
               </button>
             </div>
 
-            <p className="font-bold text-black">{content.title}</p>
-            {content.subtitle && (
-              <p className="italic text-[#4A4A4A] mt-1">{content.subtitle}</p>
-            )}
-            {content.objective && (
-              <p className="mt-3 border-l-4 border-[#2D5A3D] bg-[#F0F5F1] px-3 py-2 text-black text-sm">
-                <span className="font-bold text-[#2D5A3D]">🎯 Objectif — </span>
-                {content.objective}
-              </p>
-            )}
-            {content.pourquoi && (
-              <p className="mt-2 border-l-4 border-black bg-[#F5F5F5] px-3 py-2 text-black text-sm">
-                <span className="font-bold text-black">💡 Pourquoi ce défi ? </span>
-                {content.pourquoi}
-              </p>
-            )}
-            <div className="mb-4" />
+            {content.subtitle && <p className="text-ink-2">{content.subtitle}</p>}
+            <IntroBlocks objective={content.objective} pourquoi={content.pourquoi} compact />
 
-            <ol className="list-decimal pl-6 space-y-2 text-black text-lg">
+            <ol className="flex flex-col">
               {content.steps.map((step, i) => (
-                <li key={i}>{step}</li>
+                <li key={i} className="flex gap-4 py-3 border-t border-line last:border-b">
+                  <span className="shrink-0 w-8 h-8 rounded-full bg-brand text-white font-extrabold text-sm inline-flex items-center justify-center">
+                    {i + 1}
+                  </span>
+                  <span className="pt-0.5">{step}</span>
+                </li>
               ))}
             </ol>
 
             {content.note && (
-              <p className="italic text-[#4A4A4A] mt-4 border-t-2 border-[#E0E0E0] pt-3">
+              <p className="text-ink-2">
+                <strong className="text-ink">À retenir : </strong>
                 {content.note}
               </p>
             )}
 
-            <div className="flex justify-end mt-6">
-              <button
-                onClick={() => setOpen(false)}
-                className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] hover:bg-[#234a31] transition-colors"
-              >
+            <div className="flex justify-end">
+              <button onClick={() => setOpen(false)} className="btn btn-primary px-6 py-3">
                 Reprendre le défi
               </button>
             </div>

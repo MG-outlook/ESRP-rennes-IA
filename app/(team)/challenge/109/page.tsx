@@ -11,6 +11,7 @@ import SubmitButton from "@/components/shared/SubmitButton";
 import DocumentCamille, { getDocumentContent } from "@/components/challenges/DocumentCamille";
 import { streamFromProxy } from "@/lib/ai/proxy";
 import { BONUS_I_GLOSSAIRE_PROMPT, BONUS_I_TERMS } from "@/lib/ai/prompts";
+import Icon from "@/components/shared/Icon";
 
 const CHALLENGE_ID = 109;
 
@@ -154,12 +155,12 @@ export default function BonusIPage() {
     );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-black">Bonus I — Le glossaire qui sauve</h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <h1 className="text-4xl font-bold text-ink">Bonus I — Le glossaire qui sauve</h1>
+            <p className="text-ink-2 mt-2">
               Chassez les termes piégés, puis comparez avec l&apos;IA.
             </p>
           </div>
@@ -170,16 +171,16 @@ export default function BonusIPage() {
         </div>
 
         <section className="mb-8">
-          <h2 className="text-2xl font-bold text-black mb-4">Le courrier reçu</h2>
+          <h2 className="text-2xl font-bold text-ink mb-4">Le courrier reçu</h2>
           <DocumentCamille kind="mdph_letter" />
         </section>
 
         {/* À vous d'abord : la chasse aux termes */}
         <section className="mb-8">
-          <h2 className="text-2xl font-bold text-black mb-2">
+          <h2 className="text-2xl font-bold text-ink mb-2">
             À vous d&apos;abord : la chasse aux termes
           </h2>
-          <p className="text-[#4A4A4A] mb-3">
+          <p className="text-ink-2 mb-3">
             Relisez le courrier avec les yeux de Camille : relevez tous les
             sigles et termes techniques qui peuvent bloquer la compréhension.
             Ajoutez-les un par un.
@@ -192,12 +193,12 @@ export default function BonusIPage() {
                 onChange={(e) => setTermInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleAddTerm()}
                 placeholder="Ex : RQTH"
-                className="flex-1 border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none"
+                className="field flex-1 px-4 py-3 "
               />
               <button
                 onClick={handleAddTerm}
                 disabled={!termInput.trim()}
-                className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] disabled:opacity-50"
+                className="btn btn-primary px-6 py-3 disabled:opacity-50"
               >
                 Ajouter
               </button>
@@ -208,7 +209,7 @@ export default function BonusIPage() {
               {teamTerms.map((t) => (
                 <span
                   key={t}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 border-2 border-black text-sm font-semibold text-black"
+                  className="badge bg-brand-soft text-brand-strong gap-2 pl-3 pr-1 py-1 text-sm "
                 >
                   {t}
                   {!revealed && (
@@ -217,9 +218,9 @@ export default function BonusIPage() {
                         setTeamTerms((prev) => prev.filter((p) => p !== t))
                       }
                       aria-label={`Retirer ${t}`}
-                      className="text-[#8B3A3A] font-bold"
+                      className="w-8 h-8 inline-flex items-center justify-center rounded-full text-danger hover:bg-danger-soft"
                     >
-                      ✕
+                      <Icon name="x" size={16} strokeWidth={3} />
                     </button>
                   )}
                 </span>
@@ -231,7 +232,7 @@ export default function BonusIPage() {
               <button
                 onClick={handleReveal}
                 disabled={teamTerms.length === 0}
-                className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl disabled:opacity-50"
+                className="btn btn-primary px-6 py-3 text-xl disabled:opacity-50"
               >
                 Révéler et comparer avec l&apos;IA
               </button>
@@ -241,11 +242,11 @@ export default function BonusIPage() {
 
         {/* Révélation : trouvés / manqués */}
         {revealed && (
-          <section className="mb-8 border-2 border-[#2D5A3D] p-5">
-            <h2 className="text-2xl font-bold text-black mb-2">La révélation</h2>
-            <p className="text-[#4A4A4A] mb-3">
+          <section className="mb-8 border-2 border-brand p-5">
+            <h2 className="text-2xl font-bold text-ink mb-2">La révélation</h2>
+            <p className="text-ink-2 mb-3">
               Vous avez repéré{" "}
-              <strong className="text-[#2D5A3D]">
+              <strong className="text-brand">
                 {foundIds.size} des {BONUS_I_TERMS.length}
               </strong>{" "}
               termes piégés du courrier.
@@ -258,16 +259,16 @@ export default function BonusIPage() {
                     key={t.id}
                     className={`px-3 py-1.5 border-2 text-sm font-semibold ${
                       found
-                        ? "border-[#2D5A3D] text-[#2D5A3D]"
-                        : "border-[#8B3A3A] text-[#8B3A3A]"
+                        ? "border-success text-success"
+                        : "border-danger text-danger"
                     }`}
                   >
-                    {found ? "✓" : "✗"} {t.label}
+                    <Icon name={found ? "check" : "x"} size={16} strokeWidth={3} label={found ? "Trouvé" : "Manqué"} /> {t.label}
                   </span>
                 );
               })}
             </div>
-            <p className="text-sm text-[#4A4A4A] mt-3">
+            <p className="text-sm text-ink-2 mt-3">
               C&apos;est tout l&apos;enjeu : quand on connaît le jargon, on ne le
               voit plus. L&apos;IA, elle, le relève systématiquement — et le
               traduit en FALC ci-dessous.
@@ -277,7 +278,7 @@ export default function BonusIPage() {
 
         {(glossaire || generating) && (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-4">Glossaire FALC</h2>
+            <h2 className="text-2xl font-bold text-ink mb-4">Glossaire FALC</h2>
             <StreamedOutput content={glossaire} loading={generating} />
           </section>
         )}

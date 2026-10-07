@@ -21,6 +21,7 @@ import {
   finishChallenge,
 } from "@/lib/challenges/general-helpers";
 import { parseJsonObject } from "@/lib/challenges/general-pure";
+import Icon from "@/components/shared/Icon";
 
 const CHALLENGE_ID = 301;
 
@@ -173,14 +174,14 @@ export default function Uc1Page() {
     return <ChallengeIntro {...intro} onStart={() => setIntroDone(true)} />;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between gap-3 flex-wrap mb-8">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-black">
+            <h1 className="text-3xl sm:text-4xl font-bold text-ink">
               Cas d&apos;usage 1 — La mission documentaire
             </h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <p className="text-ink-2 mt-2">
               Choisissez les bonnes pièces. Rien de plus, rien de moins.
             </p>
           </div>
@@ -191,21 +192,21 @@ export default function Uc1Page() {
         </div>
 
         {/* La mission de l'équipe */}
-        <section className="mb-8 border-2 border-[#2D5A3D] p-5 bg-[#F0F5F1]">
-          <p className="text-sm font-bold text-[#2D5A3D] mb-1">
+        <section className="mb-8 border-2 border-brand p-5 bg-brand-soft">
+          <p className="text-sm font-bold text-brand mb-1">
             VOTRE MISSION — {mission.label}
           </p>
-          <p className="text-black leading-relaxed">{mission.brief}</p>
+          <p className="text-ink leading-relaxed">{mission.brief}</p>
         </section>
 
         {phase === "select" && (
           <>
             {/* Fond documentaire */}
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-black mb-2">
+              <h2 className="text-2xl font-bold text-ink mb-2">
                 Le fond documentaire ({UC1_FONDS.length} pièces)
               </h2>
-              <p className="text-[#4A4A4A] mb-4">
+              <p className="text-ink-2 mb-4">
                 L&apos;IA ne verra QUE les pièces que vous cochez. Trop de
                 pièces : du bruit. Pas assez : des trous. Et certaines
                 pièces… ne devraient jamais lui être confiées. Cliquez sur un
@@ -216,7 +217,7 @@ export default function Uc1Page() {
                   <div
                     key={d.id}
                     className={`border-2 ${
-                      selected[d.id] ? "border-[#2D5A3D] bg-[#F0F5F1]" : "border-black"
+                      selected[d.id] ? "border-brand bg-brand-soft" : "border-line"
                     }`}
                   >
                     <div className="flex items-center gap-3 p-3">
@@ -227,12 +228,12 @@ export default function Uc1Page() {
                         onChange={(e) =>
                           setSelected((prev) => ({ ...prev, [d.id]: e.target.checked }))
                         }
-                        className="w-5 h-5 accent-[#2D5A3D] shrink-0"
+                        className="w-5 h-5 accent-brand shrink-0"
                       />
                       <button
                         type="button"
                         onClick={() => setOpenDoc(openDoc === d.id ? null : d.id)}
-                        className="flex-1 text-left font-semibold text-black hover:text-[#2D5A3D] flex items-center gap-2"
+                        className="flex-1 text-left font-semibold text-ink hover:text-brand flex items-center gap-2"
                       >
                         <span
                           className="shrink-0 text-xs"
@@ -243,12 +244,12 @@ export default function Uc1Page() {
                         </span>
                         {d.title}
                       </button>
-                      <span className="shrink-0 text-xs px-2 py-0.5 border border-[#B8B8B8] text-[#4A4A4A]">
+                      <span className="shrink-0 text-xs px-2 py-0.5 border border-line text-ink-2">
                         {KIND_LABELS[d.kind]}
                       </span>
                     </div>
                     {openDoc === d.id && (
-                      <p className="px-4 pb-4 text-sm text-[#4A4A4A] whitespace-pre-line border-t border-[#E0E0E0] pt-3">
+                      <p className="px-4 pb-4 text-sm text-ink-2 whitespace-pre-line border-t border-line pt-3">
                         {d.content}
                       </p>
                     )}
@@ -259,7 +260,7 @@ export default function Uc1Page() {
 
             {/* Consigne */}
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-black mb-2">
+              <h2 className="text-2xl font-bold text-ink mb-2">
                 Votre consigne à l&apos;IA
               </h2>
               <textarea
@@ -267,17 +268,17 @@ export default function Uc1Page() {
                 onChange={(e) => setConsigne(e.target.value)}
                 rows={3}
                 placeholder="Ex : Rédige la note demandée, en 3 parties (progrès, difficultés, suites), ton factuel, sans rien inventer…"
-                className="w-full border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none"
+                className="field w-full px-4 py-3 "
               />
               <div className="flex items-center justify-between gap-3 mt-3 flex-wrap">
-                <span className="text-sm text-[#4A4A4A]">
+                <span className="text-sm text-ink-2">
                   {selectedIds.length} pièce{selectedIds.length > 1 ? "s" : ""} sélectionnée
                   {selectedIds.length > 1 ? "s" : ""}
                 </span>
                 <button
                   onClick={handleGenerate}
                   disabled={selectedIds.length === 0 || !consigne.trim()}
-                  className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl disabled:opacity-50"
+                  className="btn btn-primary px-6 py-3 text-xl disabled:opacity-50"
                 >
                   Lancer la mission
                 </button>
@@ -289,7 +290,7 @@ export default function Uc1Page() {
         {phase === "result" && (
           <>
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-black mb-4">
+              <h2 className="text-2xl font-bold text-ink mb-4">
                 Le livrable produit
               </h2>
               <StreamedOutput content={output} loading={generating} />
@@ -297,13 +298,13 @@ export default function Uc1Page() {
 
             {/* Révélation de la sélection */}
             {!generating && output && (
-              <section className="mb-8 border-2 border-[#2D5A3D] p-5">
-                <h2 className="text-2xl font-bold text-black mb-2">
+              <section className="mb-8 border-2 border-brand p-5">
+                <h2 className="text-2xl font-bold text-ink mb-2">
                   La révélation : votre sélection
                 </h2>
                 {rgpdPicked && (
-                  <p className="border-2 border-[#8B3A3A] bg-white text-[#8B3A3A] font-semibold p-3 mb-3">
-                    ⚠️ Vous avez transmis à l&apos;IA un document concernant une
+                  <p className="border-2 border-danger bg-white text-danger font-semibold p-3 mb-3">
+                    Vous avez transmis à l&apos;IA un document concernant une
                     AUTRE personne accompagnée. Données de santé d&apos;un tiers :
                     c&apos;est la ligne rouge, quel que soit l&apos;outil.
                   </p>
@@ -317,13 +318,11 @@ export default function Uc1Page() {
                     return (
                       <div
                         key={d.id}
-                        className={`border-l-4 pl-3 py-1 ${
-                          ok ? "border-[#2D5A3D]" : "border-[#8B3A3A]"
-                        }`}
+                        className={`rounded-lg px-3 py-2 ${ok ? "bg-success-soft" : "bg-danger-soft"}`}
                       >
-                        <p className="font-semibold text-black text-sm">
-                          {ok ? "✓" : "✗"} {d.title}
-                          <span className="font-normal text-[#4A4A4A]">
+                        <p className="font-semibold text-ink text-sm">
+                          <Icon name={ok ? "check" : "x"} size={16} strokeWidth={3} className="inline -mt-0.5 mr-1" label={ok ? "Juste" : "À revoir"} />{d.title}
+                          <span className="font-normal text-ink-2">
                             {" "}
                             —{" "}
                             {wasPicked && !wasExpected
@@ -335,7 +334,7 @@ export default function Uc1Page() {
                                 : "bien vu"}
                           </span>
                         </p>
-                        <p className="text-xs text-[#4A4A4A]">{d.debrief}</p>
+                        <p className="text-xs text-ink-2">{d.debrief}</p>
                       </div>
                     );
                   })}
@@ -347,7 +346,7 @@ export default function Uc1Page() {
             {!generating && output && (
               <section className="mb-8">
                 {evaluating && !verdict ? (
-                  <p className="text-center text-[#4A4A4A]">Évaluation en cours…</p>
+                  <p className="text-center text-ink-2">Évaluation en cours…</p>
                 ) : verdict ? (
                   <Verdict verdict={verdict} />
                 ) : null}

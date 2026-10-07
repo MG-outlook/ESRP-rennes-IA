@@ -2,7 +2,10 @@
 
 import { Suspense, useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import Spinner from "@/components/shared/Spinner";
+import Icon from "@/components/shared/Icon";
+import { BrandLogo, BrandStripe } from "@/components/shared/Brand";
 
 function JoinContent() {
   const router = useRouter();
@@ -56,7 +59,7 @@ function JoinContent() {
           await new Promise((r) => setTimeout(r, backoff[attempt]));
         } else {
           setError(
-            e instanceof Error ? e.message : "Connexion impossible. Reessayez."
+            e instanceof Error ? e.message : "Connexion impossible. Réessayez."
           );
           setRetrying(false);
         }
@@ -70,37 +73,58 @@ function JoinContent() {
 
   if (error) {
     return (
-      <main className="flex flex-col items-center justify-center min-h-screen p-8 bg-white">
-        <p className="text-[#8B3A3A] text-xl mb-6">{error}</p>
-        <button
-          onClick={() => joinTeam()}
-          className="px-6 py-3 min-h-[44px] border-2 border-[#2D5A3D] text-[#2D5A3D] font-semibold mb-4"
+      <JoinShell>
+        <div
+          role="alert"
+          className="w-full max-w-md bg-white border border-line rounded-xl p-8 flex flex-col gap-5"
         >
-          Reessayer
-        </button>
-        <a
-          href="/"
-          className="px-6 py-3 min-h-[44px] border-2 border-black text-black font-semibold"
-        >
-          Retour
-        </a>
-      </main>
+          <p className="flex items-start gap-3 text-xl font-bold text-danger">
+            <Icon name="info" size={24} className="mt-0.5" />
+            {error}
+          </p>
+          <div className="flex gap-3 flex-wrap">
+            <button onClick={() => joinTeam()} className="btn btn-primary px-6 py-3">
+              Réessayer
+            </button>
+            <Link href="/" className="btn btn-secondary px-6 py-3">
+              <Icon name="arrow-left" />
+              Retour
+            </Link>
+          </div>
+        </div>
+      </JoinShell>
     );
   }
 
   return <JoinFallback retrying={retrying} />;
 }
 
+function JoinShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex-1 flex flex-col bg-surface">
+      <header className="bg-white border-b border-line">
+        <BrandStripe />
+        <div className="max-w-6xl mx-auto px-6 py-3">
+          <BrandLogo height={40} priority />
+        </div>
+      </header>
+      <main className="flex-1 flex flex-col items-center justify-center p-8">
+        {children}
+      </main>
+    </div>
+  );
+}
+
 function JoinFallback({ retrying = false }: { retrying?: boolean }) {
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen p-8 bg-white">
+    <JoinShell>
       <div className="flex items-center gap-3">
         <Spinner size="md" />
-        <p className="text-[#4A4A4A] text-xl" aria-live="polite">
-          {retrying ? "Nouvelle tentative de connexion..." : "Connexion en cours..."}
+        <p className="text-ink-2 text-xl" aria-live="polite">
+          {retrying ? "Nouvelle tentative de connexion…" : "Connexion à votre équipe…"}
         </p>
       </div>
-    </main>
+    </JoinShell>
   );
 }
 

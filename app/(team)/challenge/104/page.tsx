@@ -11,6 +11,7 @@ import Markdown from "@/components/shared/Markdown";
 import SubmitButton from "@/components/shared/SubmitButton";
 import { streamFromProxy } from "@/lib/ai/proxy";
 import { BONUS_D_SUBVENTION_PROMPT, BONUS_D_EXAMPLES } from "@/lib/ai/prompts";
+import Icon from "@/components/shared/Icon";
 
 const CHALLENGE_ID = 104;
 
@@ -138,14 +139,14 @@ export default function BonusDPage() {
     );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex-1 bg-white">
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-black">
+            <h1 className="text-4xl font-bold text-ink">
               Bonus D — Brouillon de subvention
             </h1>
-            <p className="text-[#4A4A4A] mt-2">
+            <p className="text-ink-2 mt-2">
               8 minutes chrono pour un premier jet
             </p>
           </div>
@@ -157,16 +158,16 @@ export default function BonusDPage() {
 
         {/* Project sheet from Défi 5 (Pacte) */}
         {pact ? (
-          <details className="mb-8 border-2 border-[#2D5A3D]" open>
-            <summary className="cursor-pointer font-bold text-[#2D5A3D] px-4 py-3 bg-[#F0F5F1]">
-              📋 Votre fiche projet (Pacte du Défi 5) — cliquez pour replier
+          <details className="mb-8 border-2 border-brand" open>
+            <summary className="cursor-pointer font-bold text-brand px-4 py-3 bg-brand-soft">
+              Votre fiche projet (Pacte du Défi 5) — cliquez pour replier
             </summary>
-            <div className="p-6 border-t-2 border-[#2D5A3D] max-h-[360px] overflow-y-auto">
+            <div className="p-6 border-t-2 border-brand max-h-[360px] overflow-y-auto">
               <Markdown content={pact} />
             </div>
           </details>
         ) : (
-          <div className="mb-8 border-2 border-[#B8B8B8] bg-[#F5F5F5] p-4 text-sm text-[#4A4A4A]">
+          <div className="mb-8 border-2 border-line bg-surface p-4 text-sm text-ink-2">
             Aucune fiche projet du Défi 5 trouvée pour votre équipe. Vous pouvez
             tout de même remplir les champs ci-dessous.
           </div>
@@ -174,7 +175,7 @@ export default function BonusDPage() {
 
         {/* Example projects (one click fills the three fields, team adapts) */}
         <section className="mb-6">
-          <p className="text-[#4A4A4A] mb-3">
+          <p className="text-ink-2 mb-3">
             Pas de projet sous la main ? Partez d&apos;un exemple crédible —
             puis <strong>adaptez chaque champ</strong> à votre réalité.
           </p>
@@ -191,12 +192,12 @@ export default function BonusDPage() {
                 disabled={!!draftOutput || generating}
                 className={`border-2 p-3 text-left disabled:opacity-50 ${
                   projectName === ex.projectName
-                    ? "border-[#2D5A3D] bg-[#F0F5F1]"
-                    : "border-black bg-white hover:border-[#2D5A3D]"
+                    ? "border-brand bg-brand-soft"
+                    : "border-line bg-white hover:border-brand"
                 }`}
               >
-                <p className="font-bold text-black text-sm mb-1">{ex.label}</p>
-                <p className="text-xs text-[#4A4A4A] line-clamp-3">
+                <p className="font-bold text-ink text-sm mb-1">{ex.label}</p>
+                <p className="text-xs text-ink-2 line-clamp-3">
                   {ex.projectName} — {ex.objective}
                 </p>
               </button>
@@ -207,7 +208,7 @@ export default function BonusDPage() {
         {/* Inputs */}
         <section className="mb-8 flex flex-col gap-4">
           <div>
-            <label className="font-bold text-black block mb-1">
+            <label className="font-bold text-ink block mb-1">
               Nom du projet
             </label>
             <input
@@ -216,11 +217,11 @@ export default function BonusDPage() {
               onChange={(e) => setProjectName(e.target.value)}
               disabled={!!draftOutput}
               placeholder="Ex : Atelier IA inclusif pour les ESRP"
-              className="w-full border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-50"
+              className="field w-full px-4 py-3 disabled:opacity-50"
             />
           </div>
           <div>
-            <label className="font-bold text-black block mb-1">
+            <label className="font-bold text-ink block mb-1">
               Objectif principal
             </label>
             <textarea
@@ -229,11 +230,11 @@ export default function BonusDPage() {
               disabled={!!draftOutput}
               placeholder="Ex : Former 200 professionnels ESRP à l'usage raisonné de l'IA..."
               rows={3}
-              className="w-full border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-50 resize-none"
+              className="field w-full px-4 py-3 disabled:opacity-50 resize-none"
             />
           </div>
           <div>
-            <label className="font-bold text-black block mb-1">
+            <label className="font-bold text-ink block mb-1">
               Budget estimé
             </label>
             <input
@@ -242,7 +243,7 @@ export default function BonusDPage() {
               onChange={(e) => setBudget(e.target.value)}
               disabled={!!draftOutput}
               placeholder="Ex : 15 000 € sur 12 mois"
-              className="w-full border-2 border-black px-4 py-3 text-black focus:border-[#2D5A3D] focus:outline-none disabled:opacity-50"
+              className="field w-full px-4 py-3 disabled:opacity-50"
             />
           </div>
         </section>
@@ -253,7 +254,7 @@ export default function BonusDPage() {
             <button
               onClick={handleGenerate}
               disabled={!allFilled}
-              className="px-6 py-3 bg-[#2D5A3D] text-white font-semibold border-2 border-[#2D5A3D] text-xl disabled:opacity-50"
+              className="btn btn-primary px-6 py-3 text-xl disabled:opacity-50"
             >
               Générer le brouillon
             </button>
@@ -263,7 +264,7 @@ export default function BonusDPage() {
         {/* Output */}
         {(draftOutput || generating) && (
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-black mb-4">
+            <h2 className="text-2xl font-bold text-ink mb-4">
               Brouillon de dossier
             </h2>
             <StreamedOutput content={draftOutput} loading={generating} />
